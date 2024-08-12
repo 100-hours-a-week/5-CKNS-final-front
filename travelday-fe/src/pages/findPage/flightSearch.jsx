@@ -7,24 +7,33 @@ import switchIcon from '../../images/switch.png';
 const FlightSearch = () => {
   const [tripType, setTripType] = useState('round-trip');
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [searchType, setSearchType] = useState('');
 
   const handlePopupClose = () => {
     setIsPopupOpen(false);
   };
 
-  const handleButtonClick = () => {
+  const handleButtonClick = (type) => {
+    setSearchType(type);
     setIsPopupOpen(true);
   };
 
   return (
     <Container>
       <TripTypeSelector tripType={tripType} setTripType={setTripType} />
-      <ButtonContainer>
-        <Button onClick={handleButtonClick}>출발지</Button>
-        <SwitchIcon src={switchIcon} alt="Switch" />
-        <Button onClick={handleButtonClick}>도착지</Button>
-      </ButtonContainer>
-      <AnimatedPopup isOpen={isPopupOpen} onClose={handlePopupClose} />
+      <AreaSearchingContainer>
+        <ButtonContainer>
+          <Button onClick={() => handleButtonClick('departure')}>출발지</Button>
+          <SwitchIcon src={switchIcon} alt="Switch" />
+          <Button onClick={() => handleButtonClick('arrival')}>도착지</Button>
+        </ButtonContainer>
+      </AreaSearchingContainer>
+      <AnimatedPopup isOpen={isPopupOpen} onClose={handlePopupClose}>
+        <input 
+          type="text" 
+          placeholder={searchType === 'departure' ? "출발지를 검색하세요." : "도착지를 검색하세요."} 
+        />
+      </AnimatedPopup>
     </Container>
   );
 };
@@ -66,6 +75,14 @@ const Button = styled.button`
   outline: none;
 `;
 
+const AreaSearchingContainer = styled.div`
+  width: 390px;
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  justify-content: center;
+`;
+
 const SwitchIcon = styled.img`
   width: 24px;
   height: 24px;
@@ -89,6 +106,5 @@ const AnimatedPopup = styled(AreaPopup)`
     display: none;
   `}
 `;
-
 
 export default FlightSearch;

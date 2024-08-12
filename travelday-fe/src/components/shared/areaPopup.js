@@ -24,11 +24,11 @@ const AreaPopup = ({ isOpen, onClose, children }) => {
             <img src={backIcon} alt="뒤로가기" />
           </BackButton>
           <SearchBar>
-            <input type="text" placeholder="출발지를 검색하세요." />
+          {children}
           </SearchBar>
         </Header>
         <SearchResults>
-          {children}
+          {/* 검색 결과를 여기에 렌더링합니다 */}
         </SearchResults>
       </PopupContent>
     </PopupOverlay>
@@ -44,7 +44,7 @@ const PopupOverlay = styled.div`
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
-  align-items: flex-end; /* 팝업이 화면 하단에 위치 */
+  align-items: flex-end;
 `;
 
 const PopupContent = styled.div`
@@ -89,6 +89,7 @@ const SearchBar = styled.div`
     }
   }
 `;
+
 
 const SearchResults = styled.div`
   flex: 1;
