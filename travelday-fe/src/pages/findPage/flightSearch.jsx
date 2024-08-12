@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import TripTypeSelector from '../../components/findPage/tripType';
 import AreaPopup from '../../components/shared/areaPopup';
 import switchIcon from '../../images/switch.png';
@@ -12,22 +12,33 @@ const FlightSearch = () => {
     setIsPopupOpen(false);
   };
 
+  const handleButtonClick = () => {
+    setIsPopupOpen(true);
+  };
+
   return (
     <Container>
       <TripTypeSelector tripType={tripType} setTripType={setTripType} />
-      <Airportsearching>
-        <ButtonContainer>
-          <Button>도착지</Button>
-          <SwitchIcon src={switchIcon} alt="Switch" />
-          <Button>목적지</Button>
-        </ButtonContainer>
-      </Airportsearching>
-      <AreaPopup isOpen={isPopupOpen} onClose={handlePopupClose}>
-        <h3>공항 선택</h3>
-      </AreaPopup>
+      <ButtonContainer>
+        <Button onClick={handleButtonClick}>출발지</Button>
+        <SwitchIcon src={switchIcon} alt="Switch" />
+        <Button onClick={handleButtonClick}>도착지</Button>
+      </ButtonContainer>
+      <AnimatedPopup isOpen={isPopupOpen} onClose={handlePopupClose} />
     </Container>
   );
 };
+
+const slideUp = keyframes`
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+`;
 
 const Container = styled.div`
   display: flex;
@@ -35,34 +46,24 @@ const Container = styled.div`
   align-items: center;
 `;
 
-const Airportsearching =styled.div`
-  display: flex;
-  justify-content: center; /* 수평 가운데 정렬 */
-  align-items: center; /* 수직 가운데 정렬 */
-  background-color: #fff;
-  width: 390px;
-  height: 110px;
-`
-
 const ButtonContainer = styled.div`
   display: flex;
-  justify-content: center; /* 수평 가운데 정렬 */
-  align-items: center; /* 수직 가운데 정렬 */
+  justify-content: center;
+  align-items: center;
   width: 327px;
   height: 64px;
   background-color: #fff;
-  box-shadow: 0px 0px 10px rgba(149, 157, 177, 0.2); /* 수정된 그림자 */
-  border-radius: 8px; /* 모서리 둥글게 */
+  box-shadow: 0px 0px 10px rgba(149, 157, 177, 0.2);
+  border-radius: 8px;
 `;
-
 
 const Button = styled.button`
   padding: 8px 16px;
   margin: 0 40px;
   cursor: pointer;
   background-color: #fff;
-  border: none; /* 외곽선 제거 */
-  outline: none; /* 클릭 시 포커스 아웃라인 제거 */
+  border: none;
+  outline: none;
 `;
 
 const SwitchIcon = styled.img`
@@ -70,5 +71,24 @@ const SwitchIcon = styled.img`
   height: 24px;
   cursor: pointer;
 `;
+
+const AnimatedPopup = styled(AreaPopup)`
+  animation: ${slideUp} 0.3s ease-out;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  z-index: 1000;
+
+  ${(props) => !props.isOpen && `
+    display: none;
+  `}
+`;
+
 
 export default FlightSearch;
