@@ -6,7 +6,7 @@ import Title from '../../components/shared/title.js';
 import Toggle from '../../components/findPage/toggle.js';
 import FlightSearch from './flightSearch.jsx';
 
-const BookingPage = () => {
+const SearchingPage = () => {
   const [selectedOption, setSelectedOption] = useState('항공'); // 기본 선택을 '항공'으로 설정
 
   return (
@@ -26,7 +26,7 @@ const BookingPage = () => {
   );
 };
 
-export default BookingPage;
+export default SearchingPage;
 
 const Container = styled.div`
   display: flex;

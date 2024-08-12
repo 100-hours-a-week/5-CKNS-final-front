@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import FindPage from './pages/findPage/findPage'; // findPage 컴포넌트 가져오기
+import FindPage from './pages/findPage/searchingPage'; 
 
 import './App.css';
 
@@ -8,7 +8,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/find" element={<FindPage />} />
+        <Route path="/search" element={<FindPage />} />
       </Routes>
     </Router>
   );
