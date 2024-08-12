@@ -1,19 +1,12 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import TripTypeSelector from '../../components/findPage/tripType';
-import AirportSearchInput from '../../components/findPage/airportSearch';
 import AreaPopup from '../../components/shared/areaPopup';
 import switchIcon from '../../images/switch.png';
 
 const FlightSearch = () => {
   const [tripType, setTripType] = useState('round-trip');
-  const [departure, setDeparture] = useState('');
-  const [destination, setDestination] = useState('');
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-
-  const handleInputClick = () => {
-    setIsPopupOpen(true);
-  };
 
   const handlePopupClose = () => {
     setIsPopupOpen(false);
