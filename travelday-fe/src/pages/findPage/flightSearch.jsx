@@ -3,6 +3,7 @@ import styled, { keyframes } from 'styled-components';
 import TripTypeSelector from '../../components/findPage/tripType';
 import AreaPopup from '../../components/shared/areaPopup';
 import switchIcon from '../../images/switch.png';
+import FlightList from '../../components/findPage/flightlist';
 
 const FlightSearch = () => {
   const [tripType, setTripType] = useState('round-trip');
@@ -17,6 +18,13 @@ const FlightSearch = () => {
     setSearchType(type);
     setIsPopupOpen(true);
   };
+
+  // 예시 항공편 데이터
+  const flights = [
+    { image: '', country: '미국', city: 'New York', schedule: '2024. 11. 16 - 11.18', price: '623,000원' },
+    { image: '', country: '프랑스', city: 'Paris', schedule: '2024. 9. 12 - 9.18', price: '1,092,000원' },
+    { image: '', country: '일본', city: 'Tokyo', schedule: '2024. 8. 23 - 8.30', price: '340,000원' },
+  ];  
 
   return (
     <Container>
@@ -34,6 +42,7 @@ const FlightSearch = () => {
           placeholder={searchType === 'departure' ? "출발지를 검색하세요." : "도착지를 검색하세요."} 
         />
       </AnimatedPopup>
+      <FlightList flights={flights} />  
     </Container>
   );
 };

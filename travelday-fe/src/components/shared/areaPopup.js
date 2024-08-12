@@ -28,7 +28,7 @@ const AreaPopup = ({ isOpen, onClose, children }) => {
           </SearchBar>
         </Header>
         <SearchResults>
-          {/* 검색 결과를 여기에 렌더링합니다 */}
+          {/*검색결과자리*/}
         </SearchResults>
       </PopupContent>
     </PopupOverlay>
