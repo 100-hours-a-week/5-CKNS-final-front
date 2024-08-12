@@ -54,7 +54,7 @@ const FlightImage = styled.div`
 `;
 
 const FlightDetails = styled.div`
-  width: 350px;
+  width: 340px;
   display: flex;
   flex-direction: column;
   gap: 5px;
@@ -62,24 +62,22 @@ const FlightDetails = styled.div`
 `;
 
 const Country = styled.div`
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 12px;
 `;
 
 const City = styled.div`
-  font-size: 14px;
-  color: #555;
+  font-size: 15px;
+  font-weight: bold;
 `;
 
 const Schedule = styled.div`
-  font-size: 14px;
-  color: #333;
+  font-size: 12px;
 `;
 
 const Price = styled.div`
-  font-size: 16px;
+  font-size: 12px;
   color: #007BFF;
-  font-weight: bold;
+
 `;
 
 export default FlightList;

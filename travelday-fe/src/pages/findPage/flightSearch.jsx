@@ -24,7 +24,8 @@ const FlightSearch = () => {
     { image: '', country: '미국', city: 'New York', schedule: '2024. 11. 16 - 11.18', price: '623,000원' },
     { image: '', country: '프랑스', city: 'Paris', schedule: '2024. 9. 12 - 9.18', price: '1,092,000원' },
     { image: '', country: '일본', city: 'Tokyo', schedule: '2024. 8. 23 - 8.30', price: '340,000원' },
-  ];  
+  ];
+  
 
   return (
     <Container>
@@ -71,8 +72,9 @@ const ButtonContainer = styled.div`
   width: 327px;
   height: 64px;
   background-color: #fff;
-  box-shadow: 0px 0px 10px rgba(149, 157, 177, 0.2);
+  box-shadow: 0px 0px 10px rgba(149, 157, 177, 0.3);
   border-radius: 8px;
+  margin-bottom:10px;
 `;
 
 const Button = styled.button`
