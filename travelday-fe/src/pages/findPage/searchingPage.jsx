@@ -5,9 +5,10 @@ import BottomNav from '../../components/shared/bottomNav.js';
 import Title from '../../components/shared/title.js';
 import Toggle from '../../components/findPage/toggle.js';
 import FlightSearch from './flightSearch.jsx';
+import HotelSearch from './hotelSearch.jsx';
 
 const SearchingPage = () => {
-  const [selectedOption, setSelectedOption] = useState('항공'); // 기본 선택을 '항공'으로 설정
+  const [selectedOption, setSelectedOption] = useState('항공'); 
 
   return (
     <Container>
@@ -20,7 +21,8 @@ const SearchingPage = () => {
           onOptionClick={setSelectedOption}
         />
       </Content>
-      <FlightSearch />
+      {selectedOption === '항공' && <FlightSearch />}
+      {selectedOption === '호텔' && <HotelSearch />}
       <BottomNav />
     </Container>
   );
@@ -45,4 +47,3 @@ const Content = styled.div`
   box-sizing: border-box;
   text-align: center;
 `;
-

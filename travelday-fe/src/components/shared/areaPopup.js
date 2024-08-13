@@ -13,7 +13,7 @@ const slideUp = keyframes`
   }
 `;
 
-const AreaPopup = ({ isOpen, onClose, children }) => {
+const AreaPopup = ({ isOpen, onClose, children, searchResults = [] }) => {
   if (!isOpen) return null;
 
   return (
@@ -24,12 +24,21 @@ const AreaPopup = ({ isOpen, onClose, children }) => {
             <img src={backIcon} alt="뒤로가기" />
           </BackButton>
           <SearchBar>
-          {children}
+            {children}
           </SearchBar>
         </Header>
-        <SearchResults>
-          {/*검색결과자리*/}
-        </SearchResults>
+        <Divider />
+        {searchResults.length > 0 && (
+          <>
+            <SearchResultsTitle>검색결과</SearchResultsTitle>
+            <SearchResults>
+              {/* 검색결과*/}
+              {searchResults.map((result, index) => (
+                <div key={index}>{result}</div>
+              ))}
+            </SearchResults>
+          </>
+        )}
       </PopupContent>
     </PopupOverlay>
   );
@@ -85,16 +94,31 @@ const SearchBar = styled.div`
     font-size: 20px;
 
     &:focus {
-      outline: none; /* 포커스 시 아웃라인 제거 */
+      outline: none;
     }
   }
 `;
 
+const Divider = styled.div`
+  width: 100%;
+  height: 1px;
+  background-color: #ccc;
+  margin-top: -10px;
+  margin-bottom: 10px;
+`;
+
+const SearchResultsTitle = styled.div`
+  width: 100%;
+  text-align: left;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+`;
 
 const SearchResults = styled.div`
   flex: 1;
   overflow-y: auto;
-  margin-top: 20px;
 `;
 
 export default AreaPopup;
