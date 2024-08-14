@@ -14,7 +14,7 @@ const slideUp = keyframes`
   }
 `;
 
-const AreaPopup = ({ isOpen, onClose, children, searchResults = [] }) => {
+const AreaPopup = ({ isOpen, onClose, children, searchResults = [], onResultClick }) => {
   if (!isOpen) return null;
 
   return (
@@ -33,9 +33,8 @@ const AreaPopup = ({ isOpen, onClose, children, searchResults = [] }) => {
           <>
             <SearchResultsTitle>검색결과</SearchResultsTitle>
             <SearchResults>
-              {/* 검색결과 */}
               {searchResults.map((result, index) => (
-                <SearchResultItem key={index}>
+                <SearchResultItem key={index} onClick={() => onResultClick(result)}>
                   <img src={arrowIcon} alt="화살표" />
                   {result}
                 </SearchResultItem>
@@ -131,6 +130,7 @@ const SearchResultItem = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 10px;
+  cursor: pointer;
 
   img {
     margin-left: 10px;

@@ -42,6 +42,19 @@ const FlightSearch = () => {
     }
   };
 
+  const handleResultClick = (result) => {
+    if (searchType === 'departure') {
+      // 출발지 선택 후 도착지 팝업 열기
+      handlePopupClose();
+      setTimeout(() => {
+        handleButtonClick('arrival');
+      }, 300); // 팝업 애니메이션 시간을 고려해 300ms 딜레이 추가
+    } else {
+      // 도착지 선택 후 추가 동작을 여기에 추가할 수 있습니다.
+      handlePopupClose();
+    }
+  };
+
   // 예시 항공편 데이터
   const flights = [
     { image: '', country: '미국', city: 'New York', schedule: '2024. 11. 16 - 11.18', price: '623,000원' },
@@ -62,14 +75,15 @@ const FlightSearch = () => {
       <AnimatedPopup 
         isOpen={isPopupOpen} 
         onClose={handlePopupClose} 
-        searchResults={filteredResults} // 필터링된 결과 전달
+        searchResults={filteredResults}
+        onResultClick={handleResultClick} // 검색 결과 클릭 시 처리
       >
         <input 
           type="text" 
           placeholder={searchType === 'departure' ? "출발지를 검색하세요." : "도착지를 검색하세요."} 
           value={searchInput}
-          onChange={handleSearchInputChange} // 검색어 변경 처리
-          onKeyDown={handleKeyDown} // 엔터키를 눌렀을 때 검색 실행
+          onChange={handleSearchInputChange} 
+          onKeyDown={handleKeyDown} // 엔터 치면 검색
         />
       </AnimatedPopup>
       <FlightList flights={flights} />  
@@ -84,7 +98,7 @@ const slideUp = keyframes`
   }
   to {
     transform: translateY(0);
-    opacity: 1;
+    opacity: 1);
   }
 `;
 
@@ -103,7 +117,7 @@ const ButtonContainer = styled.div`
   background-color: #fff;
   box-shadow: 0px 0px 10px rgba(149, 157, 177, 0.3);
   border-radius: 8px;
-  margin-bottom:10px;
+  margin-bottom: 10px;
 `;
 
 const Button = styled.button`
@@ -141,7 +155,7 @@ const AnimatedPopup = styled(AreaPopup)`
   box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.1);
   padding: 20px;
   z-index: 1000;
-  overflow-y: hidden; /* 스크롤 숨기기 */
+  overflow-y: hidden;
 
   ${(props) => !props.isOpen && `
     display: none;
