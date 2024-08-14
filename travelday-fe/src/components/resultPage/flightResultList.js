@@ -2,7 +2,7 @@ import React from "react";
 import styled from 'styled-components';
 
 const FlightResultList = () => {
-  // 예시 데이터
+  // 데이터 들어오는 형식 반영
   const flights = [
     {
       airline: '아시아나항공',

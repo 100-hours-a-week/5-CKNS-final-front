@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import backIcon from '../../images/header/back.png';
+import arrowIcon from '../../images/arrow.png'; // 화살표 이미지 경로
 
 const slideUp = keyframes`
   from {
@@ -32,9 +33,12 @@ const AreaPopup = ({ isOpen, onClose, children, searchResults = [] }) => {
           <>
             <SearchResultsTitle>검색결과</SearchResultsTitle>
             <SearchResults>
-              {/* 검색결과*/}
+              {/* 검색결과 */}
               {searchResults.map((result, index) => (
-                <div key={index}>{result}</div>
+                <SearchResultItem key={index}>
+                  <img src={arrowIcon} alt="화살표" />
+                  {result}
+                </SearchResultItem>
               ))}
             </SearchResults>
           </>
@@ -58,7 +62,7 @@ const PopupOverlay = styled.div`
 
 const PopupContent = styled.div`
   width: 350px;
-  height: 863px;
+  height: 80%; /* 높이를 화면의 80%로 설정 */
   background-color: #fff;
   padding: 20px;
   border-radius: 8px 8px 0 0;
@@ -118,7 +122,22 @@ const SearchResultsTitle = styled.div`
 
 const SearchResults = styled.div`
   flex: 1;
-  overflow-y: auto;
+  margin-top: 20px;
+  font-size: 20px;
+  overflow-y: auto; 
+`;
+
+const SearchResultItem = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+
+  img {
+    margin-left: 10px;
+    margin-right: 21px;
+    width: 16px; /* 화살표 이미지 크기 */
+    height: 16px;
+  }
 `;
 
 export default AreaPopup;

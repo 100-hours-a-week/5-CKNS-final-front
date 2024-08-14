@@ -9,14 +9,37 @@ const FlightSearch = () => {
   const [tripType, setTripType] = useState('round-trip');
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [searchType, setSearchType] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  const [filteredResults, setFilteredResults] = useState([]);
+
+  const departureLocations = ['서울', '부산', '인천', '대구'];
+  const arrivalLocations = ['뉴욕', '파리', '도쿄', '런던'];
 
   const handlePopupClose = () => {
     setIsPopupOpen(false);
+    setSearchInput('');
+    setFilteredResults([]);
   };
 
   const handleButtonClick = (type) => {
     setSearchType(type);
     setIsPopupOpen(true);
+  };
+
+  const handleSearchInputChange = (event) => {
+    setSearchInput(event.target.value);
+  };
+
+  const handleSearch = () => {
+    const dataToFilter = searchType === 'departure' ? departureLocations : arrivalLocations;
+    const results = dataToFilter.filter(location => location.includes(searchInput));
+    setFilteredResults(results.length > 0 ? results : ['검색결과가 없습니다.']);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      handleSearch();
+    }
   };
 
   // 예시 항공편 데이터
@@ -25,7 +48,6 @@ const FlightSearch = () => {
     { image: '', country: '프랑스', city: 'Paris', schedule: '2024. 9. 12 - 9.18', price: '1,092,000원' },
     { image: '', country: '일본', city: 'Tokyo', schedule: '2024. 8. 23 - 8.30', price: '340,000원' },
   ];
-  
 
   return (
     <Container>
@@ -37,10 +59,17 @@ const FlightSearch = () => {
           <Button onClick={() => handleButtonClick('arrival')}>도착지</Button>
         </ButtonContainer>
       </AreaSearchingContainer>
-      <AnimatedPopup isOpen={isPopupOpen} onClose={handlePopupClose}>
+      <AnimatedPopup 
+        isOpen={isPopupOpen} 
+        onClose={handlePopupClose} 
+        searchResults={filteredResults} // 필터링된 결과 전달
+      >
         <input 
           type="text" 
           placeholder={searchType === 'departure' ? "출발지를 검색하세요." : "도착지를 검색하세요."} 
+          value={searchInput}
+          onChange={handleSearchInputChange} // 검색어 변경 처리
+          onKeyDown={handleKeyDown} // 엔터키를 눌렀을 때 검색 실행
         />
       </AnimatedPopup>
       <FlightList flights={flights} />  
@@ -105,13 +134,14 @@ const AnimatedPopup = styled(AreaPopup)`
   position: fixed;
   bottom: 0;
   left: 0;
-  right: 0;ㄴ
+  right: 0;
   background-color: #fff;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
   box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.1);
   padding: 20px;
   z-index: 1000;
+  overflow-y: hidden; /* 스크롤 숨기기 */
 
   ${(props) => !props.isOpen && `
     display: none;
