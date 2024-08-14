@@ -1,7 +1,7 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import backIcon from '../../images/header/back.png';
-import arrowIcon from '../../images/arrow.png'; // 화살표 이미지 경로
+import arrowIcon from '../../images/arrow.png'; 
 
 const slideUp = keyframes`
   from {

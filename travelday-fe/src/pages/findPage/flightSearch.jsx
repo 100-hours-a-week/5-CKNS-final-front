@@ -1,16 +1,22 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // react-router-dom을 통해 페이지 이동
 import styled, { keyframes } from 'styled-components';
 import TripTypeSelector from '../../components/findPage/tripType';
 import AreaPopup from '../../components/shared/areaPopup';
+import DateRangePopup from '../../components/shared/datePopup'; // DateRangePopup 추가
 import switchIcon from '../../images/switch.png';
 import FlightList from '../../components/findPage/flightList';
 
 const FlightSearch = () => {
   const [tripType, setTripType] = useState('round-trip');
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isDatePopupOpen, setIsDatePopupOpen] = useState(false); // DateRangePopup 상태 추가
   const [searchType, setSearchType] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [filteredResults, setFilteredResults] = useState([]);
+  const [selectedDates, setSelectedDates] = useState([]); // 선택된 날짜 저장
+
+  const navigate = useNavigate(); // 페이지 이동을 위한 useNavigate 훅
 
   const departureLocations = ['서울', '부산', '인천', '대구'];
   const arrivalLocations = ['뉴욕', '파리', '도쿄', '런던'];
@@ -44,15 +50,30 @@ const FlightSearch = () => {
 
   const handleResultClick = (result) => {
     if (searchType === 'departure') {
-      // 출발지 선택 후 도착지 팝업 열기
       handlePopupClose();
       setTimeout(() => {
         handleButtonClick('arrival');
-      }, 300); // 팝업 애니메이션 시간을 고려해 300ms 딜레이 추가
+      }, 300);
     } else {
-      // 도착지 선택 후 추가 동작을 여기에 추가할 수 있습니다.
       handlePopupClose();
+      setTimeout(() => {
+        setIsDatePopupOpen(true); // 도착지 선택 후 날짜 선택 팝업 열기
+      }, 300);
     }
+  };
+
+  const handleDateSelect = (range) => {
+    setSelectedDates(range); // 선택된 날짜 저장
+  };
+
+  const handleSearchClick = () => {
+    // 검색 버튼 클릭 시 검색 결과 페이지로 이동
+    navigate('/search-results', { state: { selectedDates } });
+  };
+
+  const handleDatePopupClose = () => {
+    setIsDatePopupOpen(false);
+    setSelectedDates([]);
   };
 
   // 예시 항공편 데이터
@@ -86,6 +107,15 @@ const FlightSearch = () => {
           onKeyDown={handleKeyDown} // 엔터 치면 검색
         />
       </AnimatedPopup>
+      <DateRangePopup 
+        isOpen={isDatePopupOpen} 
+        onClose={handleDatePopupClose}
+        onDateRangeChange={handleDateSelect}
+        onSearchClick={handleSearchClick} // 검색 버튼 클릭 시 페이지 이동
+        toggleLabel="가는날 - 오는날"
+        buttonText="검색"
+        dateRange={selectedDates} // 초기 선택된 날짜 전달
+      />
       <FlightList flights={flights} />  
     </Container>
   );
