@@ -1,19 +1,16 @@
 import React, { useEffect, useState } from "react";
 import styled from 'styled-components';
-import { useLocation } from 'react-router-dom'; 
 import ResultHeader from '../../../components/shared/resultHeader.js';
 import BottomNav from '../../../components/shared/bottomNav.js';
 import FlightResultList from '../../../components/resultPage/flightResultList';
 import DateRangePopup from '../../../components/shared/datePopup.js';
-
-// 아이콘 이미지 경로
 import calendarIcon from '../../../images/filter/calendar.png';
 import humanIcon from '../../../images/filter/human.png';
 import filterIcon from '../../../images/filter/filter.png';
+import useFlightStore from '../../../store/store.js'; //
 
 const FlightResultPage = () => {
-  const location = useLocation(); 
-  const { departure, arrival, dates } = location.state || {}; 
+  const { departure, arrival, dates } = useFlightStore();
 
   // 팝업 상태 관리
   const [isDatePopupOpen, setIsDatePopupOpen] = useState(false);
@@ -40,13 +37,13 @@ const FlightResultPage = () => {
 
   const handleDateRangeChange = (selectedDates) => {
     console.log("선택된 날짜:", selectedDates);
-    // 여기서 선택된 날짜를 처리할 수 있습니다.
+    // Zustand를 사용해 선택된 날짜를 업데이트할 수 있습니다.
+    useFlightStore.setState({ dates: selectedDates });
   };
  
   return (
     <PageContainer>
-      <ResultHeader showBackButton={true} result="항공권 검색 결과" />
-      
+     <ResultHeader showBackButton={true} result="항공권 검색 결과" />
       <FilterContainer>
         <FilterButton onClick={handleDateClick}>
           <Icon src={calendarIcon} alt="날짜 아이콘" /> 날짜

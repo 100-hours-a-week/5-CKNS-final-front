@@ -6,6 +6,7 @@ import AreaPopup from '../../components/shared/areaPopup';
 import DateRangePopup from '../../components/shared/datePopup'; 
 import switchIcon from '../../images/switch.png';
 import FlightList from '../../components/findPage/flightList';
+import useFlightStore from '../../store/store'; // Zustand 스토어 가져오기
 
 const FlightSearch = () => {
   const [tripType, setTripType] = useState('round-trip');
@@ -14,29 +15,33 @@ const FlightSearch = () => {
   const [searchType, setSearchType] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [filteredResults, setFilteredResults] = useState([]);
-  const [selectedDeparture, setSelectedDeparture] = useState(''); 
-  const [selectedArrival, setSelectedArrival] = useState('');    
-  const [selectedDates, setSelectedDates] = useState([]); 
+
+  const {
+    departure,
+    arrival,
+    dates,
+    setDeparture,
+    setArrival,
+    setDates,
+  } = useFlightStore();
 
   const navigate = useNavigate();
 
   const departureLocations = ['서울', '부산', '인천', '대구'];
   const arrivalLocations = ['뉴욕', '파리', '도쿄', '런던'];
 
-  // 출발지 선택 시 로그 출력
+  // 로그 출력
   useEffect(() => {
-    console.log("Selected Departure:", selectedDeparture);
-  }, [selectedDeparture]);
+    console.log("Selected Departure:", departure);
+  }, [departure]);
 
-  // 도착지 선택 시 로그 출력
   useEffect(() => {
-    console.log("Selected Arrival:", selectedArrival);
-  }, [selectedArrival]);
+    console.log("Selected Arrival:", arrival);
+  }, [arrival]);
 
-  // 날짜 선택 시 로그 출력
   useEffect(() => {
-    console.log("Selected Dates:", selectedDates);
-  }, [selectedDates]);
+    console.log("Selected Dates:", dates);
+  }, [dates]);
 
   const handlePopupClose = () => {
     setIsPopupOpen(false);
@@ -67,13 +72,13 @@ const FlightSearch = () => {
 
   const handleResultClick = (result) => {
     if (searchType === 'departure') {
-      setSelectedDeparture(result); 
+      setDeparture(result); // Zustand 스토어에 출발지 저장
       handlePopupClose();
       setTimeout(() => {
         handleButtonClick('arrival');
       }, 300);
     } else {
-      setSelectedArrival(result); 
+      setArrival(result); // Zustand 스토ore에 도착지 저장
       handlePopupClose();
       setTimeout(() => {
         setIsDatePopupOpen(true);
@@ -82,26 +87,20 @@ const FlightSearch = () => {
   };
 
   const handleDateSelect = (range) => {
-    setSelectedDates(range); 
+    setDates(range); // Zustand 스토어에 날짜 저장
   };
 
   const handleSearchClick = () => {
-    console.log("출발지:", selectedDeparture);
-    console.log("도착지:", selectedArrival);
-    console.log("선택된 날짜:", selectedDates);
+    console.log("출발지:", departure);
+    console.log("도착지:", arrival);
+    console.log("선택된 날짜:", dates);
 
-    navigate('/flight', { 
-      state: { 
-        departure: selectedDeparture,
-        arrival: selectedArrival,    
-        dates: selectedDates         
-      } 
-    });
+    navigate('/flight');
   };
 
   const handleDatePopupClose = () => {
     setIsDatePopupOpen(false);
-    setSelectedDates([]);
+    setDates([]);
   };
 
   // 예시 항공편 데이터
@@ -142,7 +141,7 @@ const FlightSearch = () => {
         onSearchClick={handleSearchClick} 
         toggleLabel="가는날 - 오는날"
         buttonText="검색"
-        dateRange={selectedDates} 
+        dateRange={dates} 
       />
       <FlightList flights={flights} />  
     </Container>
@@ -150,6 +149,9 @@ const FlightSearch = () => {
 };
 
 export default FlightSearch;
+
+// Styled Components remain the same
+
 
 
 const slideUp = keyframes`

@@ -57,5 +57,4 @@ const BackButton = styled.img`
   width: 24px;
   height: 24px;
   cursor: pointer;
-  display: ${(props) => (props.show ? 'inline' : 'none')};
 `;
