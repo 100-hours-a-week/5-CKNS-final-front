@@ -6,67 +6,94 @@ const FlightResultList = () => {
   const flights = [
     {
       airline: '아시아나항공',
-      departureTime: '10:00',
-      departureAirport: 'ICN',
-      arrivalTime: '16:00',
-      arrivalAirport: 'LAX',
-      duration: '10시간 0분',
-      stops: 1,  // 경유
       segments: [
         {
-          segmentDepartureTime: '10:00',
-          segmentDepartureAirport: 'ICN',
-          segmentArrivalTime: '12:00',
-          segmentArrivalAirport: 'NRT',
-          segmentDuration: '2시간 0분',
+          departure: {
+            iataCode: 'ICN',
+            at: '10:00',
+          },
+          arrival: {
+            iataCode: 'NRT',
+            at: '12:00',
+          },
+          duration: '2시간 0분',
         },
         {
-          segmentDepartureTime: '14:00',
-          segmentDepartureAirport: 'NRT',
-          segmentArrivalTime: '16:00',
-          segmentArrivalAirport: 'LAX',
-          segmentDuration: '10시간 0분',
+          departure: {
+            iataCode: 'NRT',
+            at: '14:00',
+          },
+          arrival: {
+            iataCode: 'LAX',
+            at: '16:00',
+          },
+          duration: '10시간 0분',
         },
       ],
-      returnDepartureTime: '18:00',
-      returnDepartureAirport: 'LAX',
-      returnArrivalTime: '22:00',
-      returnArrivalAirport: 'ICN',
-      returnDuration: '11시간 0분',
-      returnStops: 0,
-      price: '850,000원'
+      returnSegments: [
+        {
+          departure: {
+            iataCode: 'LAX',
+            at: '18:00',
+          },
+          arrival: {
+            iataCode: 'ICN',
+            at: '22:00',
+          },
+          duration: '11시간 0분',
+        }
+      ],
+      price: '850,000원',
     },
     {
       airline: '제주항공',
-      departureTime: '12:30',
-      departureAirport: 'INC',
-      arrivalTime: '14:30',
-      arrivalAirport: 'KIX', 
-      duration: '2시간 0분',
-      stops: 0,
-      returnDepartureTime: '16:30',
-      returnDepartureAirport: 'KIX',
-      returnArrivalTime: '18:30',
-      returnArrivalAirport: 'INC',
-      returnDuration: '2시간 0분',
-      returnStops: 0,
-      price: '130,000원'
-    }
+      segments: [
+        {
+          departure: {
+            iataCode: 'INC',
+            at: '12:30',
+          },
+          arrival: {
+            iataCode: 'KIX',
+            at: '14:30',
+          },
+          duration: '2시간 0분',
+        },
+      ],
+      returnSegments: [
+        {
+          departure: {
+            iataCode: 'KIX',
+            at: '16:30',
+          },
+          arrival: {
+            iataCode: 'INC',
+            at: '18:30',
+          },
+          duration: '2시간 0분',
+        }
+      ],
+      price: '130,000원',
+    },
   ];
 
-  const renderFlightDetails = (departureTime, departureAirport, arrivalTime, arrivalAirport) => (
+  const formatDuration = (duration) => {
+    return duration.replace(/ 0분$/, '');
+  };
+
+  const renderFlightDetails = (departure, arrival) => (
     <FlightDetails>
-      <TimeBold>{departureTime}</TimeBold>
-      <Time>({departureAirport})</Time>
+      <TimeBold>{departure.at}</TimeBold>
+      <Time>({departure.iataCode})</Time>
       <Separator>·------------·</Separator>
-      <TimeBold>{arrivalTime}</TimeBold>
-      <Time>({arrivalAirport})</Time>
+      <TimeBold>{arrival.at}</TimeBold>
+      <Time>({arrival.iataCode})</Time>
     </FlightDetails>
   );
 
   const renderFlightInfo = (duration, stops) => (
     <FlightInfo>
-      <InfoItem>{duration} 소요, {stops > 0 ? `경유 ${stops}회` : '직항'}</InfoItem>
+      <InfoItem>{formatDuration(duration)} 소요, {stops > 0 ? `경유 ${stops}회` : '직항'}</InfoItem>
     </FlightInfo>
   );
 
@@ -77,23 +104,20 @@ const FlightResultList = () => {
           <Airline>{flight.airline}</Airline>
 
           <RouteLabel>가는편</RouteLabel>
-          {flight.stops > 0 ? (
-            flight.segments.map((segment, segIndex) => (
-              <FlightSegment key={segIndex}>
-                {renderFlightDetails(segment.segmentDepartureTime, segment.segmentDepartureAirport, segment.segmentArrivalTime, segment.segmentArrivalAirport)}
-                {segIndex === flight.segments.length - 1 && renderFlightInfo(segment.segmentDuration, flight.stops)}
-              </FlightSegment>
-            ))
-          ) : (
-            <>
-              {renderFlightDetails(flight.departureTime, flight.departureAirport, flight.arrivalTime, flight.arrivalAirport)}
-              {renderFlightInfo(flight.duration, flight.stops)}
-            </>
-          )}
+          {flight.segments.map((segment, segIndex) => (
+            <FlightSegment key={segIndex}>
+              {renderFlightDetails(segment.departure, segment.arrival)}
+              {segIndex === flight.segments.length - 1 && renderFlightInfo(formatDuration(segment.duration), flight.segments.length - 1)}
+            </FlightSegment>
+          ))}
 
           <RouteLabel>오는편</RouteLabel>
-          {renderFlightDetails(flight.returnDepartureTime, flight.returnDepartureAirport, flight.returnArrivalTime, flight.returnArrivalAirport)}
-          {renderFlightInfo(flight.returnDuration, flight.returnStops)}
+          {flight.returnSegments.map((segment, segIndex) => (
+            <FlightSegment key={segIndex}>
+              {renderFlightDetails(segment.departure, segment.arrival)}
+              {segIndex === flight.returnSegments.length - 1 && renderFlightInfo(formatDuration(segment.duration), flight.returnSegments.length - 1)}
+            </FlightSegment>
+          ))}
 
           <HorizontalLine />
           <Price>{flight.price}</Price>
@@ -137,15 +161,14 @@ const Airline = styled.div`
   font-size: 13px;
   color: #000;
   width: 290px;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin-top: 10px;
 `;
 
 const RouteLabel = styled.div`
   font-size: 14px;
   font-weight: bold;
   color: #007bff;
-  margin-top: 25px;
+  margin-top: 15px;
   width: 290px;
 `;
 
