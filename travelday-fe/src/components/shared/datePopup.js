@@ -20,15 +20,16 @@ const DateRangePopup = ({
 }) => {
   const [startDate, setStartDate] = useState(null); 
   const [endDate, setEndDate] = useState(null);
-  const [isStartDateSelected, setIsStartDateSelected] = useState(true); 
+  const [isStartDateSelected, setIsStartDateSelected] = useState(true);
 
   useEffect(() => {
+    // 가는날, 오는날의 강조 상태를 설정
     if (!startDate) {
-      setIsStartDateSelected(true); // 아무것도 선택하지 않았을 때 가는날 강조
+      setIsStartDateSelected(true);  // 아무것도 선택하지 않았을 때 가는날 강조
     } else if (startDate && !endDate) {
       setIsStartDateSelected(false); // 가는날을 선택하면 오는날 강조
-    } else {
-      setIsStartDateSelected(true); // 둘 다 선택되면 가는날과 오는날 모두 강조
+    } else if (startDate && endDate) {
+      setIsStartDateSelected(true);  // 둘 다 선택되면 가는날과 오는날 모두 강조
     }
   }, [startDate, endDate]);
 
@@ -54,6 +55,7 @@ const DateRangePopup = ({
       setIsStartDateSelected(false);
     } else {
       setEndDate(date);
+      setIsStartDateSelected(true);
     }
 
     if (onDateRangeChange) {
@@ -61,7 +63,24 @@ const DateRangePopup = ({
     }
   };
 
-  const renderCalendar = (currentMonth) => {
+  const renderCalendar = (monthsToShow = 12) => {
+    const currentMonth = new Date();
+    const calendars = [];
+
+    for (let i = 0; i < monthsToShow; i++) {
+      const month = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + i, 1);
+      calendars.push(
+        <MonthContainer key={i}>
+          <MonthLabel>{month.toLocaleString('default', { month: 'long', year: 'numeric' })}</MonthLabel>
+          {renderMonthCalendar(month)}
+        </MonthContainer>
+      );
+    }
+
+    return <CalendarGrid>{calendars}</CalendarGrid>;
+  };
+
+  const renderMonthCalendar = (currentMonth) => {
     const startDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay();
     const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
     const weeks = [];
@@ -104,10 +123,8 @@ const DateRangePopup = ({
       weeks.push(<Week key="last-week">{days}</Week>);
     }
 
-    return <CalendarGrid>{weeks}</CalendarGrid>;
+    return <>{weeks}</>;
   };
-
-  const currentMonth = new Date();
 
   if (!isOpen) return null;
 
@@ -125,7 +142,7 @@ const DateRangePopup = ({
         </Header>
         <Divider />
         <CalendarContainer>
-          {renderCalendar(currentMonth)}
+          {renderCalendar(12)} {/* 12개월 표시 */}
         </CalendarContainer>
       </PopupContent>
     </PopupOverlay>
@@ -197,12 +214,22 @@ const Divider = styled.div`
 const CalendarContainer = styled.div`
   flex: 1;
   overflow-y: auto;
-  margin-bottom: 20px;
 `;
 
 const CalendarGrid = styled.div`
   display: flex;
   flex-direction: column;
+`;
+
+const MonthContainer = styled.div`
+  margin-bottom: 20px;
+`;
+
+const MonthLabel = styled.div`
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
 `;
 
 const Week = styled.div`
