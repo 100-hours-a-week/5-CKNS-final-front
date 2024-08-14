@@ -1,25 +1,42 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // react-router-dom을 통해 페이지 이동
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; 
 import styled, { keyframes } from 'styled-components';
 import TripTypeSelector from '../../components/findPage/tripType';
 import AreaPopup from '../../components/shared/areaPopup';
-import DateRangePopup from '../../components/shared/datePopup'; // DateRangePopup 추가
+import DateRangePopup from '../../components/shared/datePopup'; 
 import switchIcon from '../../images/switch.png';
 import FlightList from '../../components/findPage/flightList';
 
 const FlightSearch = () => {
   const [tripType, setTripType] = useState('round-trip');
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [isDatePopupOpen, setIsDatePopupOpen] = useState(false); // DateRangePopup 상태 추가
+  const [isDatePopupOpen, setIsDatePopupOpen] = useState(false);
   const [searchType, setSearchType] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [filteredResults, setFilteredResults] = useState([]);
-  const [selectedDates, setSelectedDates] = useState([]); // 선택된 날짜 저장
+  const [selectedDeparture, setSelectedDeparture] = useState(''); 
+  const [selectedArrival, setSelectedArrival] = useState('');    
+  const [selectedDates, setSelectedDates] = useState([]); 
 
-  const navigate = useNavigate(); // 페이지 이동을 위한 useNavigate 훅
+  const navigate = useNavigate();
 
   const departureLocations = ['서울', '부산', '인천', '대구'];
   const arrivalLocations = ['뉴욕', '파리', '도쿄', '런던'];
+
+  // 출발지 선택 시 로그 출력
+  useEffect(() => {
+    console.log("Selected Departure:", selectedDeparture);
+  }, [selectedDeparture]);
+
+  // 도착지 선택 시 로그 출력
+  useEffect(() => {
+    console.log("Selected Arrival:", selectedArrival);
+  }, [selectedArrival]);
+
+  // 날짜 선택 시 로그 출력
+  useEffect(() => {
+    console.log("Selected Dates:", selectedDates);
+  }, [selectedDates]);
 
   const handlePopupClose = () => {
     setIsPopupOpen(false);
@@ -50,25 +67,36 @@ const FlightSearch = () => {
 
   const handleResultClick = (result) => {
     if (searchType === 'departure') {
+      setSelectedDeparture(result); 
       handlePopupClose();
       setTimeout(() => {
         handleButtonClick('arrival');
       }, 300);
     } else {
+      setSelectedArrival(result); 
       handlePopupClose();
       setTimeout(() => {
-        setIsDatePopupOpen(true); // 도착지 선택 후 날짜 선택 팝업 열기
+        setIsDatePopupOpen(true);
       }, 300);
     }
   };
 
   const handleDateSelect = (range) => {
-    setSelectedDates(range); // 선택된 날짜 저장
+    setSelectedDates(range); 
   };
 
   const handleSearchClick = () => {
-    // 검색 버튼 클릭 시 검색 결과 페이지로 이동
-    navigate('/search-results', { state: { selectedDates } });
+    console.log("출발지:", selectedDeparture);
+    console.log("도착지:", selectedArrival);
+    console.log("선택된 날짜:", selectedDates);
+
+    navigate('/flight', { 
+      state: { 
+        departure: selectedDeparture,
+        arrival: selectedArrival,    
+        dates: selectedDates         
+      } 
+    });
   };
 
   const handleDatePopupClose = () => {
@@ -97,29 +125,32 @@ const FlightSearch = () => {
         isOpen={isPopupOpen} 
         onClose={handlePopupClose} 
         searchResults={filteredResults}
-        onResultClick={handleResultClick} // 검색 결과 클릭 시 처리
+        onResultClick={handleResultClick} 
       >
         <input 
           type="text" 
           placeholder={searchType === 'departure' ? "출발지를 검색하세요." : "도착지를 검색하세요."} 
           value={searchInput}
           onChange={handleSearchInputChange} 
-          onKeyDown={handleKeyDown} // 엔터 치면 검색
+          onKeyDown={handleKeyDown} 
         />
       </AnimatedPopup>
       <DateRangePopup 
         isOpen={isDatePopupOpen} 
         onClose={handleDatePopupClose}
         onDateRangeChange={handleDateSelect}
-        onSearchClick={handleSearchClick} // 검색 버튼 클릭 시 페이지 이동
+        onSearchClick={handleSearchClick} 
         toggleLabel="가는날 - 오는날"
         buttonText="검색"
-        dateRange={selectedDates} // 초기 선택된 날짜 전달
+        dateRange={selectedDates} 
       />
       <FlightList flights={flights} />  
     </Container>
   );
 };
+
+export default FlightSearch;
+
 
 const slideUp = keyframes`
   from {
@@ -191,5 +222,3 @@ const AnimatedPopup = styled(AreaPopup)`
     display: none;
   `}
 `;
-
-export default FlightSearch;
