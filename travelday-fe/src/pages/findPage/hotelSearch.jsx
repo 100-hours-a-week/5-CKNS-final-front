@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import AreaPopup from '../../components/shared/areaPopup';
-import HotelList from '../../components/findPage/hotellist'; // Corrected import
+import HotelList from '../../components/findPage/hotelList'; 
 
 const HotelSearch = () => {
-  const [tripType, setTripType] = useState('single-room');
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [searchType, setSearchType] = useState('');
 

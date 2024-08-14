@@ -3,7 +3,7 @@ import styled, { keyframes } from 'styled-components';
 import TripTypeSelector from '../../components/findPage/tripType';
 import AreaPopup from '../../components/shared/areaPopup';
 import switchIcon from '../../images/switch.png';
-import FlightList from '../../components/findPage/flightlist';
+import FlightList from '../../components/findPage/flightList';
 
 const FlightSearch = () => {
   const [tripType, setTripType] = useState('round-trip');
@@ -105,7 +105,7 @@ const AnimatedPopup = styled(AreaPopup)`
   position: fixed;
   bottom: 0;
   left: 0;
-  right: 0;
+  right: 0;ㄴ
   background-color: #fff;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
