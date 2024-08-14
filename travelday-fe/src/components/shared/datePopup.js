@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import backIcon from '../../images/header/back.png';
+import { useNavigate } from 'react-router-dom'; 
+import SearchBtn from '../../components/shared/searchBtn.js'; // 수정 필요 없음
 
 const slideUp = keyframes`
   from {
@@ -12,160 +14,168 @@ const slideUp = keyframes`
     opacity: 1;
   }
 `;
-
 const DateRangePopup = ({ isOpen, onClose, onDateRangeChange }) => {
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
-  const [isStartDateSelected, setIsStartDateSelected] = useState(true);
-  const [currentMonthIndex, setCurrentMonthIndex] = useState(0);
-
-  useEffect(() => {
-    if (!startDate) {
-      setIsStartDateSelected(true);
-    } else if (startDate && !endDate) {
-      setIsStartDateSelected(false);
-    } else if (startDate && endDate) {
-      setIsStartDateSelected(true);
-    }
-  }, [startDate, endDate]);
-
-  const handleDayClick = (date) => {
-    if (startDate && date.getTime() === startDate.getTime()) {
-      setStartDate(null);
-      setEndDate(null);
-      setIsStartDateSelected(true);
-    } else if (endDate && date.getTime() === endDate.getTime()) {
-      setEndDate(null);
-      setIsStartDateSelected(false);
-    } else if (!startDate || (startDate && endDate)) {
-      setStartDate(date);
-      setEndDate(null);
-      setIsStartDateSelected(false);
-    } else if (date < startDate) {
-      setEndDate(startDate);
-      setStartDate(date);
-      setIsStartDateSelected(false);
-    } else {
-      setEndDate(date);
-      setIsStartDateSelected(true);
-    }
-
-    if (onDateRangeChange) {
-      onDateRangeChange({ startDate, endDate });
-    }
-  };
-
-  const renderCalendar = (monthsToShow = 12) => {
-    const currentMonth = new Date();
-    const calendars = [];
-
-    for (let i = 0; i < monthsToShow; i++) {
-      const month = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + i, 1);
-      calendars.push(
-        <MonthContainer key={i} isVisible={i === currentMonthIndex}>
-          <MonthLabel>{month.toLocaleString('default', { month: 'long', year: 'numeric' })}</MonthLabel>
-          {renderMonthCalendar(month)}
-        </MonthContainer>
+    const [startDate, setStartDate] = useState(null);
+    const [endDate, setEndDate] = useState(null);
+    const [isStartDateSelected, setIsStartDateSelected] = useState(true);
+    const [currentMonthIndex, setCurrentMonthIndex] = useState(0);
+    const navigate = useNavigate(); // useNavigate 훅 사용
+  
+    useEffect(() => {
+      if (!startDate) {
+        setIsStartDateSelected(true);
+      } else if (startDate && !endDate) {
+        setIsStartDateSelected(false);
+      } else if (startDate && endDate) {
+        setIsStartDateSelected(true);
+      }
+    }, [startDate, endDate]);
+  
+    const handleDayClick = (date) => {
+      if (startDate && date.getTime() === startDate.getTime()) {
+        setStartDate(null);
+        setEndDate(null);
+        setIsStartDateSelected(true);
+      } else if (endDate && date.getTime() === endDate.getTime()) {
+        setEndDate(null);
+        setIsStartDateSelected(false);
+      } else if (!startDate || (startDate && endDate)) {
+        setStartDate(date);
+        setEndDate(null);
+        setIsStartDateSelected(false);
+      } else if (date < startDate) {
+        setEndDate(startDate);
+        setStartDate(date);
+        setIsStartDateSelected(false);
+      } else {
+        setEndDate(date);
+        setIsStartDateSelected(true);
+      }
+  
+      if (onDateRangeChange) {
+        onDateRangeChange({ startDate, endDate });
+      }
+    };
+  
+    const handleSearchClick = () => {
+      navigate('/flight'); // /flight 경로로 이동
+    };
+  
+    const renderCalendar = (monthsToShow = 12) => {
+      const currentMonth = new Date();
+      const calendars = [];
+  
+      for (let i = 0; i < monthsToShow; i++) {
+        const month = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + i, 1);
+        calendars.push(
+          <MonthContainer key={i} isVisible={i === currentMonthIndex}>
+            <MonthLabel>{month.toLocaleString('default', { month: 'long', year: 'numeric' })}</MonthLabel>
+            {renderMonthCalendar(month)}
+          </MonthContainer>
+        );
+      }
+  
+      return <CalendarGrid>{calendars}</CalendarGrid>;
+    };
+  
+    const renderMonthCalendar = (currentMonth) => {
+      const startDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay();
+      const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
+      const weeks = [];
+      let days = [];
+    
+      const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+    
+      weeks.push(
+        <Week key="weekdays">
+          {weekdays.map((day, index) => (
+            <Weekday key={index}>{day}</Weekday>
+          ))}
+        </Week>
       );
-    }
-
-    return <CalendarGrid>{calendars}</CalendarGrid>;
-  };
-
-  const renderMonthCalendar = (currentMonth) => {
-    const startDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay();
-    const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
-    const weeks = [];
-    let days = [];
+    
+      // 첫 주의 빈 칸 추가
+      for (let i = 0; i < startDay; i++) {
+        days.push(<Day key={`empty-${i}`} />);
+      }
+    
+      // 월의 모든 날 추가
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+        const isDisabled = startDate && !endDate && date < startDate;
+        const isSelected = date >= startDate && date <= (endDate || startDate);
+        days.push(
+          <Day 
+            key={day} 
+            isSelected={isSelected} 
+            isDisabled={isDisabled} 
+            onClick={() => !isDisabled && handleDayClick(date)} 
+          >
+            {day}
+          </Day>
+        );
+    
+        // 일주일이 끝나면 새로운 주로 시작
+        if (days.length === 7) {
+          weeks.push(<Week key={`week-${day}`}>{days}</Week>);
+          days = [];
+        }
+      }
+    
+      // 마지막 주의 남은 빈 칸 추가
+      if (days.length > 0) {
+        const remainingDays = 7 - days.length;
+        for (let i = 0; i < remainingDays; i++) {
+          days.push(<Day key={`empty-end-${i}`} />);
+        }
+        weeks.push(<Week key="last-week">{days}</Week>);
+      }
+    
+      return <>{weeks}</>;
+    };
   
-    const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+    const handlePreviousMonth = () => {
+      if (currentMonthIndex > 0) {
+        setCurrentMonthIndex(currentMonthIndex - 1);
+      }
+    };
   
-    weeks.push(
-      <Week key="weekdays">
-        {weekdays.map((day, index) => (
-          <Weekday key={index}>{day}</Weekday>
-        ))}
-      </Week>
+    const handleNextMonth = () => {
+      if (currentMonthIndex < 11) {
+        setCurrentMonthIndex(currentMonthIndex + 1);
+      }
+    };
+  
+    if (!isOpen) return null;
+  
+    return (
+      <PopupOverlay>
+        <PopupContent>
+          <Header>
+            <BackButton onClick={onClose}>
+              <img src={backIcon} alt="뒤로가기" />
+            </BackButton>
+            <ToggleContainer>
+              <ToggleLabel isActive={isStartDateSelected || (!startDate && !endDate)}>가는날</ToggleLabel>
+              <ToggleLabel isActive={!isStartDateSelected || (startDate && endDate)}>오는날</ToggleLabel>
+            </ToggleContainer>
+          </Header>
+          <Divider />
+          <MonthNavigation>
+            <NavButton onClick={handlePreviousMonth}>&lt;</NavButton>
+            <NavButton onClick={handleNextMonth}>&gt;</NavButton>
+          </MonthNavigation>
+          <CalendarContainer>
+            {renderCalendar(12)}
+          </CalendarContainer>
+          <ButtonContainer>
+            <SearchBtn text="검색" onClick={handleSearchClick} /> {/* 버튼 클릭 시 handleSearchClick 호출 */}
+          </ButtonContainer>
+        </PopupContent>
+      </PopupOverlay>
     );
-  
-    // 첫 주의 빈 칸 추가
-    for (let i = 0; i < startDay; i++) {
-      days.push(<Day key={`empty-${i}`} />);
-    }
-  
-    // 월의 모든 날 추가
-    for (let day = 1; day <= daysInMonth; day++) {
-      const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-      const isDisabled = startDate && !endDate && date < startDate;
-      const isSelected = date >= startDate && date <= (endDate || startDate);
-      days.push(
-        <Day 
-          key={day} 
-          isSelected={isSelected} 
-          isDisabled={isDisabled} 
-          onClick={() => !isDisabled && handleDayClick(date)} 
-        >
-          {day}
-        </Day>
-      );
-  
-      // 일주일이 끝나면 새로운 주로 시작
-      if (days.length === 7) {
-        weeks.push(<Week key={`week-${day}`}>{days}</Week>);
-        days = [];
-      }
-    }
-  
-    // 마지막 주의 남은 빈 칸 추가
-    if (days.length > 0) {
-      const remainingDays = 7 - days.length;
-      for (let i = 0; i < remainingDays; i++) {
-        days.push(<Day key={`empty-end-${i}`} />);
-      }
-      weeks.push(<Week key="last-week">{days}</Week>);
-    }
-  
-    return <>{weeks}</>;
   };
-
-  const handlePreviousMonth = () => {
-    if (currentMonthIndex > 0) {
-      setCurrentMonthIndex(currentMonthIndex - 1);
-    }
-  };
-
-  const handleNextMonth = () => {
-    if (currentMonthIndex < 11) {
-      setCurrentMonthIndex(currentMonthIndex + 1);
-    }
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <PopupOverlay>
-      <PopupContent>
-        <Header>
-          <BackButton onClick={onClose}>
-            <img src={backIcon} alt="뒤로가기" />
-          </BackButton>
-          <ToggleContainer>
-            <ToggleLabel isActive={isStartDateSelected || (!startDate && !endDate)}>가는날</ToggleLabel>
-            <ToggleLabel isActive={!isStartDateSelected || (startDate && endDate)}>오는날</ToggleLabel>
-          </ToggleContainer>
-        </Header>
-        <Divider />
-        <MonthNavigation>
-          <NavButton onClick={handlePreviousMonth}>&lt;</NavButton>
-          <NavButton onClick={handleNextMonth}>&gt;</NavButton>
-        </MonthNavigation>
-        <CalendarContainer>
-          {renderCalendar(12)}
-        </CalendarContainer>
-      </PopupContent>
-    </PopupOverlay>
-  );
-};
+  
 
 const PopupOverlay = styled.div`
   position: fixed;
@@ -189,7 +199,7 @@ const PopupContent = styled.div`
   box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start; /* 변경된 부분 */
 `;
 
 const Header = styled.div`
@@ -249,8 +259,9 @@ const NavButton = styled.button`
 `;
 
 const CalendarContainer = styled.div`
-  flex: 1;
   overflow-y: auto;
+  max-height: 60%; /* 변경된 부분 */
+  margin-bottom: 20px; /* 여백 추가 */
 `;
 
 const CalendarGrid = styled.div`
@@ -297,6 +308,16 @@ const Day = styled.div`
   &:hover {
     background-color: ${({ isSelected, isDisabled }) => (isSelected ? '#3d91ff' : isDisabled ? 'transparent' : '#eaeaea')};
   }
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+  background-color: #fff;
+  position: sticky;
+  bottom: 0;
 `;
 
 export default DateRangePopup;
