@@ -141,7 +141,7 @@ const FlightItem = styled.div`
   flex-direction: column;
   align-items: center;
   padding: 15px;
-  margin-bottom: 10px;
+  margin-top: 10px;
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
