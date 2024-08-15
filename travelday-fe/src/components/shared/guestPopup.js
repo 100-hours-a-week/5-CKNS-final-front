@@ -3,6 +3,7 @@ import styled, { keyframes } from 'styled-components';
 import backIcon from '../../images/header/back.png';
 import addIcon from '../../images/filter/add.png';
 import minusIcon from '../../images/filter/minus.png';
+import SearchBtn from '../../components/shared/searchBtn.js'; // 이미 수정된 부분
 
 const slideUp = keyframes`
   from {
@@ -16,14 +17,19 @@ const slideUp = keyframes`
 `;
 
 const GuestSelectorPopup = ({ isOpen, onClose }) => {
-  const [adultCount, setAdultCount] = useState(1); // 성인 인원 수
-  const [childCount, setChildCount] = useState(0); // 유아 인원 수
+  const [adultCount, setAdultCount] = useState(1); 
+  const [childCount, setChildCount] = useState(0); 
 
   if (!isOpen) return null;
 
   const increaseCount = (setCount, count) => setCount(count + 1);
   const decreaseCount = (setCount, count) => {
     if (count > 0) setCount(count - 1);
+  };
+
+  const handleSearchClick = () => {
+    console.log('검색 버튼 클릭');
+    onClose(); // 팝업 닫기
   };
 
   return (
@@ -62,6 +68,9 @@ const GuestSelectorPopup = ({ isOpen, onClose }) => {
             </CountControl>
           </GuestType>
         </GuestTypeContainer>
+        <ButtonContainer>
+          <SearchBtn text="검색" onClick={handleSearchClick} />
+        </ButtonContainer>
       </PopupContent>
     </PopupOverlay>
   );
@@ -127,12 +136,14 @@ const GuestTypeContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
+  margin-bottom: 50px;
 `;
 
 const GuestType = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 20px;
 `;
 
 const GuestLabel = styled.div`
@@ -164,4 +175,14 @@ const GuestCount = styled.div`
   margin: 0 15px;
   width: 30px;
   text-align: center;
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+  background-color: #fff;
+  position: sticky;
+  bottom: 0;
 `;

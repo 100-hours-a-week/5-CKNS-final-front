@@ -6,17 +6,20 @@ import BottomNav from '../../../components/shared/bottomNav.js';
 import FlightResultList from '../../../components/resultPage/flightResultList';
 import DateRangePopup from '../../../components/shared/datePopup.js';
 import GuestSelectorPopup from '../../../components/shared/guestPopup.js';
+import FilterPopup from '../../../components/shared/filterPopup.js'; 
 import calendarIcon from '../../../images/filter/calendar.png';
-import humanIcon from '../../../images/filter/human.png'; // 인원 아이콘 추가
+import humanIcon from '../../../images/filter/human.png'; 
+import filterIcon from '../../../images/filter/filter.png'; 
 import useFlightStore from '../../../store/store.js';
 
 const FlightResultPage = () => {
-  const { departure, arrival, dates, setDates } = useFlightStore();
+  const { departure, arrival, dates, setDates, adults, children } = useFlightStore();
   const navigate = useNavigate();
 
   const [isDatePopupOpen, setIsDatePopupOpen] = useState(false);
   const [localDates, setLocalDates] = useState(dates); // 로컬 상태로 초기화
   const [isGuestPopupOpen, setIsGuestPopupOpen] = useState(false); // 인원 팝업 상태 추가
+  const [isFilterPopupOpen, setIsFilterPopupOpen] = useState(false); // 필터 팝업 상태 추가
 
   useEffect(() => {
     console.log("출발지:", departure);
@@ -29,12 +32,15 @@ const FlightResultPage = () => {
   };
 
   const handleGuestClick = () => {
-    setIsGuestPopupOpen(true); // 인원 팝업 열기
+    setIsGuestPopupOpen(true);
+  };
+
+  const handleFilterClick = () => {
+    setIsFilterPopupOpen(true); 
   };
 
   const resultTitle = `${departure} - ${arrival}`;
 
-  // 선택된 날짜를 "YYYY-MM-DD - YYYY-MM-DD" 형식으로 표시
   const formattedDates = localDates && localDates.startDate && localDates.endDate
     ? `${localDates.startDate.toLocaleDateString()} - ${localDates.endDate.toLocaleDateString()}`
     : "날짜 선택";
@@ -44,7 +50,8 @@ const FlightResultPage = () => {
     setLocalDates(selectedDates);  // 로컬 상태 업데이트
   };
 
-  //8.15 여기 작동 안함 확인 필요
+  const formattedGuests = `인원 ${adults + children}명`;
+
   const handleSearchClick = () => {
     setDates(localDates); // 선택된 날짜를 Zustand 스토어에 저장
     navigate('/flight'); // 검색 버튼 클릭 시 /flight로 이동
@@ -63,7 +70,10 @@ const FlightResultPage = () => {
           <Icon src={calendarIcon} alt="날짜 아이콘" /> {formattedDates}
         </FilterButton>
         <FilterButton onClick={handleGuestClick}>
-          <Icon src={humanIcon} alt="인원 아이콘" /> 인원
+          <Icon src={humanIcon} alt="인원 아이콘" /> {formattedGuests}
+        </FilterButton>
+        <FilterButton onClick={handleFilterClick}>
+          <Icon src={filterIcon} alt="필터 아이콘" /> 필터
         </FilterButton>
       </FilterContainer>
 
@@ -81,11 +91,18 @@ const FlightResultPage = () => {
         />
       )}
 
-      {/* 인원 선택 팝업 추가 - 실제 팝업 컴포넌트를 만들어야 합니다 */}
       {isGuestPopupOpen && (
         <GuestSelectorPopup 
           isOpen={isGuestPopupOpen} 
           onClose={() => setIsGuestPopupOpen(false)} 
+          // 여기에 필요한 다른 props 추가
+        />
+      )}
+
+      {isFilterPopupOpen && (
+        <FilterPopup 
+          isOpen={isFilterPopupOpen} 
+          onClose={() => setIsFilterPopupOpen(false)} 
           // 여기에 필요한 다른 props 추가
         />
       )}
@@ -120,7 +137,7 @@ const FilterContainer = styled.div`
 `;
 
 const FilterButton = styled.button`
-  padding: 10px 20px;
+  padding: 8px;
   font-size: 13px;
   background-color: #fff;
   border: 1px solid #ddd;
