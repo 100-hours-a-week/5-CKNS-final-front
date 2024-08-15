@@ -1,4 +1,3 @@
-// store.js
 import create from 'zustand';
 
 const useFlightStore = create((set) => ({
@@ -7,7 +6,6 @@ const useFlightStore = create((set) => ({
   dates: [],
   adults: 1, 
   children: 0,
-
 
   setDeparture: (departure) => set({ departure }),
   setArrival: (arrival) => set({ arrival }),

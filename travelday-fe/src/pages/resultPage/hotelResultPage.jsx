@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react'; 
 import { useNavigate } from 'react-router-dom'; 
 import styled from 'styled-components';
-import ResultHeader from '../../../components/shared/resultHeader.js';
-import BottomNav from '../../../components/shared/bottomNav.js';
-import FlightResultList from '../../../components/resultPage/flightResultList';
-import DateRangePopup from '../../../components/shared/datePopup.js';
-import GuestSelectorPopup from '../../../components/shared/guestPopup.js';
-import FilterPopup from '../../../components/shared/filterPopup.js'; 
-import calendarIcon from '../../../images/filter/calendar.png';
-import humanIcon from '../../../images/filter/human.png'; 
-import filterIcon from '../../../images/filter/filter.png'; 
-import useFlightStore from '../../../store/store.js';
+import ResultHeader from '../../components/shared/resultHeader.js';
+import BottomNav from '../../components/shared/bottomNav.js';
+import HotelResultList from '../../components/resultPage/hotelResultList.js'; // 호텔 결과 목록 컴포넌트
+import DateRangePopup from '../../components/shared/datePopup.js';
+import GuestSelectorPopup from '../../components/shared/guestPopup.js';
+import FilterPopup from '../../components/shared/hotelFilterPopup.js'; 
+import calendarIcon from '../../images/filter/calendar.png';
+import humanIcon from '../../images/filter/human.png'; 
+import filterIcon from '../../images/filter/filter.png'; 
+import useHotelStore from '../../store/useHotelStore.js'; // 호텔 검색용 스토어
 
-const FlightResultPage = () => {
-  const { departure, arrival, dates, setDates, adults, children } = useFlightStore();
-  const navigate = useNavigate();
+const HotelResultPage = () => {
+  const { location, dates, setDates, adults, children } = useHotelStore();
+  const navigate = useNavigate(); 
 
   const [isDatePopupOpen, setIsDatePopupOpen] = useState(false);
   const [localDates, setLocalDates] = useState(dates); // 로컬 상태로 초기화
@@ -22,10 +22,9 @@ const FlightResultPage = () => {
   const [isFilterPopupOpen, setIsFilterPopupOpen] = useState(false); // 필터 팝업 상태 추가
 
   useEffect(() => {
-    console.log("출발지:", departure);
-    console.log("도착지:", arrival);
+    console.log("선택된 위치:", location);
     console.log("선택된 날짜:", dates);
-  }, [departure, arrival, dates]);
+  }, [location, dates]);
 
   const handleDateClick = () => {
     setIsDatePopupOpen(true);
@@ -39,7 +38,7 @@ const FlightResultPage = () => {
     setIsFilterPopupOpen(true); 
   };
 
-  const resultTitle = `${departure} - ${arrival}`;
+  const resultTitle = `${location}`;
 
   const formattedDates = localDates && localDates.startDate && localDates.endDate
     ? `${localDates.startDate.toLocaleDateString()} - ${localDates.endDate.toLocaleDateString()}`
@@ -54,7 +53,7 @@ const FlightResultPage = () => {
 
   const handleSearchClick = () => {
     setDates(localDates); // 선택된 날짜를 Zustand 스토어에 저장
-    navigate('/flight'); // 검색 버튼 클릭 시 /flight로 이동
+    navigate('/hotel'); // 검색 버튼 클릭 시 /hotel로 이동
     setIsDatePopupOpen(false); // 팝업 닫기
   };
 
@@ -78,8 +77,9 @@ const FlightResultPage = () => {
       </FilterContainer>
 
       <ContentContainer>
-        <FlightResultList departure={departure} arrival={arrival} dates={dates} />
+        <HotelResultList /> {/* 호텔 결과 목록 */}
       </ContentContainer>
+      
       <BottomNav />
 
       {isDatePopupOpen && (
@@ -110,7 +110,7 @@ const FlightResultPage = () => {
   );
 };
 
-export default FlightResultPage;
+export default HotelResultPage;
 
 const PageContainer = styled.div`
   display: flex;

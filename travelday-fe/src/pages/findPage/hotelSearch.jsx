@@ -1,19 +1,84 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
 import AreaPopup from '../../components/shared/areaPopup';
+import DateRangePopup from '../../components/shared/datePopup';
 import HotelList from '../../components/findPage/hotelList'; 
+import useHotelStore from '../../store/useHotelStore'; // 올바른 스토어 가져오기
 
 const HotelSearch = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [searchType, setSearchType] = useState('');
+  const [isDatePopupOpen, setIsDatePopupOpen] = useState(false);
+  const [searchInput, setSearchInput] = useState('');
+  const [filteredResults, setFilteredResults] = useState([]);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+
+  // 여기서 사용할 목데이터
+  const locations = [
+    '서울, 대한민국',
+    '부산, 대한민국',
+    '인천, 대한민국',
+    '대구, 대한민국',
+    '뉴욕, 미국',
+    '파리, 프랑스',
+    '도쿄, 일본',
+    '런던, 영국',
+  ];
+
+  const {
+    location,
+    dates,
+    setLocation,
+    setDates,
+  } = useHotelStore();
+
+  const navigate = useNavigate();
 
   const handlePopupClose = () => {
     setIsPopupOpen(false);
+    setSearchInput('');
+    setFilteredResults([]);
   };
 
-  const handleButtonClick = (type) => {
-    setSearchType(type);
+  const handleButtonClick = () => {
     setIsPopupOpen(true);
+  };
+
+  const handleSearchInputChange = (event) => {
+    setSearchInput(event.target.value);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      const results = locations.filter(location => location.includes(searchInput));
+      setFilteredResults(results.length > 0 ? results : ['검색결과가 없습니다.']);
+    }
+  };
+
+  const handleResultClick = (result) => {
+    if (result !== '검색결과가 없습니다.') {
+      setSelectedLocation(result); // 지역 선택
+      handlePopupClose();
+      setTimeout(() => {
+        setIsDatePopupOpen(true); // 날짜 선택 팝업 열기
+      }, 300);
+    }
+  };
+
+  const handleDateSelect = (range) => {
+    setDates(range); // 선택된 날짜를 Zustand 스토어에 저장
+  };
+
+  const handleSearchClick = () => {
+    setLocation(selectedLocation); // 선택된 지역을 Zustand 스토어에 저장
+    console.log("선택된 지역:", selectedLocation);
+    console.log("선택된 날짜:", dates);
+
+    navigate('/hotel'); // /hotel 페이지로 이동
+  };
+
+  const handleDatePopupClose = () => {
+    setIsDatePopupOpen(false);
   };
 
   // 예시 호텔 데이터
@@ -27,19 +92,40 @@ const HotelSearch = () => {
     <Container>
       <AreaSearchingContainer>
         <ButtonContainer>
-          <Button onClick={() => handleButtonClick('location')}>도시, 호텔 이름을 검색하세요.</Button>
+          <Button onClick={handleButtonClick}>도시, 호텔 이름을 검색하세요.</Button>
         </ButtonContainer>
       </AreaSearchingContainer>
-      <AnimatedPopup isOpen={isPopupOpen} onClose={handlePopupClose}>
+      <AnimatedPopup 
+        isOpen={isPopupOpen} 
+        onClose={handlePopupClose} 
+        searchResults={filteredResults}
+        onResultClick={handleResultClick} 
+      >
         <input 
           type="text" 
           placeholder="도시, 호텔 위치를 검색하세요." 
+          value={searchInput}
+          onChange={handleSearchInputChange} 
+          onKeyDown={handleKeyDown} // 
         />
       </AnimatedPopup>
+      <DateRangePopup 
+        isOpen={isDatePopupOpen} 
+        onClose={handleDatePopupClose}
+        onDateRangeChange={handleDateSelect}
+        onSearchClick={handleSearchClick} 
+        buttonText="검색"
+        dateRange={dates} 
+      />
       <HotelList hotels={hotels} />  
     </Container>
   );
 };
+
+export default HotelSearch;
+
+
+// Styled Components remain the same
 
 const slideUp = keyframes`
   from {
@@ -71,7 +157,6 @@ const ButtonContainer = styled.div`
   border: 1px solid #ccc;
 `;
 
-
 const Button = styled.button`
   padding: 8px 16px;
   margin: 0 40px;
@@ -91,7 +176,6 @@ const AreaSearchingContainer = styled.div`
   justify-content: center;
 `;
 
-
 const AnimatedPopup = styled(AreaPopup)`
   animation: ${slideUp} 0.3s ease-out;
   position: fixed;
@@ -109,5 +193,3 @@ const AnimatedPopup = styled(AreaPopup)`
     display: none;
   `}
 `;
-
-export default HotelSearch;

@@ -6,7 +6,7 @@ import AreaPopup from '../../components/shared/areaPopup';
 import DateRangePopup from '../../components/shared/datePopup'; 
 import switchIcon from '../../images/switch.png';
 import FlightList from '../../components/findPage/flightList';
-import useFlightStore from '../../store/store'; // Zustand 스토어 가져오기
+import useFlightStore from '../../store/useFlightStore'; // Zustand 스토어 가져오기
 
 const FlightSearch = () => {
   const [tripType, setTripType] = useState('round-trip');

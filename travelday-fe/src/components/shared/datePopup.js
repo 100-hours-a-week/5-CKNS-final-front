@@ -11,16 +11,15 @@ const slideUp = keyframes`
   }
   to {
     transform: translateY(0);
-    opacity: 1);
+    opacity: 1;
   }
 `;
 
-const DateRangePopup = ({ isOpen, onClose, onDateRangeChange }) => {
+const DateRangePopup = ({ isOpen, onClose, onDateRangeChange, onSearchClick }) => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [isStartDateSelected, setIsStartDateSelected] = useState(true);
   const [currentMonthIndex, setCurrentMonthIndex] = useState(0);
-  const navigate = useNavigate(); 
 
   useEffect(() => {
     if (!startDate) {
@@ -53,10 +52,6 @@ const DateRangePopup = ({ isOpen, onClose, onDateRangeChange }) => {
     } else {
       onDateRangeChange({ startDate: date, endDate: null });
     }
-  };
-
-  const handleSearchClick = () => {
-    navigate('/flight'); // /flight 경로로 이동
   };
 
   const renderCalendar = (monthsToShow = 12) => {
@@ -163,12 +158,13 @@ const DateRangePopup = ({ isOpen, onClose, onDateRangeChange }) => {
           {renderCalendar(12)}
         </CalendarContainer>
         <ButtonContainer>
-          <SearchBtn text="검색" onClick={handleSearchClick} />
+          <SearchBtn text="검색" onClick={onSearchClick} />
         </ButtonContainer>
       </PopupContent>
     </PopupOverlay>
   );
 };
+
 
 const PopupOverlay = styled.div`
   position: fixed;
