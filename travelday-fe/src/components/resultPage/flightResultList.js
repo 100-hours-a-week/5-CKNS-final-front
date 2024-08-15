@@ -151,6 +151,7 @@ const FlightItem = styled.div`
 
   &:hover {
     cursor: pointer;
+    transform: scale(1.02);
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
     border: 1px solid #007bff;
   }

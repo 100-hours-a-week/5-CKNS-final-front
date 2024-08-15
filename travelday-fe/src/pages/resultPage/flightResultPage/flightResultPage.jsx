@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from 'react'; 
+import { useNavigate } from 'react-router-dom'; 
 import styled from 'styled-components';
 import ResultHeader from '../../../components/shared/resultHeader.js';
 import BottomNav from '../../../components/shared/bottomNav.js';
@@ -7,15 +8,13 @@ import DateRangePopup from '../../../components/shared/datePopup.js';
 import calendarIcon from '../../../images/filter/calendar.png';
 import humanIcon from '../../../images/filter/human.png';
 import filterIcon from '../../../images/filter/filter.png';
-import useFlightStore from '../../../store/store.js'; //
+import useFlightStore from '../../../store/store.js';
 
 const FlightResultPage = () => {
   const { departure, arrival, dates } = useFlightStore();
+  const navigate = useNavigate();
 
-  // 팝업 상태 관리
   const [isDatePopupOpen, setIsDatePopupOpen] = useState(false);
-  const [isPeoplePopupOpen, setIsPeoplePopupOpen] = useState(false);
-  const [isFilterPopupOpen, setIsFilterPopupOpen] = useState(false);
 
   useEffect(() => {
     console.log("출발지:", departure);
@@ -27,32 +26,28 @@ const FlightResultPage = () => {
     setIsDatePopupOpen(true);
   };
 
-  const handlePeopleClick = () => {
-    setIsPeoplePopupOpen(true);
-  };
+  const resultTitle = `${departure} - ${arrival}`;
 
-  const handleFilterClick = () => {
-    setIsFilterPopupOpen(true);
-  };
+  // 선택된 날짜를 "YYYY-MM-DD - YYYY-MM-DD" 형식으로 표시
+  const formattedDates = dates && dates.startDate && dates.endDate
+    ? `${dates.startDate.toLocaleDateString()} - ${dates.endDate.toLocaleDateString()}`
+    : "날짜 선택";
 
   const handleDateRangeChange = (selectedDates) => {
     console.log("선택된 날짜:", selectedDates);
-    // Zustand를 사용해 선택된 날짜를 업데이트할 수 있습니다.
     useFlightStore.setState({ dates: selectedDates });
   };
- 
+
+  const handleBackClick = () => {
+    navigate('/search'); 
+  };
+
   return (
     <PageContainer>
-     <ResultHeader showBackButton={true} result="항공권 검색 결과" />
+      <ResultHeader showBackButton={true} result={resultTitle} onBackClick={handleBackClick} />
       <FilterContainer>
         <FilterButton onClick={handleDateClick}>
-          <Icon src={calendarIcon} alt="날짜 아이콘" /> 날짜
-        </FilterButton>
-        <FilterButton onClick={handlePeopleClick}>
-          <Icon src={humanIcon} alt="인원 아이콘" /> 인원
-        </FilterButton>
-        <FilterButton onClick={handleFilterClick}>
-          <Icon src={filterIcon} alt="필터 아이콘" /> 필터
+          <Icon src={calendarIcon} alt="날짜 아이콘" /> {formattedDates}
         </FilterButton>
       </FilterContainer>
 
@@ -61,7 +56,6 @@ const FlightResultPage = () => {
       </ContentContainer>
       <BottomNav />
 
-      {/* 팝업 컴포넌트들 */}
       {isDatePopupOpen && (
         <DateRangePopup 
           isOpen={isDatePopupOpen} 
@@ -69,10 +63,6 @@ const FlightResultPage = () => {
           onDateRangeChange={handleDateRangeChange}
         />
       )}
-      {/* 
-      {isPeoplePopupOpen && <PeoplePopup onClose={() => setIsPeoplePopupOpen(false)} />}
-      {isFilterPopupOpen && <FilterPopup onClose={() => setIsFilterPopupOpen(false)} />}
-      */}
     </PageContainer>
   );
 };
