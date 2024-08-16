@@ -42,15 +42,15 @@ const RightSection = styled.div`
 `;
 
 const Title = styled.span`
-  font-size: 20px;
+  font-size: 22px;
   font-weight: bold;
   margin-left: 10px;
 `;
 
 const Icon = styled.img`
-  width: 24px;
-  height: 24px;
-  margin-left: 15px;
+  width: 27px;
+  height: 27px;
+  margin-left: 23px;
   cursor: pointer;
 `;
 
