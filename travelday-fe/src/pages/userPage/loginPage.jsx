@@ -19,13 +19,15 @@ const LoginPage = () => {
 
   return (
     <PageContainer>
-      <Header />
-      <KaKaoButtonWrapper>
-                <KakaoButton onClick={handleLogin}>
-                    <KakaoImage src={KakaoLoginImage} alt="kakao login" />
-                </KakaoButton>
-            </KaKaoButtonWrapper>
-      <BottomNav />
+        <Container>
+        <Header />
+        <KaKaoButtonWrapper>
+                    <KakaoButton onClick={handleLogin}>
+                        <KakaoImage src={KakaoLoginImage} alt="kakao login" />
+                    </KakaoButton>
+                </KaKaoButtonWrapper>
+        <BottomNav />
+        </Container>
     </PageContainer>
   );
 };
@@ -39,6 +41,15 @@ const PageContainer = styled.div`
   width: 100%;
   height: 100vh;
   background-color: #fafafa;
+`;
+
+const Container = styled.div`
+  width:390px;
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+  align-items: center;
+  background-color: #fff;
 `;
 
 const KaKaoButtonWrapper = styled.div`

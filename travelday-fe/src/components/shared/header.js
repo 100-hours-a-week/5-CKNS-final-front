@@ -3,13 +3,14 @@ import styled from 'styled-components';
 import backIcon from '../../images/header/back.png'; 
 import bellIcon from '../../images/header/bell.png';
 import userIcon from '../../images/header/user.png';
+import logoImage from '../../images/logo/logo7.png'; // 로고 이미지 import
 
 const Header = ({ showBackButton = false }) => {
   return (
     <HeaderContainer>
       <LeftSection>
         <BackButton src={backIcon} alt="뒤로가기" show={showBackButton} />
-        <Title>여행한DAY</Title>
+        <Logo src={logoImage} alt="여행한DAY 로고" /> {/* 로고 이미지로 변경 */}
       </LeftSection>
       <RightSection>
         <Icon src={bellIcon} alt="알람 아이콘" />
@@ -41,10 +42,10 @@ const RightSection = styled.div`
   align-items: center;
 `;
 
-const Title = styled.span`
-  font-size: 22px;
-  font-weight: bold;
-  margin-left: 10px;
+const Logo = styled.img`
+  width: 180px; /* 로고 크기 조정 */
+  height: auto; /* 로고 크기 조정 */
+  margin-left: cpx;
 `;
 
 const Icon = styled.img`
