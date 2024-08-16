@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import Header from '../../components/shared/header.js'; 
 import BottomNav from '../../components/shared/bottomNav.js';  
 import ImageSlider from '../../components/mainPage/imageSlider.js';
+import NewFlightList from '../../components/mainPage/newFlightList.js'; 
+import JapanSaleList from '../../components/mainPage/japanSaleList.js';  // 일본 세일 리스트 컴포넌트 임포트
 
 const MainPage = () => {
   return (
@@ -12,7 +14,12 @@ const MainPage = () => {
         <ImageSlider />
       </SliderContainer>
       <Content>
-        <p>메인 자리</p>
+        <SectionTitle>신규 노선은 뭐가 있을까?</SectionTitle>
+        <SectionSubTitle>#새로운 노선만 모아 뒀어요!</SectionSubTitle>
+        <NewFlightList />
+        <SectionTitle>3일 안에 떠나는 일본 ✈️</SectionTitle>
+        <SectionSubTitle>#바로 출발해 봐요</SectionSubTitle>
+        <JapanSaleList />  
       </Content>
       <BottomNav />
     </PageContainer>
@@ -38,10 +45,30 @@ const SliderContainer = styled.div`
 
 const Content = styled.div`
   flex: 1;
-  padding: 20px;
-  background-color: #f8f9fa;
+  width: 390px;
+  background-color: #fff;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
   text-align: center;
+`;
+
+const SectionTitle = styled.h2`
+  font-size: 18px;
+  text-align: left;
+  width: 370px;
+  margin-left: 10px;
+  font-weight: bold;
+  margin-top: 30px;
+  margin-bottom: 0px;
+`;
+
+const SectionSubTitle = styled.h2`
+  font-size: 15px;
+  text-align: left;
+  width: 370px;
+  margin-left: 10px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  color: #c2c2c2;
 `;

@@ -8,11 +8,11 @@ import mapIcon from '../../images/footer/map.png';
 const BottomNav = () => {
   return (
     <NavContainer>
-      <NavItem href="#">
+      <NavItem href="/">
         <NavIcon src={homeIcon} alt="메인" />
         <NavText>메인</NavText>
       </NavItem>
-      <NavItem href="#">
+      <NavItem href="/search">
         <NavIcon src={airplaneIcon} alt="예약" />
         <NavText>예약</NavText>
       </NavItem>

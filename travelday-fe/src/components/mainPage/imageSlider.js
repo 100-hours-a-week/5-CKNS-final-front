@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 
 const colors = ['#FFB3BA', '#FFDFBA', '#FFFFBA', '#BAFFC9', '#BAE1FF'];
 
@@ -37,14 +37,9 @@ const ImageSlider = () => {
 
 export default ImageSlider;
 
-const slideAnimation = keyframes`
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
-`;
-
 const Slider = styled.div`
   width: 390px;
-  height: 270px;
+  height: 320px;
   overflow: hidden;
   position: relative;
 `;
@@ -59,7 +54,7 @@ const SliderContent = styled.div`
 
 const Slide = styled.div`
   width: 390px;
-  height: 270px;
+  height: 320px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
