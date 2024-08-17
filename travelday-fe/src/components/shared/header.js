@@ -11,7 +11,7 @@ const Header = ({ showBackButton = false }) => {
   const navigate = useNavigate();
 
   const handleBackClick = () => {
-    navigate('/');  // 뒤로가기 버튼 클릭 시 /로 이동
+    navigate('/'); 
   };
 
   const handleUserIconClick = () => {

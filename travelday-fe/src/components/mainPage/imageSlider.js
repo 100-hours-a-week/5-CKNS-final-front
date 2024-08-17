@@ -1,33 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import SliderImage from '../../images/main/slider/ppl1.png'; // 첫 번째 슬라이드에 사용할 이미지
 
-const colors = ['#FFB3BA', '#FFDFBA', '#FFFFBA', '#BAFFC9', '#BAE1FF'];
+const colors = ['#FFB3BA', '#FFDFBA', '#FFFFBA', '#BAFFC9', '#BAE1FF']; // 나머지 슬라이드의 색상 배열
 
 const ImageSlider = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setActiveIndex((prevIndex) => (prevIndex + 1) % colors.length);
+      setActiveIndex((prevIndex) => (prevIndex + 1) % (colors.length + 1));
     }, 4000); // 슬라이드 4초
 
     return () => clearInterval(interval);
   }, []);
 
+  const handleImageClick = () => {
+    window.location.href = 'https://www.jeju-the-rentcar.com/detail?id=1026'; // URL로 이동
+  };
+
   return (
     <Slider>
       <SliderContent activeIndex={activeIndex}>
+        <Slide>
+          <Image src={SliderImage} alt="slide-0" onClick={handleImageClick} /> {/* 첫 번째 슬라이드에 이미지 클릭 핸들러 추가 */}
+        </Slide>
         {colors.map((color, index) => (
-          <Slide key={index} style={{ backgroundColor: color }}>
+          <Slide key={index + 1} style={{ backgroundColor: color }}>
             <ColorBox>{color}</ColorBox>
           </Slide>
         ))}
       </SliderContent>
       <Indicators>
+        <Indicator isActive={activeIndex === 0} />
         {colors.map((_, index) => (
           <Indicator
-            key={index}
-            isActive={index === activeIndex}
+            key={index + 1}
+            isActive={index + 1 === activeIndex}
           />
         ))}
       </Indicators>
@@ -59,6 +68,13 @@ const Slide = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+`;
+
+const Image = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: pointer; /* 클릭 가능한 커서 모양으로 변경 */
 `;
 
 const ColorBox = styled.div`
