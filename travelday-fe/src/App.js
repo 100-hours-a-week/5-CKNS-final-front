@@ -9,6 +9,7 @@ import Callback from './pages/userPage/callback';
 import MyPage from './pages/userPage/myPage';
 import MapPage from './pages/mapPage/mapPage';
 import SchedulePage from './pages/schedulePage/schedulePage';
+import AlarmPage from './pages/userPage/alarmPage';
 
 import './App.css';
 
@@ -25,6 +26,7 @@ function App() {
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/schedule" element={<SchedulePage />} />
+        <Route path="/alarm" element={<AlarmPage />} />
 
       </Routes>
     </Router>

@@ -4,6 +4,7 @@ import SimpleHeader from '../../components/shared/simpleHeader.js';
 import BottomNav from '../../components/shared/bottomNav.js';  
 import KakaoLoginImage from '../../images/login/kakaologin.png'; 
 import BubbleImage from '../../images/login/bubble.png'; 
+import LogoImage from '../../images/logo/logo12.png'; // 로고 이미지 임포트
 
 const LoginPage = () => {
 
@@ -21,6 +22,9 @@ const LoginPage = () => {
         <Container>
         <SimpleHeader title="로그인" showBackButton={true} /> 
         <KaKaoButtonWrapper>
+            <LogoWrapper>
+                <Logo src={LogoImage} alt="로고" />
+            </LogoWrapper>
             <BubbleWrapper>
                 <Bubble src={BubbleImage} alt="말풍선" />
                 <BubbleText>카카오로 5초 만에 시작하기</BubbleText>
@@ -59,7 +63,7 @@ const PageContainer = styled.div`
 `;
 
 const Container = styled.div`
-  width:390px;
+  width: 390px;
   display: flex;
   height: 100vh;
   flex-direction: column;
@@ -70,9 +74,19 @@ const Container = styled.div`
 const KaKaoButtonWrapper = styled.div`
   cursor: pointer;
   display: flex;
-  margin-top:250px;
+  margin-top: 80px;
   flex-direction: column;
   align-items: center;
+`;
+
+const LogoWrapper = styled.div`
+  margin-bottom: 20px;
+`;
+
+const Logo = styled.img`
+  width: 100px; /* 로고 크기 조정 */
+  height: auto;
+  margin-bottom: 30px;
 `;
 
 const KakaoButton = styled.button`
@@ -104,5 +118,5 @@ const BubbleText = styled.span`
   font-size: 14px;
   color: #fff;
   padding-left: 10px;
-  padding-bottom:5px;
+  padding-bottom: 5px;
 `;
