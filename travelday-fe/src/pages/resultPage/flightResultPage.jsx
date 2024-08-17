@@ -80,6 +80,7 @@ const FlightResultPage = () => {
       <ContentContainer>
         <FlightResultList departure={departure} arrival={arrival} dates={dates} />
       </ContentContainer>
+      <BottomPadding />
       <BottomNav />
 
       {isDatePopupOpen && (
@@ -155,4 +156,8 @@ const Icon = styled.img`
   width: 20px;
   height: 20px;
   margin-right: 8px;
+`;
+
+const BottomPadding = styled.div`
+  height: 110px;  /* 하단 네비게이션 바의 높이만큼 여유 공간 추가 */
 `;

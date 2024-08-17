@@ -23,6 +23,7 @@ const SearchingPage = () => {
       </Content>
       {selectedOption === '항공' && <FlightSearch />}
       {selectedOption === '호텔' && <HotelSearch />}
+      <BottomPadding />
       <BottomNav />
     </Container>
   );
@@ -46,4 +47,8 @@ const Content = styled.div`
   width: 100%;
   box-sizing: border-box;
   text-align: center;
+`;
+
+const BottomPadding = styled.div`
+  height: 110px;  /* 하단 네비게이션 바의 높이만큼 여유 공간 추가 */
 `;
