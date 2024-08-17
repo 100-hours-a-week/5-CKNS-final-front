@@ -1,52 +1,53 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import React from 'react';
+import styled, { keyframes } from 'styled-components';
 import SimpleHeader from '../../components/shared/simpleHeader.js';
-import BottomNav from '../../components/shared/bottomNav.js';
-import KakaoLoginImage from '../../images/login/kakaologin.png';
-import BubbleImage from '../../images/login/bubble.png';
+import BottomNav from '../../components/shared/bottomNav.js';  
+import KakaoLoginImage from '../../images/login/kakaologin.png'; 
+import BubbleImage from '../../images/login/bubble.png'; 
 
 const LoginPage = () => {
-  const navigate = useNavigate();
 
-  // 가정: 로그인 상태를 로컬 스토리지에서 확인
-  const isLoggedIn = localStorage.getItem('isLoggedIn');  // 예시로 로컬 스토리지 사용
+    const Rest_api_key = process.env.REACT_APP_KAKAO_APP_KEY; 
+    const redirect_uri = 'http://localhost:3000/auth/kakao/callback';
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      navigate('/mypage');  // 이미 로그인한 상태라면 닉네임 변경 페이지로 리다이렉트
-    }
-  }, [isLoggedIn, navigate]);
+    const kakaoURL = `https://kauth.kakao.com/oauth/authorize?client_id=${Rest_api_key}&redirect_uri=${redirect_uri}&response_type=code`;
 
-  const Rest_api_key = process.env.REACT_APP_KAKAO_APP_KEY;
-  const redirect_uri = 'http://localhost:3000/auth/kakao/callback';
-
-  const kakaoURL = `https://kauth.kakao.com/oauth/authorize?client_id=${Rest_api_key}&redirect_uri=${redirect_uri}&response_type=code`;
-
-  const handleLogin = () => {
-    window.location.href = kakaoURL;
-  };
+    const handleLogin = () => {
+        window.location.href = kakaoURL;
+    };
 
   return (
     <PageContainer>
-      <Container>
-        <SimpleHeader title="로그인" showBackButton={true} />
+        <Container>
+        <SimpleHeader title="로그인" showBackButton={true} /> 
         <KaKaoButtonWrapper>
-          <BubbleWrapper>
-            <Bubble src={BubbleImage} alt="말풍선" />
-            <BubbleText>카카오로 5초 만에 시작하기</BubbleText>
-          </BubbleWrapper>
-          <KakaoButton onClick={handleLogin}>
-            <KakaoImage src={KakaoLoginImage} alt="kakao login" />
-          </KakaoButton>
+            <BubbleWrapper>
+                <Bubble src={BubbleImage} alt="말풍선" />
+                <BubbleText>카카오로 5초 만에 시작하기</BubbleText>
+            </BubbleWrapper>
+            <KakaoButton onClick={handleLogin}>
+                <KakaoImage src={KakaoLoginImage} alt="kakao login" />
+            </KakaoButton>
         </KaKaoButtonWrapper>
         <BottomNav />
-      </Container>
+        </Container>
     </PageContainer>
   );
 };
 
 export default LoginPage;
+
+const bounce = keyframes`
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-20px);
+  }
+  60% {
+    transform: translateY(-15px);
+  }
+`;
 
 const PageContainer = styled.div`
   display: flex;
@@ -58,7 +59,7 @@ const PageContainer = styled.div`
 `;
 
 const Container = styled.div`
-  width: 390px;
+  width:390px;
   display: flex;
   height: 100vh;
   flex-direction: column;
@@ -69,7 +70,7 @@ const Container = styled.div`
 const KaKaoButtonWrapper = styled.div`
   cursor: pointer;
   display: flex;
-  margin-top: 250px;
+  margin-top:250px;
   flex-direction: column;
   align-items: center;
 `;
@@ -90,6 +91,7 @@ const BubbleWrapper = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 20px;
+  animation: ${bounce} 2s infinite;
 `;
 
 const Bubble = styled.img`
@@ -102,5 +104,5 @@ const BubbleText = styled.span`
   font-size: 14px;
   color: #fff;
   padding-left: 10px;
-  padding-bottom: 5px;
+  padding-bottom:5px;
 `;
