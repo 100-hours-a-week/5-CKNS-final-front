@@ -1,42 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import SliderImage from '../../images/main/slider/ppl1.png'; // 첫 번째 슬라이드에 사용할 이미지
+import SliderImage from '../../images/main/slider/ppl1.png'; 
+import SliderImage2 from '../../images/main/slider/ppl2.png'; 
+import SliderImage3 from '../../images/main/slider/ppl3.png'; 
+import SliderImage4 from '../../images/main/slider/ppl4.png'; 
+import SliderImage5 from '../../images/main/slider/ppl5.png'; 
 
-const colors = ['#FFB3BA', '#FFDFBA', '#FFFFBA', '#BAFFC9', '#BAE1FF']; // 나머지 슬라이드의 색상 배열
+const images = [
+  { src: SliderImage, alt: "slide-0", onClick: () => window.location.href = 'https://www.jeju-the-rentcar.com/detail?id=1026' },
+  { src: SliderImage2, alt: "slide-1", onClick: () => window.location.href = 'https://www.hanatour.com/promotion/plan/PM0000114126' },
+  { src: SliderImage3, alt: "slide-2", onClick: () => window.location.href = 'https://www.skyscanner.co.kr/news/summer-foodie-roadtrips' },
+  { src: SliderImage4, alt: "slide-3", onClick: () => window.location.href = 'https://www.jejuair.net/ko/event/eventDetail.do?eventNo=0000002180' },
+  { src: SliderImage5, alt: "slide-4", onClick: () => window.location.href = 'https://web.travelover.co.kr/insu/intro?utm_campaign=pckey&utm_source=google&utm_medium=ads&utm_term=%EC%97%AC%ED%96%89%EC%9E%90%EB%B3%B4%ED%97%98&gad_source=1&gclid=Cj0KCQjwlIG2BhC4ARIsADBgpVRVqlzAfUvGjKnBTugrESV3nILtThScC5pO7OPRax0_pe3ZwTD_oHkaAhkGEALw_wcB' }
+];
 
 const ImageSlider = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setActiveIndex((prevIndex) => (prevIndex + 1) % (colors.length + 1));
+      setActiveIndex((prevIndex) => (prevIndex + 1) % images.length);
     }, 4000); // 슬라이드 4초
 
     return () => clearInterval(interval);
   }, []);
 
-  const handleImageClick = () => {
-    window.location.href = 'https://www.jeju-the-rentcar.com/detail?id=1026'; // URL로 이동
-  };
-
   return (
     <Slider>
       <SliderContent activeIndex={activeIndex}>
-        <Slide>
-          <Image src={SliderImage} alt="slide-0" onClick={handleImageClick} /> {/* 첫 번째 슬라이드에 이미지 클릭 핸들러 추가 */}
-        </Slide>
-        {colors.map((color, index) => (
-          <Slide key={index + 1} style={{ backgroundColor: color }}>
-            <ColorBox>{color}</ColorBox>
+        {images.map((image, index) => (
+          <Slide key={index}>
+            <Image src={image.src} alt={image.alt} onClick={image.onClick} />
           </Slide>
         ))}
       </SliderContent>
       <Indicators>
-        <Indicator isActive={activeIndex === 0} />
-        {colors.map((_, index) => (
+        {images.map((_, index) => (
           <Indicator
-            key={index + 1}
-            isActive={index + 1 === activeIndex}
+            key={index}
+            isActive={index === activeIndex}
           />
         ))}
       </Indicators>
@@ -74,18 +76,7 @@ const Image = styled.img`
   width: 100%;
   height: 100%;
   object-fit: cover;
-  cursor: pointer; /* 클릭 가능한 커서 모양으로 변경 */
-`;
-
-const ColorBox = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  color: #333;
-  text-align: center;
+  cursor: pointer; 
 `;
 
 const Indicators = styled.div`
