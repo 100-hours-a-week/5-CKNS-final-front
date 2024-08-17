@@ -1,20 +1,27 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';  // useNavigate 임포트
 import backIcon from '../../images/header/back.png'; 
 import bellIcon from '../../images/header/bell.png';
 import userIcon from '../../images/header/user.png';
-import logoImage from '../../images/logo/logo11.png'; // 로고 이미지 import
+import logoImage from '../../images/logo/logo11.png'; 
 
 const Header = ({ showBackButton = false }) => {
+  const navigate = useNavigate();  // useNavigate 훅 사용
+
+  const handleUserIconClick = () => {
+    navigate('/login');  // 유저 아이콘 클릭 시 /login 페이지로 이동
+  };
+
   return (
     <HeaderContainer>
       <LeftSection>
         <BackButton src={backIcon} alt="뒤로가기" show={showBackButton} />
-        <Logo src={logoImage} alt="여행한DAY 로고" /> {/* 로고 이미지로 변경 */}
+        <Logo src={logoImage} alt="여행한DAY 로고" />
       </LeftSection>
       <RightSection>
         <Icon src={bellIcon} alt="알람 아이콘" />
-        <Icon src={userIcon} alt="유저 아이콘" />
+        <Icon src={userIcon} alt="유저 아이콘" onClick={handleUserIconClick} />  {/* onClick 이벤트 추가 */}
       </RightSection>
     </HeaderContainer>
   );
@@ -43,9 +50,8 @@ const RightSection = styled.div`
 `;
 
 const Logo = styled.img`
-  width: 140px; /* 로고 크기 조정 */
-  height: auto; /* 로고 크기 조정 */
-  margin-left: cpx;
+  width: 140px;
+  height: auto;
 `;
 
 const Icon = styled.img`

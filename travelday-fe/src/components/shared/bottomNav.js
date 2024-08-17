@@ -52,8 +52,8 @@ const NavItem = styled.a`
 `;
 
 const NavIcon = styled.img`
-  width: 28px;
-  height: 28px;
+  width: 23px;
+  height: 23px;
   margin-bottom: 5px;
 `;
 

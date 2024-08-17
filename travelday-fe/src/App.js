@@ -6,6 +6,7 @@ import HotelResultPage from './pages/resultPage/hotelResultPage';
 import MainPage from './pages/mainPage/mainPage';
 import LoginPage from './pages/userPage/loginPage';
 import Callback from './pages/userPage/callback';
+import MyPage from './pages/userPage/myPage';
 
 import './App.css';
 
@@ -19,6 +20,7 @@ function App() {
         <Route path="/flight" element={<FlightResultPage />} />
         <Route path="/hotel" element={<HotelResultPage />} /> 
         <Route path="/auth/kakao/callback" element={<Callback />} />
+        <Route path="/mypage" element={<MyPage />} />
       </Routes>
     </Router>
   );
