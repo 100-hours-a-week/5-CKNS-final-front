@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import backIcon from '../../images/header/back.png'; 
 import bellIcon from '../../images/header/bell.png';
 import userIcon from '../../images/header/user.png';
-import logoImage from '../../images/logo/logo7.png'; // 로고 이미지 import
+import logoImage from '../../images/logo/logo11.png'; // 로고 이미지 import
 
 const Header = ({ showBackButton = false }) => {
   return (
@@ -43,7 +43,7 @@ const RightSection = styled.div`
 `;
 
 const Logo = styled.img`
-  width: 180px; /* 로고 크기 조정 */
+  width: 140px; /* 로고 크기 조정 */
   height: auto; /* 로고 크기 조정 */
   margin-left: cpx;
 `;
@@ -58,6 +58,7 @@ const Icon = styled.img`
 const BackButton = styled.img`
   width: 24px;
   height: 24px;
+  margin-right: 10px;
   cursor: pointer;
   display: ${(props) => (props.show ? 'inline' : 'none')};
 `;

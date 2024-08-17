@@ -21,6 +21,7 @@ const MainPage = () => {
         <SectionSubTitle>#바로 출발해 봐요</SectionSubTitle>
         <JapanSaleList />  
       </Content>
+      <BottomPadding />
       <BottomNav />
     </PageContainer>
   );
@@ -33,7 +34,7 @@ const PageContainer = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   background-color: #fafafa;
 `;
 
@@ -71,4 +72,8 @@ const SectionSubTitle = styled.h2`
   margin-top: 15px;
   margin-bottom: 15px;
   color: #c2c2c2;
+`;
+
+const BottomPadding = styled.div`
+  height: 110px;  /* 하단 네비게이션 바의 높이만큼 여유 공간 추가 */
 `;

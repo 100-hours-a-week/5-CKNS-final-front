@@ -20,7 +20,7 @@ const LoginPage = () => {
   return (
     <PageContainer>
         <Container>
-        <Header />
+        <Header showBackButton={true} />
         <KaKaoButtonWrapper>
                     <KakaoButton onClick={handleLogin}>
                         <KakaoImage src={KakaoLoginImage} alt="kakao login" />
