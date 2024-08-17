@@ -16,11 +16,11 @@ const BottomNav = () => {
         <NavIcon src={airplaneIcon} alt="예약" />
         <NavText>예약</NavText>
       </NavItem>
-      <NavItem href="#">
+      <NavItem href="/schedule">
         <NavIcon src={scheduleIcon} alt="일정" />
         <NavText>일정</NavText>
       </NavItem>
-      <NavItem href="#">
+      <NavItem href="map">
         <NavIcon src={mapIcon} alt="지도" />
         <NavText>지도</NavText>
       </NavItem>
