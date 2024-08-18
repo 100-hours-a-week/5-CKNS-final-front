@@ -1,14 +1,21 @@
 import React from 'react';
 import styled from 'styled-components';
+import Image7 from '../../images/main/list2/7.png';
+import Image8 from '../../images/main/list2/8.png';
+import Image9 from '../../images/main/list2/9.png';
+import Image10 from '../../images/main/list2/10.png';
 
 const JapanSaleList = () => {
+  const images = [Image7, Image8, Image9, Image10];
+
   return (
     <Wrapper>
       <ListContainer>
-        <ListItem />
-        <ListItem />
-        <ListItem />
-        <ListItem />
+        {images.map((image, index) => (
+          <ListItem key={index}>
+            <Image src={image} alt={`sale-${index}`} />
+          </ListItem>
+        ))}
       </ListContainer>
     </Wrapper>
   );
@@ -36,7 +43,13 @@ const ListContainer = styled.div`
 const ListItem = styled.div`
   width: 290px;
   height: 290px;
-  background-color: #ccc; /* 회색 박스 */
-  border-radius: 8px;
   flex-shrink: 0; /* 아이템 크기를 고정 */
+  border-radius: 8px;
+  overflow: hidden; /* 이미지를 아이템 경계에 맞게 잘라냄 */
+`;
+
+const Image = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 이미지가 박스에 맞게 크기 조정 */
 `;
