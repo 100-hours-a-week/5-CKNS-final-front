@@ -10,6 +10,7 @@ import MyPage from './pages/userPage/myPage';
 import MapPage from './pages/mapPage/mapPage';
 import SchedulePage from './pages/schedulePage/schedulePage';
 import AlarmPage from './pages/userPage/alarmPage';
+import IntroPage from './pages/introPage/introPage';
 
 import './App.css';
 
@@ -27,7 +28,7 @@ function App() {
         <Route path="/map" element={<MapPage />} />
         <Route path="/schedule" element={<SchedulePage />} />
         <Route path="/alarm" element={<AlarmPage />} />
-
+        <Route path="/intro" element={<IntroPage />} /> 
       </Routes>
     </Router>
   );
