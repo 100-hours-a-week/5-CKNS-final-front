@@ -13,18 +13,6 @@ const HotelSearch = () => {
   const [isGuestPopupOpen, setIsGuestPopupOpen] = useState(false); // 인원 팝업 상태 추가
   const [searchInput, setSearchInput] = useState('');
   const [filteredResults, setFilteredResults] = useState([]);
-  const [selectedLocation, setSelectedLocation] = useState(null);
-
-  const locations = [
-    '서울, 대한민국',
-    '부산, 대한민국',
-    '인천, 대한민국',
-    '대구, 대한민국',
-    '뉴욕, 미국',
-    '파리, 프랑스',
-    '도쿄, 일본',
-    '런던, 영국',
-  ];
 
   const {
     location,
@@ -36,6 +24,17 @@ const HotelSearch = () => {
   } = useHotelStore();
 
   const navigate = useNavigate();
+
+  const locations = [
+    '서울, 대한민국',
+    '부산, 대한민국',
+    '인천, 대한민국',
+    '대구, 대한민국',
+    '뉴욕, 미국',
+    '파리, 프랑스',
+    '도쿄, 일본',
+    '런던, 영국',
+  ];
 
   const handlePopupClose = () => {
     setIsPopupOpen(false);
@@ -60,7 +59,7 @@ const HotelSearch = () => {
 
   const handleResultClick = (result) => {
     if (result !== '검색결과가 없습니다.') {
-      setSelectedLocation(result); // 지역 선택
+      setLocation(result); // 지역을 Zustand 스토어에 저장
       handlePopupClose();
       setTimeout(() => {
         setIsDatePopupOpen(true); // 날짜 선택 팝업 열기
