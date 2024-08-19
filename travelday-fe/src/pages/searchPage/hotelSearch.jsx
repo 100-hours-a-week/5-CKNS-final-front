@@ -5,18 +5,22 @@ import AreaPopup from '../../components/shared/areaPopup';
 import DateRangePopup from '../../components/shared/datePopup';
 import GuestSelectorPopup from '../../components/shared/guestPopup';
 import HotelList from '../../components/searchPage/hotelList'; 
-import useHotelStore from '../../store/useHotelStore'; // 올바른 스토어 가져오기
+import useHotelStore from '../../store/useHotelStore';
+import { fetchHotels } from '../../utils/hotelSearch'; 
 
 const HotelSearch = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isDatePopupOpen, setIsDatePopupOpen] = useState(false);
-  const [isGuestPopupOpen, setIsGuestPopupOpen] = useState(false); // 인원 팝업 상태 추가
+  const [isGuestPopupOpen, setIsGuestPopupOpen] = useState(false);
   const [searchInput, setSearchInput] = useState('');
   const [filteredResults, setFilteredResults] = useState([]);
+  const [hotelData, setHotelData] = useState(null);
 
   const {
     location,
     dates,
+    adults,
+    children,
     setLocation,
     setDates,
     setAdults,
@@ -59,40 +63,35 @@ const HotelSearch = () => {
 
   const handleResultClick = (result) => {
     if (result !== '검색결과가 없습니다.') {
-      setLocation(result); // 지역을 Zustand 스토어에 저장
+      setLocation(result);
       handlePopupClose();
       setTimeout(() => {
-        setIsDatePopupOpen(true); // 날짜 선택 팝업 열기
+        setIsDatePopupOpen(true);
       }, 300);
     }
   };
 
   const handleDateSelect = (range) => {
-    setDates(range); // 선택된 날짜를 Zustand 스토어에 저장
+    setDates(range);
   };
 
   const handleDateSearchClick = () => {
-    setIsDatePopupOpen(false);  // 날짜 선택 팝업 닫기
-    setIsGuestPopupOpen(true);  // 인원 선택 팝업 열기
+    setIsDatePopupOpen(false);
+    setIsGuestPopupOpen(true);
   };
 
-  const handleGuestSelect = (adults, children) => {
+  const handleGuestSelect = async (adults, children) => {
     setAdults(adults);
     setChildren(children);
     setIsGuestPopupOpen(false);
-    navigate('/hotel');  // 인원 선택 후 /hotel로 이동
-  };
 
-  const handleDatePopupClose = () => {
-    setIsDatePopupOpen(false);
-  };
-
-  const handleGuestPopupClose = () => {
-    setIsGuestPopupOpen(false);
+    const fetchedHotels = await fetchHotels(location, dates, adults, children);
+    setHotelData(fetchedHotels || []);
+    navigate('/hotel');
   };
 
   // 예시 호텔 데이터
-  const hotels = [
+  const mockHotels = [
     { image: '', name: 'Hilton New York', location: 'New York, USA', rating: '5 stars', price: '1,500,000원' },
     { image: '', name: 'Hotel de Paris', location: 'Paris, France', rating: '5 stars', price: '2,000,000원' },
     { image: '', name: 'Tokyo Inn', location: 'Tokyo, Japan', rating: '3 stars', price: '800,000원' },
@@ -116,12 +115,12 @@ const HotelSearch = () => {
           placeholder="도시, 호텔 위치를 검색하세요." 
           value={searchInput}
           onChange={handleSearchInputChange} 
-          onKeyDown={handleKeyDown} // 
+          onKeyDown={handleKeyDown} 
         />
       </AnimatedPopup>
       <DateRangePopup 
         isOpen={isDatePopupOpen} 
-        onClose={handleDatePopupClose}
+        onClose={() => setIsDatePopupOpen(false)}
         onDateRangeChange={handleDateSelect}
         onSearchClick={handleDateSearchClick} 
         buttonText="검색"
@@ -130,16 +129,20 @@ const HotelSearch = () => {
       {isGuestPopupOpen && (
         <GuestSelectorPopup 
           isOpen={isGuestPopupOpen}
-          onClose={handleGuestPopupClose}
+          onClose={() => setIsGuestPopupOpen(false)}
           onGuestSelect={handleGuestSelect}
         />
       )}
-      <HotelList hotels={hotels} />  
+      <HotelList hotels={hotelData || mockHotels} />  
     </Container>
   );
 };
 
 export default HotelSearch;
+
+// Styled Components ...
+
+
 
 const slideUp = keyframes`
   from {

@@ -9,14 +9,16 @@ import FilterPopup from '../../components/shared/filterPopup.js';
 import calendarIcon from '../../images/filter/calendar.png';
 import filterIcon from '../../images/filter/filter.png'; 
 import useFlightStore from '../../store/useFlightStore.js';
+import { getFlights } from '../../utils/flightSearch'; // Flight API 가져오기
 
 const FlightResultPage = () => {
-  const { departure, arrival, dates, setDates, adults, children } = useFlightStore(); // adults와 children 추가
+  const { departure, arrival, dates, setDates, adults, children } = useFlightStore(); 
   const navigate = useNavigate();
 
   const [isDatePopupOpen, setIsDatePopupOpen] = useState(false);
-  const [localDates, setLocalDates] = useState(dates); // 로컬 상태로 초기화
-  const [isFilterPopupOpen, setIsFilterPopupOpen] = useState(false); // 필터 팝업 상태 추가
+  const [localDates, setLocalDates] = useState(dates); 
+  const [isFilterPopupOpen, setIsFilterPopupOpen] = useState(false); 
+  const [flights, setFlights] = useState([]); // 항공편 데이터 상태 추가
 
   useEffect(() => {
     console.log("출발지:", departure);
@@ -24,7 +26,27 @@ const FlightResultPage = () => {
     console.log("선택된 날짜:", dates);
     console.log("Adults:", adults);
     console.log("Children:", children);
+
+    // 페이지 로드 시 항공편 데이터 가져오기
+    fetchFlights();
   }, [departure, arrival, dates, adults, children]);
+
+  const fetchFlights = async () => {
+    try {
+      const params = {
+        departure,
+        arrival,
+        startDate: dates.startDate.toISOString().split('T')[0], 
+        endDate: dates.endDate.toISOString().split('T')[0],
+        adults,
+        children,
+      };
+      const data = await getFlights(params);
+      setFlights(data); // 가져온 데이터를 상태에 저장
+    } catch (error) {
+      console.error('Failed to fetch flights:', error);
+    }
+  };
 
   const handleDateClick = () => {
     setIsDatePopupOpen(true);
@@ -42,13 +64,13 @@ const FlightResultPage = () => {
 
   const handleDateRangeChange = (selectedDates) => {
     console.log("선택된 날짜:", selectedDates);
-    setLocalDates(selectedDates);  // 로컬 상태 업데이트
+    setLocalDates(selectedDates);  
   };
 
   const handleSearchClick = () => {
-    setDates(localDates); // 선택된 날짜를 Zustand 스토어에 저장
-    navigate('/flight'); // 검색 버튼 클릭 시 /flight로 이동
-    setIsDatePopupOpen(false); // 팝업 닫기
+    setDates(localDates); 
+    fetchFlights(); // 검색 시 항공편 데이터 새로고침
+    setIsDatePopupOpen(false); 
   };
 
   const handleBackClick = () => {
@@ -61,8 +83,8 @@ const FlightResultPage = () => {
         showBackButton={true} 
         result={resultTitle} 
         onBackClick={handleBackClick}
-        adults={adults} // adults 값을 전달
-        children={children} // children 값을 전달
+        adults={adults} 
+        children={children} 
       />
       <FilterContainer>
         <FilterButton onClick={handleDateClick}>
@@ -74,7 +96,7 @@ const FlightResultPage = () => {
       </FilterContainer>
 
       <ContentContainer>
-        <FlightResultList departure={departure} arrival={arrival} dates={dates} />
+        <FlightResultList flights={flights} /> {/* 받아온 항공편 데이터 전달 */}
       </ContentContainer>
       <BottomPadding />
       <BottomNav />
@@ -84,7 +106,7 @@ const FlightResultPage = () => {
           isOpen={isDatePopupOpen} 
           onClose={() => setIsDatePopupOpen(false)} 
           onDateRangeChange={handleDateRangeChange}
-          onSearchClick={handleSearchClick} // 검색 버튼 클릭 시 호출
+          onSearchClick={handleSearchClick} 
         />
       )}
 
@@ -92,7 +114,6 @@ const FlightResultPage = () => {
         <FilterPopup 
           isOpen={isFilterPopupOpen} 
           onClose={() => setIsFilterPopupOpen(false)} 
-          // 여기에 필요한 다른 props 추가
         />
       )}
     </PageContainer>
@@ -100,6 +121,7 @@ const FlightResultPage = () => {
 };
 
 export default FlightResultPage;
+
 
 const PageContainer = styled.div`
   display: flex;

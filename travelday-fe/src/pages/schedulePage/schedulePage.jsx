@@ -32,13 +32,13 @@ const Content = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 100px; /* 필요한 경우 위치 조정을 위해 여백 추가 */
+  margin-top: 100px; 
 `;
 
 const Image = styled.img`
-  width: 200px; /* 이미지 크기 조정 */
+  width: 200px; 
   height: auto;
-  margin-bottom: 20px; /* 이미지와 텍스트 사이의 간격 조정 */
+  margin-bottom: 20px;
 `;
 
 const Text = styled.p`

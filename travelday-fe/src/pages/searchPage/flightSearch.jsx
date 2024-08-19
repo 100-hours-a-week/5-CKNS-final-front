@@ -8,6 +8,7 @@ import GuestSelectorPopup from '../../components/shared/guestPopup';
 import switchIcon from '../../images/switch.png';
 import FlightList from '../../components/searchPage/flightList';
 import useFlightStore from '../../store/useFlightStore'; 
+import { getFlights } from '../../utils/flightSearch'; 
 
 // 이미지 파일 import
 import img1 from '../../images/search/1.png';
@@ -18,10 +19,11 @@ const FlightSearch = () => {
   const [tripType, setTripType] = useState('round-trip');
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isDatePopupOpen, setIsDatePopupOpen] = useState(false);
-  const [isGuestPopupOpen, setIsGuestPopupOpen] = useState(false);  // 인원 팝업 상태 추가
+  const [isGuestPopupOpen, setIsGuestPopupOpen] = useState(false);  
   const [searchType, setSearchType] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [filteredResults, setFilteredResults] = useState([]);
+  const [flights, setFlights] = useState([]); 
 
   const {
     departure,
@@ -38,10 +40,9 @@ const FlightSearch = () => {
 
   const navigate = useNavigate();
 
-  const departureLocations = ['서울', '부산', '인천', '대구'];
-  const arrivalLocations = ['뉴욕', '파리', '도쿄', '런던'];
+  const departureLocations = ['서울', '부산', '인천', '대구']; // 수정된 부분
+  const arrivalLocations = ['뉴욕', '파리', '도쿄', '런던']; // 수정된 부분
 
-  // 로그 출력
   useEffect(() => {
     console.log("Selected Departure:", departure);
     console.log("Selected Arrival:", arrival);
@@ -49,6 +50,23 @@ const FlightSearch = () => {
     console.log("Adults:", adults);
     console.log("Children:", children);
   }, [departure, arrival, dates, adults, children]);
+
+  const fetchFlights = async () => {
+    try {
+      const params = {
+        departure,
+        arrival,
+        startDate: dates.startDate.toISOString().split('T')[0], 
+        endDate: dates.endDate.toISOString().split('T')[0],
+        adults,
+        children,
+      };
+      const data = await getFlights(params);
+      setFlights(data); // 가져온 데이터를 상태에 저장
+    } catch (error) {
+      console.error('Failed to fetch flights:', error);
+    }
+  };
 
   const handlePopupClose = () => {
     setIsPopupOpen(false);
@@ -102,10 +120,11 @@ const FlightSearch = () => {
     setIsGuestPopupOpen(true);  // 인원 선택 팝업 열기
   };
 
-  const handleGuestSelect = (adults, children) => {
+  const handleGuestSelect = async (adults, children) => {
     setAdults(adults);
     setChildren(children);
-    navigate('/flight');  // 인원 선택 후 /flight로 이동
+    await fetchFlights(); // 인원 선택 후, API 호출
+    navigate('/flight'); // 이후 /flight 페이지로 이동
   };
 
   const handleDatePopupClose = () => {
@@ -155,7 +174,7 @@ const FlightSearch = () => {
           children={children}
         />
       )}
-      <FlightList flights={[
+      <FlightList flights={flights.length > 0 ? flights : [
         { image: img1, country: '미국', city: 'New York', schedule: '2024. 11. 16 - 11.18', price: '623,000원' },
         { image: img2, country: '프랑스', city: 'Paris', schedule: '2024. 9. 12 - 9.18', price: '1,092,000원' },
         { image: img3, country: '일본', city: 'Tokyo', schedule: '2024. 8. 23 - 8.30', price: '340,000원' },
