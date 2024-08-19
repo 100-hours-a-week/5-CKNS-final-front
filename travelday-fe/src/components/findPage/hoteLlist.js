@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const HotelList = ({ hotels }) => {
+const HoteLlist = ({ hotels }) => {
   return (
     <ListContainer>
       {hotels.map((hotel, index) => (
@@ -79,4 +79,4 @@ const Price = styled.div`
   color: #007BFF;
 `;
 
-export default HotelList;
+export default HoteLlist;
