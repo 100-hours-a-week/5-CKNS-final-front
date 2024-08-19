@@ -3,17 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
 import AreaPopup from '../../components/shared/areaPopup';
 import DateRangePopup from '../../components/shared/datePopup';
+import GuestSelectorPopup from '../../components/shared/guestPopup';
 import HotelList from '../../components/searchPage/hotelList'; 
 import useHotelStore from '../../store/useHotelStore'; // 올바른 스토어 가져오기
 
 const HotelSearch = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isDatePopupOpen, setIsDatePopupOpen] = useState(false);
+  const [isGuestPopupOpen, setIsGuestPopupOpen] = useState(false); // 인원 팝업 상태 추가
   const [searchInput, setSearchInput] = useState('');
   const [filteredResults, setFilteredResults] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState(null);
 
-  // 여기서 사용할 목데이터
   const locations = [
     '서울, 대한민국',
     '부산, 대한민국',
@@ -30,6 +31,8 @@ const HotelSearch = () => {
     dates,
     setLocation,
     setDates,
+    setAdults,
+    setChildren,
   } = useHotelStore();
 
   const navigate = useNavigate();
@@ -69,16 +72,24 @@ const HotelSearch = () => {
     setDates(range); // 선택된 날짜를 Zustand 스토어에 저장
   };
 
-  const handleSearchClick = () => {
-    setLocation(selectedLocation); // 선택된 지역을 Zustand 스토어에 저장
-    console.log("선택된 지역:", selectedLocation);
-    console.log("선택된 날짜:", dates);
+  const handleDateSearchClick = () => {
+    setIsDatePopupOpen(false);  // 날짜 선택 팝업 닫기
+    setIsGuestPopupOpen(true);  // 인원 선택 팝업 열기
+  };
 
-    navigate('/hotel'); // /hotel 페이지로 이동
+  const handleGuestSelect = (adults, children) => {
+    setAdults(adults);
+    setChildren(children);
+    setIsGuestPopupOpen(false);
+    navigate('/hotel');  // 인원 선택 후 /hotel로 이동
   };
 
   const handleDatePopupClose = () => {
     setIsDatePopupOpen(false);
+  };
+
+  const handleGuestPopupClose = () => {
+    setIsGuestPopupOpen(false);
   };
 
   // 예시 호텔 데이터
@@ -113,19 +124,23 @@ const HotelSearch = () => {
         isOpen={isDatePopupOpen} 
         onClose={handleDatePopupClose}
         onDateRangeChange={handleDateSelect}
-        onSearchClick={handleSearchClick} 
+        onSearchClick={handleDateSearchClick} 
         buttonText="검색"
         dateRange={dates} 
       />
+      {isGuestPopupOpen && (
+        <GuestSelectorPopup 
+          isOpen={isGuestPopupOpen}
+          onClose={handleGuestPopupClose}
+          onGuestSelect={handleGuestSelect}
+        />
+      )}
       <HotelList hotels={hotels} />  
     </Container>
   );
 };
 
 export default HotelSearch;
-
-
-// Styled Components remain the same
 
 const slideUp = keyframes`
   from {

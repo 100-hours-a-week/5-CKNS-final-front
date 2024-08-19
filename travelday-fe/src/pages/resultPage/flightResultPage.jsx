@@ -11,7 +11,7 @@ import filterIcon from '../../images/filter/filter.png';
 import useFlightStore from '../../store/useFlightStore.js';
 
 const FlightResultPage = () => {
-  const { departure, arrival, dates, setDates } = useFlightStore();
+  const { departure, arrival, dates, setDates, adults, children } = useFlightStore(); // adults와 children 추가
   const navigate = useNavigate();
 
   const [isDatePopupOpen, setIsDatePopupOpen] = useState(false);
@@ -22,7 +22,9 @@ const FlightResultPage = () => {
     console.log("출발지:", departure);
     console.log("도착지:", arrival);
     console.log("선택된 날짜:", dates);
-  }, [departure, arrival, dates]);
+    console.log("Adults:", adults);
+    console.log("Children:", children);
+  }, [departure, arrival, dates, adults, children]);
 
   const handleDateClick = () => {
     setIsDatePopupOpen(true);
@@ -55,7 +57,13 @@ const FlightResultPage = () => {
 
   return (
     <PageContainer>
-      <ResultHeader showBackButton={true} result={resultTitle} onBackClick={handleBackClick} />
+      <ResultHeader 
+        showBackButton={true} 
+        result={resultTitle} 
+        onBackClick={handleBackClick}
+        adults={adults} // adults 값을 전달
+        children={children} // children 값을 전달
+      />
       <FilterContainer>
         <FilterButton onClick={handleDateClick}>
           <Icon src={calendarIcon} alt="날짜 아이콘" /> {formattedDates}
@@ -112,8 +120,8 @@ const ContentContainer = styled.div`
 const FilterContainer = styled.div`
   width: 390px;
   padding: 0px 0px 10px 0px;
-   display: flex;
-   gap: 20px;
+  display: flex;
+  gap: 20px;
   align-items: center;
   background-color: #fff;
   justify-content: center;
