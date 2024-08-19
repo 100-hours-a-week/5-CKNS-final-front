@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import backIcon from '../../images/header/back.png';
+import arrowIcon from '../../images/arrow.png'; 
 
 const slideUp = keyframes`
   from {
@@ -13,7 +14,7 @@ const slideUp = keyframes`
   }
 `;
 
-const AreaPopup = ({ isOpen, onClose, children }) => {
+const AreaPopup = ({ isOpen, onClose, children, searchResults = [], onResultClick }) => {
   if (!isOpen) return null;
 
   return (
@@ -24,12 +25,23 @@ const AreaPopup = ({ isOpen, onClose, children }) => {
             <img src={backIcon} alt="뒤로가기" />
           </BackButton>
           <SearchBar>
-            <input type="text" placeholder="출발지를 검색하세요." />
+            {children}
           </SearchBar>
         </Header>
-        <SearchResults>
-          {children}
-        </SearchResults>
+        <Divider />
+        {searchResults.length > 0 && (
+          <>
+            <SearchResultsTitle>검색결과</SearchResultsTitle>
+            <SearchResults>
+              {searchResults.map((result, index) => (
+                <SearchResultItem key={index} onClick={() => onResultClick(result)}>
+                  <img src={arrowIcon} alt="화살표" />
+                  {result}
+                </SearchResultItem>
+              ))}
+            </SearchResults>
+          </>
+        )}
       </PopupContent>
     </PopupOverlay>
   );
@@ -44,12 +56,12 @@ const PopupOverlay = styled.div`
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
-  align-items: flex-end; /* 팝업이 화면 하단에 위치 */
+  align-items: flex-end;
 `;
 
 const PopupContent = styled.div`
   width: 350px;
-  height: 863px;
+  height: 80%; /* 높이를 화면의 80%로 설정 */
   background-color: #fff;
   padding: 20px;
   border-radius: 8px 8px 0 0;
@@ -85,15 +97,47 @@ const SearchBar = styled.div`
     font-size: 20px;
 
     &:focus {
-      outline: none; /* 포커스 시 아웃라인 제거 */
+      outline: none;
     }
   }
 `;
 
+const Divider = styled.div`
+  width: 100%;
+  height: 1px;
+  background-color: #ccc;
+  margin-top: -10px;
+  margin-bottom: 10px;
+`;
+
+const SearchResultsTitle = styled.div`
+  width: 100%;
+  text-align: left;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+`;
+
 const SearchResults = styled.div`
   flex: 1;
-  overflow-y: auto;
   margin-top: 20px;
+  font-size: 20px;
+  overflow-y: auto; 
+`;
+
+const SearchResultItem = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  cursor: pointer;
+
+  img {
+    margin-left: 10px;
+    margin-right: 21px;
+    width: 16px; /* 화살표 이미지 크기 */
+    height: 16px;
+  }
 `;
 
 export default AreaPopup;

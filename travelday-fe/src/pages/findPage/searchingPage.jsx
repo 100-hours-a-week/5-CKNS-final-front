@@ -5,9 +5,10 @@ import BottomNav from '../../components/shared/bottomNav.js';
 import Title from '../../components/shared/title.js';
 import Toggle from '../../components/findPage/toggle.js';
 import FlightSearch from './flightSearch.jsx';
+import HotelSearch from './hotelSearch.jsx';
 
 const SearchingPage = () => {
-  const [selectedOption, setSelectedOption] = useState('항공'); // 기본 선택을 '항공'으로 설정
+  const [selectedOption, setSelectedOption] = useState('항공'); 
 
   return (
     <Container>
@@ -20,7 +21,9 @@ const SearchingPage = () => {
           onOptionClick={setSelectedOption}
         />
       </Content>
-      <FlightSearch />
+      {selectedOption === '항공' && <FlightSearch />}
+      {selectedOption === '호텔' && <HotelSearch />}
+      <BottomPadding />
       <BottomNav />
     </Container>
   );
@@ -33,7 +36,7 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   background-color: #fafafa;
 `;
 
@@ -46,3 +49,6 @@ const Content = styled.div`
   text-align: center;
 `;
 
+const BottomPadding = styled.div`
+  height: 110px;  /* 하단 네비게이션 바의 높이만큼 여유 공간 추가 */
+`;

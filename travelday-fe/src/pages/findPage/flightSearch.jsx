@@ -1,33 +1,158 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; 
 import styled, { keyframes } from 'styled-components';
 import TripTypeSelector from '../../components/findPage/tripType';
 import AreaPopup from '../../components/shared/areaPopup';
+import DateRangePopup from '../../components/shared/datePopup'; 
 import switchIcon from '../../images/switch.png';
+import FlightList from '../../components/findPage/flightList';
+import useFlightStore from '../../store/useFlightStore'; // Zustand 스토어 가져오기
 
 const FlightSearch = () => {
   const [tripType, setTripType] = useState('round-trip');
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isDatePopupOpen, setIsDatePopupOpen] = useState(false);
+  const [searchType, setSearchType] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  const [filteredResults, setFilteredResults] = useState([]);
+
+  const {
+    departure,
+    arrival,
+    dates,
+    setDeparture,
+    setArrival,
+    setDates,
+  } = useFlightStore();
+
+  const navigate = useNavigate();
+
+  const departureLocations = ['서울', '부산', '인천', '대구'];
+  const arrivalLocations = ['뉴욕', '파리', '도쿄', '런던'];
+
+  // 로그 출력
+  useEffect(() => {
+    console.log("Selected Departure:", departure);
+  }, [departure]);
+
+  useEffect(() => {
+    console.log("Selected Arrival:", arrival);
+  }, [arrival]);
+
+  useEffect(() => {
+    console.log("Selected Dates:", dates);
+  }, [dates]);
 
   const handlePopupClose = () => {
     setIsPopupOpen(false);
+    setSearchInput('');
+    setFilteredResults([]);
   };
 
-  const handleButtonClick = () => {
+  const handleButtonClick = (type) => {
+    setSearchType(type);
     setIsPopupOpen(true);
   };
+
+  const handleSearchInputChange = (event) => {
+    setSearchInput(event.target.value);
+  };
+
+  const handleSearch = () => {
+    const dataToFilter = searchType === 'departure' ? departureLocations : arrivalLocations;
+    const results = dataToFilter.filter(location => location.includes(searchInput));
+    setFilteredResults(results.length > 0 ? results : ['검색결과가 없습니다.']);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  const handleResultClick = (result) => {
+    if (searchType === 'departure') {
+      setDeparture(result); // Zustand 스토어에 출발지 저장
+      handlePopupClose();
+      setTimeout(() => {
+        handleButtonClick('arrival');
+      }, 300);
+    } else {
+      setArrival(result); // Zustand 스토ore에 도착지 저장
+      handlePopupClose();
+      setTimeout(() => {
+        setIsDatePopupOpen(true);
+      }, 300);
+    }
+  };
+
+  const handleDateSelect = (range) => {
+    setDates(range); // Zustand 스토어에 날짜 저장
+  };
+
+  const handleSearchClick = () => {
+    console.log("출발지:", departure);
+    console.log("도착지:", arrival);
+    console.log("선택된 날짜:", dates);
+
+    navigate('/flight');
+  };
+
+  const handleDatePopupClose = () => {
+    setIsDatePopupOpen(false);
+    setDates([]);
+  };
+
+  // 예시 항공편 데이터
+  const flights = [
+    { image: '', country: '미국', city: 'New York', schedule: '2024. 11. 16 - 11.18', price: '623,000원' },
+    { image: '', country: '프랑스', city: 'Paris', schedule: '2024. 9. 12 - 9.18', price: '1,092,000원' },
+    { image: '', country: '일본', city: 'Tokyo', schedule: '2024. 8. 23 - 8.30', price: '340,000원' },
+  ];
 
   return (
     <Container>
       <TripTypeSelector tripType={tripType} setTripType={setTripType} />
-      <ButtonContainer>
-        <Button onClick={handleButtonClick}>출발지</Button>
-        <SwitchIcon src={switchIcon} alt="Switch" />
-        <Button onClick={handleButtonClick}>도착지</Button>
-      </ButtonContainer>
-      <AnimatedPopup isOpen={isPopupOpen} onClose={handlePopupClose} />
+      <AreaSearchingContainer>
+        <ButtonContainer>
+          <Button onClick={() => handleButtonClick('departure')}>출발지</Button>
+          <SwitchIcon src={switchIcon} alt="Switch" />
+          <Button onClick={() => handleButtonClick('arrival')}>도착지</Button>
+        </ButtonContainer>
+      </AreaSearchingContainer>
+      <AnimatedPopup 
+        isOpen={isPopupOpen} 
+        onClose={handlePopupClose} 
+        searchResults={filteredResults}
+        onResultClick={handleResultClick} 
+      >
+        <input 
+          type="text" 
+          placeholder={searchType === 'departure' ? "출발지를 검색하세요." : "도착지를 검색하세요."} 
+          value={searchInput}
+          onChange={handleSearchInputChange} 
+          onKeyDown={handleKeyDown} 
+        />
+      </AnimatedPopup>
+      <DateRangePopup 
+        isOpen={isDatePopupOpen} 
+        onClose={handleDatePopupClose}
+        onDateRangeChange={handleDateSelect}
+        onSearchClick={handleSearchClick} 
+        toggleLabel="가는날 - 오는날"
+        buttonText="검색"
+        dateRange={dates} 
+      />
+      <FlightList flights={flights} />  
     </Container>
   );
 };
+
+export default FlightSearch;
+
+// Styled Components remain the same
+
+
 
 const slideUp = keyframes`
   from {
@@ -36,7 +161,7 @@ const slideUp = keyframes`
   }
   to {
     transform: translateY(0);
-    opacity: 1;
+    opacity: 1);
   }
 `;
 
@@ -53,8 +178,9 @@ const ButtonContainer = styled.div`
   width: 327px;
   height: 64px;
   background-color: #fff;
-  box-shadow: 0px 0px 10px rgba(149, 157, 177, 0.2);
+  box-shadow: 0px 0px 10px rgba(149, 157, 177, 0.3);
   border-radius: 8px;
+  margin-bottom: 10px;
 `;
 
 const Button = styled.button`
@@ -64,6 +190,14 @@ const Button = styled.button`
   background-color: #fff;
   border: none;
   outline: none;
+`;
+
+const AreaSearchingContainer = styled.div`
+  width: 390px;
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  justify-content: center;
 `;
 
 const SwitchIcon = styled.img`
@@ -84,11 +218,9 @@ const AnimatedPopup = styled(AreaPopup)`
   box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.1);
   padding: 20px;
   z-index: 1000;
+  overflow-y: hidden;
 
   ${(props) => !props.isOpen && `
     display: none;
   `}
 `;
-
-
-export default FlightSearch;
