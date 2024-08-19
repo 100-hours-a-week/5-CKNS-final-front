@@ -16,7 +16,7 @@ const slideUp = keyframes`
   }
 `;
 
-const GuestSelectorPopup = ({ isOpen, onClose }) => {
+const GuestSelectorPopup = ({ isOpen, onClose, onGuestSelect }) => {
   const [adultCount, setAdultCount] = useState(1); 
   const [childCount, setChildCount] = useState(0); 
 
@@ -29,6 +29,8 @@ const GuestSelectorPopup = ({ isOpen, onClose }) => {
 
   const handleSearchClick = () => {
     console.log('검색 버튼 클릭');
+    // 인원 선택 후 /flight로 이동하도록 onGuestSelect 호출
+    onGuestSelect(adultCount, childCount);
     onClose(); // 팝업 닫기
   };
 
@@ -77,6 +79,9 @@ const GuestSelectorPopup = ({ isOpen, onClose }) => {
 };
 
 export default GuestSelectorPopup;
+
+// Styled Components remain the same
+
 
 const PopupOverlay = styled.div`
   position: fixed;

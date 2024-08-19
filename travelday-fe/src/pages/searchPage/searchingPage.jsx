@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import Title from '../../components/shared/title.js';
-import Toggle from '../../components/findPage/toggle.js';
+import Toggle from '../../components/searchPage/toggle.js';
 import FlightSearch from './flightSearch.jsx';
 import HotelSearch from './hotelSearch.jsx';
 

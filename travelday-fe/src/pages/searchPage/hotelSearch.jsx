@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
 import AreaPopup from '../../components/shared/areaPopup';
 import DateRangePopup from '../../components/shared/datePopup';
-import HotelList from '../../components/findPage/hotelList'; 
+import HotelList from '../../components/searchPage/hotelList'; 
 import useHotelStore from '../../store/useHotelStore'; // 올바른 스토어 가져오기
 
 const HotelSearch = () => {

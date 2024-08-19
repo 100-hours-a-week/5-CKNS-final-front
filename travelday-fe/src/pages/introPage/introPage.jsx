@@ -3,10 +3,10 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';  // useNavigate 훅을 import
 
 const Intro = () => {
-  const navigate = useNavigate();  // useNavigate 훅 사용
+  const navigate = useNavigate(); 
 
   const handleButtonClick = () => {
-    navigate('/');  // / 경로로 이동
+    navigate('/'); 
   };
 
   return (
@@ -29,7 +29,7 @@ const VideoContainer = styled.div`
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  position: relative; /* 버튼을 동영상 위에 배치하기 위해 상대 위치 설정 */
+  position: relative; 
 `;
 
 const BackgroundVideo = styled.video`

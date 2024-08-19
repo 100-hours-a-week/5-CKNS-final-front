@@ -9,7 +9,7 @@ const LoginPage = () => {
 
   const handleNicknameChange = (e) => {
     setNickname(e.target.value);
-    setIsButtonEnabled(e.target.value.trim() !== '');  // 입력란이 비어 있지 않으면 버튼 활성화
+    setIsButtonEnabled(e.target.value.trim() !== '');  
   };
 
   const handleSubmit = () => {

@@ -1,17 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import styled, { keyframes } from 'styled-components';
-import TripTypeSelector from '../../components/findPage/tripType';
+import TripTypeSelector from '../../components/searchPage/tripType';
 import AreaPopup from '../../components/shared/areaPopup';
-import DateRangePopup from '../../components/shared/datePopup'; 
+import DateRangePopup from '../../components/shared/datePopup';
+import GuestSelectorPopup from '../../components/shared/guestPopup';
 import switchIcon from '../../images/switch.png';
-import FlightList from '../../components/findPage/flightList';
-import useFlightStore from '../../store/useFlightStore'; // Zustand 스토어 가져오기
+import FlightList from '../../components/searchPage/flightList';
+import useFlightStore from '../../store/useFlightStore'; 
+
+// 이미지 파일 import
+import img1 from '../../images/search/1.png';
+import img2 from '../../images/search/2.png';
+import img3 from '../../images/search/3.png';
 
 const FlightSearch = () => {
   const [tripType, setTripType] = useState('round-trip');
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isDatePopupOpen, setIsDatePopupOpen] = useState(false);
+  const [isGuestPopupOpen, setIsGuestPopupOpen] = useState(false);  // 인원 팝업 상태 추가
   const [searchType, setSearchType] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [filteredResults, setFilteredResults] = useState([]);
@@ -20,9 +27,13 @@ const FlightSearch = () => {
     departure,
     arrival,
     dates,
+    adults,
+    children,
     setDeparture,
     setArrival,
     setDates,
+    setAdults,
+    setChildren,
   } = useFlightStore();
 
   const navigate = useNavigate();
@@ -33,15 +44,11 @@ const FlightSearch = () => {
   // 로그 출력
   useEffect(() => {
     console.log("Selected Departure:", departure);
-  }, [departure]);
-
-  useEffect(() => {
     console.log("Selected Arrival:", arrival);
-  }, [arrival]);
-
-  useEffect(() => {
     console.log("Selected Dates:", dates);
-  }, [dates]);
+    console.log("Adults:", adults);
+    console.log("Children:", children);
+  }, [departure, arrival, dates, adults, children]);
 
   const handlePopupClose = () => {
     setIsPopupOpen(false);
@@ -72,13 +79,13 @@ const FlightSearch = () => {
 
   const handleResultClick = (result) => {
     if (searchType === 'departure') {
-      setDeparture(result); // Zustand 스토어에 출발지 저장
+      setDeparture(result);
       handlePopupClose();
       setTimeout(() => {
         handleButtonClick('arrival');
       }, 300);
     } else {
-      setArrival(result); // Zustand 스토ore에 도착지 저장
+      setArrival(result); 
       handlePopupClose();
       setTimeout(() => {
         setIsDatePopupOpen(true);
@@ -87,28 +94,24 @@ const FlightSearch = () => {
   };
 
   const handleDateSelect = (range) => {
-    setDates(range); // Zustand 스토어에 날짜 저장
+    setDates(range);
   };
 
   const handleSearchClick = () => {
-    console.log("출발지:", departure);
-    console.log("도착지:", arrival);
-    console.log("선택된 날짜:", dates);
+    setIsDatePopupOpen(false);  // 날짜 선택 팝업 닫기
+    setIsGuestPopupOpen(true);  // 인원 선택 팝업 열기
+  };
 
-    navigate('/flight');
+  const handleGuestSelect = (adults, children) => {
+    setAdults(adults);
+    setChildren(children);
+    navigate('/flight');  // 인원 선택 후 /flight로 이동
   };
 
   const handleDatePopupClose = () => {
     setIsDatePopupOpen(false);
     setDates([]);
   };
-
-  // 예시 항공편 데이터
-  const flights = [
-    { image: '', country: '미국', city: 'New York', schedule: '2024. 11. 16 - 11.18', price: '623,000원' },
-    { image: '', country: '프랑스', city: 'Paris', schedule: '2024. 9. 12 - 9.18', price: '1,092,000원' },
-    { image: '', country: '일본', city: 'Tokyo', schedule: '2024. 8. 23 - 8.30', price: '340,000원' },
-  ];
 
   return (
     <Container>
@@ -143,15 +146,25 @@ const FlightSearch = () => {
         buttonText="검색"
         dateRange={dates} 
       />
-      <FlightList flights={flights} />  
+      {isGuestPopupOpen && (
+        <GuestSelectorPopup 
+          isOpen={isGuestPopupOpen}
+          onClose={() => setIsGuestPopupOpen(false)}
+          onGuestSelect={handleGuestSelect}
+          adults={adults}
+          children={children}
+        />
+      )}
+      <FlightList flights={[
+        { image: img1, country: '미국', city: 'New York', schedule: '2024. 11. 16 - 11.18', price: '623,000원' },
+        { image: img2, country: '프랑스', city: 'Paris', schedule: '2024. 9. 12 - 9.18', price: '1,092,000원' },
+        { image: img3, country: '일본', city: 'Tokyo', schedule: '2024. 8. 23 - 8.30', price: '340,000원' },
+      ]} />  
     </Container>
   );
 };
 
 export default FlightSearch;
-
-// Styled Components remain the same
-
 
 
 const slideUp = keyframes`
@@ -185,7 +198,7 @@ const ButtonContainer = styled.div`
 
 const Button = styled.button`
   padding: 8px 16px;
-  margin: 0 40px;
+  margin: 0 20px;
   cursor: pointer;
   background-color: #fff;
   border: none;
