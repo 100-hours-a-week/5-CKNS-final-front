@@ -18,35 +18,40 @@ function MapPage() {
   const [places, setPlaces] = useState([]);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState(null);
+  const [isSearchComplete, setIsSearchComplete] = useState(false);
 
   const handleSearch = () => {
     if (map && searchInput) {
       const service = new window.google.maps.places.PlacesService(map);
       const request = {
         query: searchInput,
-        fields: ['name', 'geometry', 'formatted_address', 'rating', 'photos'], // place_id 대신 name을 사용
+        fields: ['name', 'geometry', 'formatted_address', 'rating', 'photos'],
         language: 'ko'
       };
   
       service.textSearch(request, (results, status) => {
         if (status === window.google.maps.places.PlacesServiceStatus.OK && results) {
-          console.log('Search results:', results); // API에서 반환된 결과를 콘솔에 출력
+          console.log('Search results:', results);  
           const newMarkers = results.map(result => ({
             position: result.geometry.location,
             name: result.name,
             address: result.formatted_address
           }));
+          console.log('New markers:', newMarkers);  
           setMarkers(newMarkers);
           setPlaces(results); 
           setIsPopupOpen(true);
+          setIsSearchComplete(true); 
           if (results[0]) {
             map.setCenter(results[0].geometry.location);
             map.setZoom(12);
           }
         } else {
-          console.error('Places Service failed:', status); // 오류 메시지 출력
+          console.error('Places Service failed:', status); 
         }
       });
+    } else {
+      console.warn('Map is not loaded or searchInput is empty.');  
     }
   };
   
@@ -57,7 +62,7 @@ function MapPage() {
   };
 
   const handleMarkerClick = (marker) => {
-    console.log('Marker clicked:', marker); // 마커 클릭 시 정보 출력
+    console.log('Marker clicked:', marker);  
     setSelectedPlace(marker);
   };
 
@@ -69,14 +74,18 @@ function MapPage() {
     if (map && place.geometry.location) {
       map.setCenter(place.geometry.location);
       map.setZoom(15);
-      setIsPopupOpen(false); // 팝업 닫기
+      setIsPopupOpen(false);
     }
   };
 
+  const handlePopupToggle = () => {
+    setIsPopupOpen(!isPopupOpen);  
+  };
+
   return (
-    <Container>
-      <Header />
-      <Content>
+    <Content>
+      <Container>
+        <Header />
         <SearchContainer>
           <SearchInput 
             type="text" 
@@ -87,50 +96,59 @@ function MapPage() {
           />
           <SearchIcon src={searchIcon} onClick={handleSearch} alt="search icon" />
         </SearchContainer>
-        <GoogleMap
-          mapContainerStyle={containerStyle}
-          center={center}
-          zoom={10}
-          onLoad={map => setMap(map)}
-        >
-          {markers.map((marker, index) => (
-            <Marker 
-              key={index} 
-              position={marker.position} 
-              onClick={() => handleMarkerClick(marker)} // 마커 클릭 시 handleMarkerClick 호출
-            />
-          ))}
-
-          {selectedPlace && (
-            <InfoWindow
-              position={selectedPlace.position}
-              onCloseClick={handleInfoWindowClose}
-            >
-              <InfoWindowContent>
-                <h3>{selectedPlace.name}</h3>
-                <p>{selectedPlace.address}</p>
-                <a 
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedPlace.name)}`} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                >
-                  Google Maps에서 열기
-                </a>
-              </InfoWindowContent>
-            </InfoWindow>
+        <MapButtonContainer>
+          {isSearchComplete && (
+            <PopupToggleButton onClick={handlePopupToggle}>
+              {isPopupOpen ? '리스트로 보기' : '리스트로 보기'}
+            </PopupToggleButton>
           )}
-        </GoogleMap>
-      </Content>
-      <BottomPadding />
-      <BottomNav />
+          <GoogleMap
+            mapContainerStyle={isSearchComplete ? containerStyleWithButton : containerStyle}
+            center={center}
+            zoom={10}
+            onLoad={map => setMap(map)}
+          >
+            {markers.length > 0 ? markers.map((marker, index) => (
+              <Marker 
+                key={index} 
+                position={marker.position} 
+                onClick={() => handleMarkerClick(marker)}
+              />
+            )) : (
+              console.log('No markers to display')  
+            )}
 
-      <SearchResultsPopup 
-        isOpen={isPopupOpen} 
-        onClose={() => setIsPopupOpen(false)} 
-        searchResults={places} 
-        onResultClick={handleResultClick}
-      />
-    </Container>
+            {selectedPlace && (
+              <InfoWindow
+                position={selectedPlace.position}
+                onCloseClick={handleInfoWindowClose}
+              >
+                <InfoWindowContent>
+                  <h3>{selectedPlace.name}</h3>
+                  <p>{selectedPlace.address}</p>
+                  <a 
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedPlace.name)}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
+                    Google Maps에서 열기
+                  </a>
+                </InfoWindowContent>
+              </InfoWindow>
+            )}
+          </GoogleMap>
+        </MapButtonContainer>
+        <BottomPadding />
+        <BottomNav />
+
+        <SearchResultsPopup 
+          isOpen={isPopupOpen} 
+          onClose={() => setIsPopupOpen(false)} 
+          searchResults={places} 
+          onResultClick={handleResultClick}
+        />
+      </Container>
+    </Content>
   );
 }
 
@@ -138,16 +156,21 @@ export default React.memo(MapPage);
 
 const containerStyle = {
   width: '390px',
-  height: '920px'
+  height: '910px'  
+};
+
+const containerStyleWithButton = {
+  width: '390px',
+  height: '860px'  
 };
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
+  width: 390px;
   height: 100%;
-  background-color: #fafafa;
+  background-color: #fff;  /* 전체 배경색을 흰색으로 설정 */
 `;
 
 const Content = styled.div`
@@ -167,6 +190,13 @@ const SearchContainer = styled.div`
   padding-left: 15px;
   padding-right: 15px;
   background-color: #fff;
+`;
+
+const MapButtonContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #fff;  /* 맵과 버튼을 감싸는 컨테이너의 배경색을 흰색으로 설정 */
 `;
 
 const SearchInput = styled.input`
@@ -210,5 +240,23 @@ const InfoWindowContent = styled.div`
     &:hover {
       text-decoration: underline;
     }
+  }
+`;
+
+const PopupToggleButton = styled.button`
+  margin-bottom: 10px;  
+  width: 310px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #ccc; 
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease; 
+
+  &:hover {
+    background-color: #e0e0e0; 
+    color: #000; 
   }
 `;
