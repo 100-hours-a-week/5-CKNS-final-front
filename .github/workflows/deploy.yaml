@@ -34,7 +34,7 @@ jobs:
       - name: 의존성 설치 및 빌드
         run: |
           npm ci
-          npm run build
+          CI=false npm run build
         working-directory: travelday-fe
 
       - name: AWS IAM 사용자 설정
