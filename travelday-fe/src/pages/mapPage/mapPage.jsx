@@ -1,48 +1,62 @@
 import React from 'react';
-import styled from 'styled-components';
-import Header from '../../components/shared/header.js';
-import BottomNav from '../../components/shared/bottomNav.js';
-import InfoImage from '../../images/information.png'; // 이미지 임포트
+import { GoogleMap, Marker, InfoWindow, useJsApiLoader } from '@react-google-maps/api';
 
-const MapPage = () => {
-  return (
-    <Container>
-      <Header showBackButton={true} />
-      <Content>
-        <Image src={InfoImage} alt="Information" />
-        <Text>9/7일에 업데이트 됩니다!</Text>
-      </Content>
-      <BottomNav />
-    </Container>
-  );
+const containerStyle = {
+  width: '100%',
+  height: '400px'
 };
 
-export default MapPage;
+const center = {
+  lat: 37.5400456,
+  lng: 126.9921017
+};
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  height: 100vh;
-  background-color: #fafafa;
-`;
+const malls = [
+  { label: "C", name: "코엑스몰", lat: 37.5115557, lng: 127.0595261 },
+  { label: "G", name: "고투몰", lat: 37.5062379, lng: 127.0050378 },
+  { label: "D", name: "동대문시장", lat: 37.566596, lng: 127.007702 },
+  { label: "I", name: "IFC몰", lat: 37.5251644, lng: 126.9255491 },
+  { label: "L", name: "롯데월드타워몰", lat: 37.5125585, lng: 127.1025353 },
+  { label: "M", name: "명동지하상가", lat: 37.563692, lng: 126.9822107 },
+  { label: "T", name: "타임스퀘어", lat: 37.5173108, lng: 126.9033793 }
+];
 
-const Content = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 100px; /* 필요한 경우 위치 조정을 위해 여백 추가 */
-`;
+function MyMapComponent() {
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAP_KEY// 자신의 API 키로 대체하세요.
+  });
 
-const Image = styled.img`
-  width: 200px; /* 이미지 크기 조정 */
-  height: auto;
-  margin-bottom: 20px; /* 이미지와 텍스트 사이의 간격 조정 */
-`;
+  const [selectedMall, setSelectedMall] = React.useState(null);
 
-const Text = styled.p`
-  font-size: 18px;
-  color: #333;
-  text-align: center;
-`;
+  if (!isLoaded) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <GoogleMap
+      mapContainerStyle={containerStyle}
+      center={center}
+      zoom={10}
+    >
+      {malls.map((mall) => (
+        <Marker
+          key={mall.name}
+          position={{ lat: mall.lat, lng: mall.lng }}
+          label={mall.label}
+          onClick={() => setSelectedMall(mall)}
+        />
+      ))}
+
+      {selectedMall && (
+        <InfoWindow
+          position={{ lat: selectedMall.lat, lng: selectedMall.lng }}
+          onCloseClick={() => setSelectedMall(null)}
+        >
+          <div>{selectedMall.name}</div>
+        </InfoWindow>
+      )}
+    </GoogleMap>
+  );
+}
+
+export default React.memo(MyMapComponent);

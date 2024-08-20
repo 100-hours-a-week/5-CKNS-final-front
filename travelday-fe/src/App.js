@@ -11,7 +11,7 @@ import MapPage from './pages/mapPage/mapPage';
 import SchedulePage from './pages/schedulePage/schedulePage';
 import AlarmPage from './pages/userPage/alarmPage';
 import IntroPage from './pages/introPage/introPage';
-
+import HotelDetailPage from './pages/resultPage/hotelDetailPage';
 import './App.css';
 
 function App() {
@@ -23,6 +23,7 @@ function App() {
         <Route path="/search" element={<FindPage />} />
         <Route path="/flight" element={<FlightResultPage />} />
         <Route path="/hotel" element={<HotelResultPage />} /> 
+        <Route path="/hotel/hotel-detail" element={<HotelDetailPage />} />
         <Route path="/auth/kakao/callback" element={<Callback />} />
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/map" element={<MapPage />} />

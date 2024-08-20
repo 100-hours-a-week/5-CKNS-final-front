@@ -15,7 +15,7 @@ const HotelResultPage = () => {
   const navigate = useNavigate(); 
 
   const [isDatePopupOpen, setIsDatePopupOpen] = useState(false);
-  const [localDates, setLocalDates] = useState(dates); // 로컬 상태로 초기화
+  const [localDates, setLocalDates] = useState(dates);
   const [isFilterPopupOpen, setIsFilterPopupOpen] = useState(false); 
 
   useEffect(() => {
@@ -46,9 +46,9 @@ const HotelResultPage = () => {
   };
 
   const handleSearchClick = () => {
-    setDates(localDates); // 선택된 날짜를 Zustand 스토어에 저장
-    navigate('/hotel'); // 검색 버튼 클릭 시 /hotel로 이동
-    setIsDatePopupOpen(false); // 팝업 닫기
+    setDates(localDates); 
+    navigate('/hotel'); 
+    setIsDatePopupOpen(false); 
   };
 
   const handleBackClick = () => {
@@ -84,7 +84,7 @@ const HotelResultPage = () => {
           isOpen={isDatePopupOpen} 
           onClose={() => setIsDatePopupOpen(false)} 
           onDateRangeChange={handleDateRangeChange}
-          onSearchClick={handleSearchClick} // 검색 버튼 클릭 시 호출
+          onSearchClick={handleSearchClick}
         />
       )}
 
@@ -92,7 +92,7 @@ const HotelResultPage = () => {
         <FilterPopup 
           isOpen={isFilterPopupOpen} 
           onClose={() => setIsFilterPopupOpen(false)} 
-          // 여기에 필요한 다른 props 추가
+
         />
       )}
     </PageContainer>
