@@ -68,5 +68,5 @@ const NavIcon = styled.img`
 
 const NavText = styled.span`
   font-size: 12px;
-  color: ${({ isActive }) => (isActive ? '#007bff' : '#000')}; /* 활성화된 아이템의 텍스트 색상 변경 */
+  color: ${({ isActive }) => (isActive ? '#007bff' : '#000')}; 
 `;

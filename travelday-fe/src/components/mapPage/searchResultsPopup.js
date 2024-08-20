@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import backIcon from '../../images/header/back.png';
 import heartIcon from '../../images/wishList/heart.png';
-import WishlistModal from '../../components/wishList/wishListModal.js'; // 모달 컴포넌트 import
-
+import WishlistPopup from '../wishList/wishListPopup'; 
 
 const slideUp = keyframes`
   from {
@@ -17,22 +16,22 @@ const slideUp = keyframes`
 `;
 
 const SearchResultsPopup = ({ isOpen, onClose, searchResults = [], onResultClick }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedResult, setSelectedResult] = useState(null);
 
   const handleHeartClick = (result) => {
     setSelectedResult(result);
-    setIsModalOpen(true);
+    setIsPopupOpen(true);
   };
 
-  const handleModalClose = () => {
-    setIsModalOpen(false);
+  const handlePopupClose = () => {
+    setIsPopupOpen(false);
   };
 
-  const handleWishlistConfirm = () => {
-    // 위시리스트에 추가하는 로직 처리
-    setIsModalOpen(false);
-    // 여기서 여행방 리스트로 이동하는 로직을 구현할 수 있습니다.
+  const handleRoomSelect = (room) => {
+    console.log(`Selected room: ${room}`);
+    setIsPopupOpen(false);
+    // 여행방 선택 후 처리 로직 구현
   };
 
   if (!isOpen) return null;
@@ -73,10 +72,11 @@ const SearchResultsPopup = ({ isOpen, onClose, searchResults = [], onResultClick
         </PopupContent>
       </PopupOverlay>
       
-      <WishlistModal 
-        isOpen={isModalOpen} 
-        onClose={handleModalClose} 
-        onConfirm={handleWishlistConfirm} 
+      <WishlistPopup 
+        isOpen={isPopupOpen} 
+        onClose={handlePopupClose} 
+        travelRooms={["공듀들의 일본 여행", "하이든의 네팔 여행"]} // 방 이름 예시
+        onRoomSelect={handleRoomSelect} 
       />
     </>
   );
@@ -156,7 +156,7 @@ const SearchResults = styled.div`
 
 const SearchResultItem = styled.div`
   display: flex;
-  justify-content: space-between; /* 텍스트와 하트 버튼을 양 끝에 배치 */
+  justify-content: space-between;
   align-items: center;
   padding: 15px 0;
   cursor: pointer;
@@ -174,8 +174,9 @@ const ResultDetails = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  flex-grow: 1; /* 하트 버튼과 겹치지 않도록 공간 확보 */
-  margin-right: 15px; /* 하트 버튼과의 간격을 위해 오른쪽 마진 추가 */
+  flex-grow: 1;
+  margin-right: 15px; 
+  gap: 3px;
 `;
 
 const ResultName = styled.span`
@@ -199,9 +200,29 @@ const HeartButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  
+  position: relative;
+  z-index: 1;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 200ms cubic-bezier(.2,0,.7,1), box-shadow 400ms cubic-bezier(.2,0,.7,1);
+
   img {
     width: 24px;
     height: 24px;
+    transition: transform 200ms cubic-bezier(.2,0,.7,1);
+  }
+
+  &:hover {
+    transform: rotate(45deg);
+    box-shadow: 0 0 1px 15px rgba(138, 59, 88, 0.4),
+                0 0 1px 30px rgba(138, 59, 88, 0.1),
+                0 0 1px 45px rgba(138, 59, 88, 0.1);
+  }
+
+  &:hover img {
+    transform: rotate(-45deg);
   }
 `;
