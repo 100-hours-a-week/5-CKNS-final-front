@@ -3,7 +3,9 @@ import styled from 'styled-components';
 import backIcon from '../../images/header/back.png'; 
 import userIcon from '../../images/header/user.png';
 
-const ResultHeader = ({ showBackButton = false, result = "검색 결과", onBackClick }) => {
+const ResultHeader = ({ showBackButton = false, result = "검색 결과", onBackClick, adults = 0, children = 0 }) => {
+  const totalGuests = adults + children;
+
   return (
     <HeaderContainer>
       <LeftSection>
@@ -11,7 +13,10 @@ const ResultHeader = ({ showBackButton = false, result = "검색 결과", onBack
           <BackButton src={backIcon} alt="뒤로가기" onClick={onBackClick} />
         )}
       </LeftSection>
-      <Title>{result}</Title>
+      <TitleContainer>
+        <Title>{result}</Title>
+        <SubTitle>인원 {totalGuests}명 기준</SubTitle>
+      </TitleContainer>
       <RightSection>
         <Icon src={userIcon} alt="유저 아이콘" />
       </RightSection>
@@ -29,7 +34,7 @@ const HeaderContainer = styled.div`
   padding: 10px 20px;
   background-color: #fff;
   width: 350px;
-  height: 48px;
+  height: 48px; 
 `;
 
 const LeftSection = styled.div`
@@ -42,12 +47,21 @@ const RightSection = styled.div`
   align-items: center;
 `;
 
-const Title = styled.span`
-  font-size: 20px;
-  font-weight: bold;
+const TitleContainer = styled.div`
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
+  text-align: center;
+`;
+
+const Title = styled.span`
+  font-size: 20px;
+  font-weight: bold;
+`;
+
+const SubTitle = styled.span`
+  font-size: 12px;
+  color: #666;
 `;
 
 const Icon = styled.img`

@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from 'styled-components';
 
 const FlightResultList = () => {
-  // 데이터 들어오는 형식 반영
-  const flights = [
+  const [flights, setFlights] = useState([]); // 상태를 사용하여 데이터를 관리
+  const [isLoading, setIsLoading] = useState(true); // 로딩 상태 관리
+
+  const mockData = [
     {
       airline: '아시아나항공',
       segments: [
@@ -77,6 +79,29 @@ const FlightResultList = () => {
     },
   ];
 
+  useEffect(() => {
+    const fetchFlights = async () => {
+      try {
+        const response = await fetch('http://travelday-env.eba-zmxjim7g.ap-northeast-2.elasticbeanstalk.com/api/flights');
+        const data = await response.json();
+
+        // 만약 flights 데이터가 존재하지 않거나 빈 배열일 경우 목업 데이터를 사용
+        if (data.flights && data.flights.length > 0) {
+          setFlights(data.flights);
+        } else {
+          setFlights(mockData); // 목업 데이터 사용
+        }
+      } catch (error) {
+        console.error("Error fetching flights:", error);
+        setFlights(mockData); // 오류가 발생할 경우에도 목업 데이터를 사용
+      } finally {
+        setIsLoading(false); // 데이터 로딩 완료
+      }
+    };
+
+    fetchFlights(); // 컴포넌트 마운트 시 데이터 가져오기
+  }, []); // 빈 배열을 넣어서 컴포넌트가 마운트될 때만 실행되도록 설정
+
   const formatDuration = (duration) => {
     return duration.replace(/ 0분$/, '');
   };
@@ -96,6 +121,10 @@ const FlightResultList = () => {
       <InfoItem>{formatDuration(duration)} 소요, {stops > 0 ? `경유 ${stops}회` : '직항'}</InfoItem>
     </FlightInfo>
   );
+
+  if (isLoading) {
+    return <div>Loading...</div>; // 로딩 중일 때 표시할 내용
+  }
 
   return (
     <ListContainer>
@@ -128,6 +157,8 @@ const FlightResultList = () => {
 };
 
 export default FlightResultList;
+
+// styled-components 그대로 유지
 
 const ListContainer = styled.div`
   display: flex;

@@ -5,33 +5,28 @@ import ResultHeader from '../../components/shared/resultHeader.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import HotelResultList from '../../components/resultPage/hotelResultList.js'; // 호텔 결과 목록 컴포넌트
 import DateRangePopup from '../../components/shared/datePopup.js';
-import GuestSelectorPopup from '../../components/shared/guestPopup.js';
 import FilterPopup from '../../components/shared/hotelFilterPopup.js'; 
 import calendarIcon from '../../images/filter/calendar.png';
-import humanIcon from '../../images/filter/human.png'; 
 import filterIcon from '../../images/filter/filter.png'; 
-import useHotelStore from '../../store/useHotelStore.js'; // 호텔 검색용 스토어
+import useHotelStore from '../../store/useHotelStore.js'; 
 
 const HotelResultPage = () => {
   const { location, dates, setDates, adults, children } = useHotelStore();
   const navigate = useNavigate(); 
 
   const [isDatePopupOpen, setIsDatePopupOpen] = useState(false);
-  const [localDates, setLocalDates] = useState(dates); // 로컬 상태로 초기화
-  const [isGuestPopupOpen, setIsGuestPopupOpen] = useState(false); // 인원 팝업 상태 추가
-  const [isFilterPopupOpen, setIsFilterPopupOpen] = useState(false); // 필터 팝업 상태 추가
+  const [localDates, setLocalDates] = useState(dates);
+  const [isFilterPopupOpen, setIsFilterPopupOpen] = useState(false); 
 
   useEffect(() => {
     console.log("선택된 위치:", location);
     console.log("선택된 날짜:", dates);
-  }, [location, dates]);
+    console.log("어른 수:", adults);
+    console.log("어린이 수:", children);
+  }, [location, dates, adults, children]);
 
   const handleDateClick = () => {
     setIsDatePopupOpen(true);
-  };
-
-  const handleGuestClick = () => {
-    setIsGuestPopupOpen(true);
   };
 
   const handleFilterClick = () => {
@@ -39,6 +34,7 @@ const HotelResultPage = () => {
   };
 
   const resultTitle = `${location}`;
+  const formattedGuests = `인원 ${adults + children}명`;
 
   const formattedDates = localDates && localDates.startDate && localDates.endDate
     ? `${localDates.startDate.toLocaleDateString()} - ${localDates.endDate.toLocaleDateString()}`
@@ -49,12 +45,10 @@ const HotelResultPage = () => {
     setLocalDates(selectedDates);  // 로컬 상태 업데이트
   };
 
-  const formattedGuests = `인원 ${adults + children}명`;
-
   const handleSearchClick = () => {
-    setDates(localDates); // 선택된 날짜를 Zustand 스토어에 저장
-    navigate('/hotel'); // 검색 버튼 클릭 시 /hotel로 이동
-    setIsDatePopupOpen(false); // 팝업 닫기
+    setDates(localDates); 
+    navigate('/hotel'); 
+    setIsDatePopupOpen(false); 
   };
 
   const handleBackClick = () => {
@@ -63,13 +57,16 @@ const HotelResultPage = () => {
 
   return (
     <PageContainer>
-      <ResultHeader showBackButton={true} result={resultTitle} onBackClick={handleBackClick} />
+      <ResultHeader 
+        showBackButton={true} 
+        result={resultTitle} 
+        onBackClick={handleBackClick}
+        adults={adults}  // adults 값을 전달
+        children={children}  // children 값을 전달
+      />
       <FilterContainer>
         <FilterButton onClick={handleDateClick}>
           <Icon src={calendarIcon} alt="날짜 아이콘" /> {formattedDates}
-        </FilterButton>
-        <FilterButton onClick={handleGuestClick}>
-          <Icon src={humanIcon} alt="인원 아이콘" /> {formattedGuests}
         </FilterButton>
         <FilterButton onClick={handleFilterClick}>
           <Icon src={filterIcon} alt="필터 아이콘" /> 필터
@@ -87,15 +84,7 @@ const HotelResultPage = () => {
           isOpen={isDatePopupOpen} 
           onClose={() => setIsDatePopupOpen(false)} 
           onDateRangeChange={handleDateRangeChange}
-          onSearchClick={handleSearchClick} // 검색 버튼 클릭 시 호출
-        />
-      )}
-
-      {isGuestPopupOpen && (
-        <GuestSelectorPopup 
-          isOpen={isGuestPopupOpen} 
-          onClose={() => setIsGuestPopupOpen(false)} 
-          // 여기에 필요한 다른 props 추가
+          onSearchClick={handleSearchClick}
         />
       )}
 
@@ -103,7 +92,7 @@ const HotelResultPage = () => {
         <FilterPopup 
           isOpen={isFilterPopupOpen} 
           onClose={() => setIsFilterPopupOpen(false)} 
-          // 여기에 필요한 다른 props 추가
+
         />
       )}
     </PageContainer>
@@ -129,11 +118,13 @@ const ContentContainer = styled.div`
 `;
 
 const FilterContainer = styled.div`
-  display: flex;
-  justify-content: space-around;
   width: 390px;
   padding: 0px 0px 10px 0px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
   background-color: #fff;
+  justify-content: center;
 `;
 
 const FilterButton = styled.button`
@@ -156,6 +147,7 @@ const Icon = styled.img`
   height: 20px;
   margin-right: 8px;
 `;
+
 const BottomPadding = styled.div`
   height: 110px;  /* 하단 네비게이션 바의 높이만큼 여유 공간 추가 */
 `;
