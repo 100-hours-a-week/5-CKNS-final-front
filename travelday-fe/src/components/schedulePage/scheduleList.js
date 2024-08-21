@@ -13,7 +13,7 @@ const ScheduleList = ({ schedules, onItemClick }) => {
 
     schedules.forEach((schedule, index) => {
       const date = new Date(schedule.date.split(' ~ ')[0]);
-      const scheduleWithIndex = { ...schedule, originalIndex: index }; // 원래 인덱스 추가
+      const scheduleWithIndex = { ...schedule, originalIndex: index }; 
       if (date < today) {
         pastSchedules.push(scheduleWithIndex);
       } else {

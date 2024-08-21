@@ -14,6 +14,9 @@ import AlarmPage from './pages/userPage/alarmPage';
 import IntroPage from './pages/introPage/introPage';
 import HotelDetailPage from './pages/resultPage/hotelDetailPage';
 import ScheduleDetail from './pages/schedulePage/scheduleDetailPage';
+import WishListPage from './pages/schedulePage/wishListPage';
+import MapLocationPage from './pages/schedulePage/mapLocationPage';
+import CreateSchedulePage from './pages/schedulePage/createSchedulePage';  
 
 import './App.css';
 
@@ -43,8 +46,11 @@ function App() {
         <Route path="/map" element={<MapPage />} />
         <Route path="/schedule" element={<SchedulePage />} />
         <Route path="/schedule/:id" element={<ScheduleDetail />} />
+        <Route path="/wishlist/:id" element={<WishListPage />} /> 
+        <Route path="/maplocation/:id" element={<MapLocationPage />} /> 
         <Route path="/alarm" element={<AlarmPage />} />
         <Route path="/intro" element={<IntroPage />} /> 
+        <Route path="/createschedule" element={<CreateSchedulePage />} /> {/* CreateSchedulePage 경로 추가 */}
       </Routes>
     </Router>
   );

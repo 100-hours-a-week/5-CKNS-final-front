@@ -15,7 +15,11 @@ const SchedulePage = () => {
   const navigate = useNavigate();
 
   const handleItemClick = (index) => {
-    navigate(`/schedule/${index}`, { state: { schedule: schedules[index] } });
+    navigate(`/schedule/${index}`, { state: { schedule: schedules[index], id: index } });
+  };
+
+  const handleCreateButtonClick = () => {
+    navigate('/createschedule'); // CreateSchedulePage로 이동
   };
 
   return (
@@ -23,7 +27,7 @@ const SchedulePage = () => {
       <Header />
       <ContentWrapper>
         <Title>여행 일정</Title>
-        <CreateButton>
+        <CreateButton onClick={handleCreateButtonClick}>
           <PlusCircle>+</PlusCircle>
           <BoldText>여행 일정 만들기</BoldText>
           <Subtitle>새로운 여행을 떠나보세요!</Subtitle>
@@ -36,6 +40,8 @@ const SchedulePage = () => {
 };
 
 export default SchedulePage;
+
+// 스타일 컴포넌트 정의는 동일합니다
 
 const Container = styled.div`
   display: flex;
