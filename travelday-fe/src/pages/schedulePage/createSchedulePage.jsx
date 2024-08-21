@@ -81,6 +81,7 @@ const Title = styled.h1`
   font-size: 20px;
   font-weight: bold;
   margin-bottom: 30px;
+  margin-top: 100px;
   text-align: center;
 `;
 
@@ -95,7 +96,6 @@ const Label = styled.label`
   margin-bottom: 5px;
   display: block;
 `;
-
 const Input = styled.input`
   width: 100%;
   padding: 10px;
@@ -103,6 +103,11 @@ const Input = styled.input`
   border: 1px solid #ccc;
   border-radius: 8px;
   box-sizing: border-box;
+  outline: none;  
+
+  &:focus {
+   border: 2px solid #f12e5e;
+  }
 `;
 
 const CreateButton = styled.button`
@@ -111,12 +116,13 @@ const CreateButton = styled.button`
   font-size: 18px;
   background-color: #f12e5e;
   color: #fff;
-  border: none;
+  border: 1px solid transparent;
   border-radius: 8px;
   cursor: pointer;
   margin-top: 30px;
+  outline: none;  
 
   &:hover {
     background-color: #d11a45;
-  }
 `;
+

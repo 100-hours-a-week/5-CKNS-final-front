@@ -122,7 +122,7 @@ const RoomList = styled.div`
 `;
 
 const RoomListItem = styled.div`
-  padding: 10px;
+  padding: 15px;
   font-size: 18px;
   border-radius: 5px;
   cursor: pointer;
@@ -130,7 +130,7 @@ const RoomListItem = styled.div`
   border: 2px solid transparent; 
 
   &:hover {
-    border-color: #007BFF; 
+    border-color: #25c196; 
 
   }
 `

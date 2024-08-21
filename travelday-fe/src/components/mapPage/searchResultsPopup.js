@@ -192,7 +192,7 @@ const ResultAddress = styled.div`
 
 const ResultRating = styled.div`
   font-size: 16px;
-  color: #ff9900;
+  color: #007bff;
 `;
 
 const HeartButton = styled.button`
@@ -209,19 +209,9 @@ const HeartButton = styled.button`
   transition: transform 200ms cubic-bezier(.2,0,.7,1), box-shadow 400ms cubic-bezier(.2,0,.7,1);
 
   img {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     transition: transform 200ms cubic-bezier(.2,0,.7,1);
   }
 
-  &:hover {
-    transform: rotate(45deg);
-    box-shadow: 0 0 1px 15px rgba(138, 59, 88, 0.4),
-                0 0 1px 30px rgba(138, 59, 88, 0.1),
-                0 0 1px 45px rgba(138, 59, 88, 0.1);
-  }
-
-  &:hover img {
-    transform: rotate(-45deg);
-  }
 `;

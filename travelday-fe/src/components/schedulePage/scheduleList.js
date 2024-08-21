@@ -92,7 +92,7 @@ const Button = styled.button`
   border: none;
   background: none;
   color: ${(props) => (props.selected ? '#f12e5e' : '#888')};  
-  font-size: 14px;
+  font-size: 16px;
   cursor: pointer;
   font-weight: ${(props) => (props.selected ? 'bold' : 'normal')};
   transition: color 0.3s ease;
@@ -129,8 +129,9 @@ const ScheduleItem = styled.div`
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
-    transform: scale(1.01);  /* 살짝 커지는 효과 */
-    background-color: ${(props) => (props.isPast ? '#ffffff' : '#fdfcf0')}; 
+    transform: scale(1.05);  
+    border: 2px solid #f12e5e; 
+    background-color: ${(props) => (props.isPast ? '#ffffff' : '#fffff')}; 
   }
 `;
 

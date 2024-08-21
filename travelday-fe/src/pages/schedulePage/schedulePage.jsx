@@ -41,7 +41,6 @@ const SchedulePage = () => {
 
 export default SchedulePage;
 
-// 스타일 컴포넌트 정의는 동일합니다
 
 const Container = styled.div`
   display: flex;
