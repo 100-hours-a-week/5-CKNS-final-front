@@ -17,7 +17,7 @@ const CreateSchedulePage = () => {
 
   return (
     <Container>
-      <Header />
+      <Header showBackButton={true} onBackClick={() => navigate('/schedule')} />
       <ContentWrapper>
         <Title>새로운 여행 일정 만들기</Title>
         <InputField>
