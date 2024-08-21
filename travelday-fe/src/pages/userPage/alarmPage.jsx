@@ -3,11 +3,14 @@ import styled from 'styled-components';
 import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import InfoImage from '../../images/information.png'; // 이미지 임포트
+import { useNavigate } from 'react-router-dom';
 
 const AlarmPage = () => {
+  const navigate = useNavigate();
+
   return (
     <Container>
-      <Header showBackButton={true} />
+      <Header showBackButton={true} onBackClick={() => navigate('/')} />
       <Content>
         <Image src={InfoImage} alt="Information" />
         <Text>9/7일에 업데이트 됩니다!</Text>
@@ -16,6 +19,7 @@ const AlarmPage = () => {
     </Container>
   );
 };
+
 
 export default AlarmPage;
 

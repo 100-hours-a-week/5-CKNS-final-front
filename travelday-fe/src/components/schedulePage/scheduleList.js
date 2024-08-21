@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 const ScheduleList = ({ schedules, onItemClick }) => {
-  const [sortedSchedules, setSortedSchedules] = useState(schedules);
-  const [sortOrder, setSortOrder] = useState('nearest'); 
+  const [sortedSchedules, setSortedSchedules] = useState([]);
+  const [sortOrder, setSortOrder] = useState('nearest');
 
   useEffect(() => {
     const today = new Date();
@@ -11,17 +11,16 @@ const ScheduleList = ({ schedules, onItemClick }) => {
     const upcomingSchedules = [];
     const pastSchedules = [];
 
-    // 여행을 지나간 여행과 다가올 여행으로 분류
-    schedules.forEach(schedule => {
+    schedules.forEach((schedule, index) => {
       const date = new Date(schedule.date.split(' ~ ')[0]);
+      const scheduleWithIndex = { ...schedule, originalIndex: index }; // 원래 인덱스 추가
       if (date < today) {
-        pastSchedules.push(schedule);
+        pastSchedules.push(scheduleWithIndex);
       } else {
-        upcomingSchedules.push(schedule);
+        upcomingSchedules.push(scheduleWithIndex);
       }
     });
 
-    // 다가올 여행을 선택한 정렬 기준에 따라 정렬
     const sortedUpcoming = upcomingSchedules.sort((a, b) => {
       const dateA = new Date(a.date.split(' ~ ')[0]);
       const dateB = new Date(b.date.split(' ~ ')[0]);
@@ -29,7 +28,6 @@ const ScheduleList = ({ schedules, onItemClick }) => {
       return sortOrder === 'nearest' ? dateA - dateB : dateB - dateA;
     });
 
-    // 최종적으로 다가올 여행 + "지나간 여행" 텍스트 + 지나간 여행으로 리스트 구성
     setSortedSchedules([...sortedUpcoming, { type: 'pastLabel' }, ...pastSchedules]);
   }, [schedules, sortOrder]);
 
@@ -55,13 +53,12 @@ const ScheduleList = ({ schedules, onItemClick }) => {
             return <PastLabel key={index}>지나간 여행</PastLabel>;
           }
 
-          const date = new Date(schedule.date.split(' ~ ')[0]);
-          const isPast = date < new Date();
+          const isPast = new Date(schedule.date.split(' ~ ')[0]) < new Date();
 
           return (
             <ScheduleItem
               key={index}
-              onClick={() => onItemClick(index)}
+              onClick={() => onItemClick(schedule.originalIndex)} // 원래 인덱스를 사용
               isPast={isPast}
             >
               <ScheduleTitle isPast={isPast}>{schedule.title}</ScheduleTitle>
@@ -94,7 +91,7 @@ const SortButtons = styled.div`
 const Button = styled.button`
   border: none;
   background: none;
-  color: ${(props) => (props.selected ? '#f12e5e' : '#888')};  /* 선택된 버튼 강조 */
+  color: ${(props) => (props.selected ? '#f12e5e' : '#888')};  
   font-size: 14px;
   cursor: pointer;
   font-weight: ${(props) => (props.selected ? 'bold' : 'normal')};
@@ -129,9 +126,11 @@ const ScheduleItem = styled.div`
   border: 2px solid #f2f2f2; 
   cursor: pointer;
   opacity: ${(props) => (props.isPast ? 0.5 : 1)}; 
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
-    background-color: ${(props) => (props.isPast ? '#ffffff' : '#f9f9f9')}; 
+    transform: scale(1.01);  /* 살짝 커지는 효과 */
+    background-color: ${(props) => (props.isPast ? '#ffffff' : '#fdfcf0')}; 
   }
 `;
 
@@ -139,10 +138,10 @@ const ScheduleTitle = styled.h2`
   font-size: 15px;
   font-weight: bold;
   margin-bottom: 10px;
-  color: ${(props) => (props.isPast ? '#aaa' : '#000')}; /* 지나간 항목은 회색 텍스트 */
+  color: ${(props) => (props.isPast ? '#aaa' : '#000')}; 
 `;
 
 const ScheduleDate = styled.p`
   font-size: 13px;
-  color: ${(props) => (props.isPast ? '#aaa' : '#666')}; /* 지나간 항목은 회색 텍스트 */
+  color: ${(props) => (props.isPast ? '#aaa' : '#666')}; 
 `;

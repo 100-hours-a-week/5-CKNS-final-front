@@ -7,11 +7,15 @@ import userIcon from '../../images/header/user.png';
 import logoImage from '../../images/logo/logo11.png'; 
 import logoHoverImage from '../../images/logo/logo13.png'; 
 
-const Header = ({ showBackButton = false }) => {
+const Header = ({ showBackButton = false, onBackClick }) => {
   const navigate = useNavigate();
 
   const handleBackClick = () => {
-    navigate('/'); 
+    if (onBackClick) {
+      onBackClick();
+    } else {
+      navigate('/'); // 기본 동작: /로 이동
+    }
   };
 
   const handleUserIconClick = () => {
@@ -23,8 +27,8 @@ const Header = ({ showBackButton = false }) => {
   };
 
   const handleBellIconClick = () => {
-    navigate('/alarm')
-  }
+    navigate('/alarm');
+  };
 
   return (
     <HeaderContainer>
@@ -41,6 +45,9 @@ const Header = ({ showBackButton = false }) => {
 };
 
 export default Header;
+
+// 스타일 컴포넌트 그대로 유지
+
 
 const HeaderContainer = styled.div`
     display: flex;
