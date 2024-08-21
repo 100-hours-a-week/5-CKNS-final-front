@@ -11,9 +11,8 @@ const CreateSchedulePage = () => {
   const navigate = useNavigate();
 
   const handleCreateSchedule = () => {
-    // 새로운 일정 생성 로직 추가 (e.g., 일정 저장 및 스케줄 페이지로 리다이렉트)
-    console.log('New schedule created:', { title, startDate, endDate });
-    navigate('/schedule'); // 생성 후 일정 목록 페이지로 이동
+    console.log('새로운 일정 생성:', { title, startDate, endDate });
+    navigate('/schedule'); 
   };
 
   return (
@@ -69,7 +68,7 @@ const Container = styled.div`
 `;
 
 const ContentWrapper = styled.div`
-  width: 390px;
+  width: 350px;
   height: 100%;
   display: flex;
   flex-direction: column;
