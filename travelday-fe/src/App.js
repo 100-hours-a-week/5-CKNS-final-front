@@ -6,7 +6,7 @@ import FlightResultPage from './pages/resultPage/flightResultPage';
 import HotelResultPage from './pages/resultPage/hotelResultPage';
 import MainPage from './pages/mainPage/mainPage';
 import LoginPage from './pages/userPage/loginPage';
-import Callback from './pages/userPage/callback';
+import Callback from './pages/userPage/oAuth2LoginSuccessPage';
 import MyPage from './pages/userPage/myPage';
 import MapPage from './pages/mapPage/mapPage'; 
 import SchedulePage from './pages/schedulePage/schedulePage';
@@ -41,7 +41,7 @@ function App() {
         <Route path="/flight" element={<FlightResultPage />} />
         <Route path="/hotel" element={<HotelResultPage />} /> 
         <Route path="/hotel/hotel-detail" element={<HotelDetailPage />} />
-        <Route path="/auth/kakao/callback" element={<Callback />} />
+        <Route path="/oauth2-login-success" element={<Callback />} />
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/schedule" element={<SchedulePage />} />

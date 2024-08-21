@@ -8,14 +8,13 @@ import LogoImage from '../../images/logo/logo12.png'; // 로고 이미지 임포
 
 const LoginPage = () => {
 
-    const Rest_api_key = process.env.REACT_APP_GOOGLE_MAP_KEY; 
-    const redirect_uri = 'http://localhost:3000/auth/kakao/callback';
-
-    const kakaoURL = `https://kauth.kakao.com/oauth/authorize?client_id=${Rest_api_key}&redirect_uri=${redirect_uri}&response_type=code`;
+    // OAuth 요청 URL
+    const kakaoURL = `http://api.thetravelday.co.kr/oauth2/authorization/kakao`;
 
     const handleLogin = () => {
         window.location.href = kakaoURL;
     };
+
 
   return (
     <PageContainer>
