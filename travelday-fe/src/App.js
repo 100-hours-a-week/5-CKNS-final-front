@@ -13,17 +13,17 @@ import SchedulePage from './pages/schedulePage/schedulePage';
 import AlarmPage from './pages/userPage/alarmPage';
 import IntroPage from './pages/introPage/introPage';
 import HotelDetailPage from './pages/resultPage/hotelDetailPage';
+import ScheduleDetail from './pages/schedulePage/scheduleDetailPage';
+
 import './App.css';
 
 const libraries = ['places']; 
 
 function App() {
-  // Google Maps API 로드 상태를 확인하고 관리
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAP_KEY, 
     libraries,
   });
-
 
   if (!isLoaded) {
     return <div>Loading...</div>;
@@ -42,6 +42,7 @@ function App() {
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/schedule" element={<SchedulePage />} />
+        <Route path="/schedule/:id" element={<ScheduleDetail />} />
         <Route path="/alarm" element={<AlarmPage />} />
         <Route path="/intro" element={<IntroPage />} /> 
       </Routes>

@@ -136,7 +136,6 @@ const Divider = styled.div`
   width: 100%;
   height: 1px;
   background-color: #ccc;
-  margin-top: -10px;
   margin-bottom: 10px;
 `;
 
