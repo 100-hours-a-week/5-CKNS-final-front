@@ -1,8 +1,8 @@
 import React from "react";
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 
 const HotelResultList = () => {
-  // 호텔 데이터 예시
   const hotels = [
     {
       name: 'Hilton New York',
@@ -27,10 +27,17 @@ const HotelResultList = () => {
     },
   ];
 
+  const navigate = useNavigate();
+
+  const handleHotelClick = (hotelName) => {
+    // 호텔 이름을 포함해 상세 페이지로 이동
+    navigate(`hotel-detail/${encodeURIComponent(hotelName)}`);
+  };
+
   return (
     <ListContainer>
       {hotels.map((hotel, index) => (
-        <HotelItem key={index}>
+        <HotelItem key={index} onClick={() => handleHotelClick(hotel.name)}>
           <ImagePlaceholder /> {/* 이미지가 들어갈 자리 */}
           <HotelName>{hotel.name}</HotelName>
           <HotelLocation>{hotel.location}</HotelLocation>

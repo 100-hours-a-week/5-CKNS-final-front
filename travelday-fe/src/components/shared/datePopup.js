@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import backIcon from '../../images/header/back.png';
 import { useNavigate } from 'react-router-dom'; 
-import SearchBtn from '../../components/shared/searchBtn.js'; // 수정 필요 없음
+import SearchBtn from '../../components/shared/searchBtn.js';
 
 const slideUp = keyframes`
   from {

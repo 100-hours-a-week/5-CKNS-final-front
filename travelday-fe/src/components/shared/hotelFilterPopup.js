@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import backIcon from '../../images/header/back.png';
-import hotelIcon from '../../images/filter/hotel.png';
 import commentsIcon from '../../images/filter/comments.png';
+import priceIcon from '../../images/filter/price.png';
 import SearchBtn from '../../components/shared/searchBtn.js';
 
 const slideUp = keyframes`
@@ -17,15 +17,8 @@ const slideUp = keyframes`
 `;
 
 const HotelFilterPopup = ({ isOpen, onClose }) => {
-  const [selectedStarRating, setSelectedStarRating] = useState('모든 등급');
   const [selectedRating, setSelectedRating] = useState('모든 평점');
-
-  const starRatings = [
-    { label: '모든 등급', icon: hotelIcon },
-    { label: '5성급', icon: hotelIcon },
-    { label: '4성급 이상~', icon: hotelIcon },
-    { label: '3성급 이상~', icon: hotelIcon },
-  ];
+  const [selectedPrice, setSelectedPrice] = useState('모든 가격대');
 
   const ratings = [
     { label: '9점 이상 ~', icon: commentsIcon },
@@ -34,20 +27,27 @@ const HotelFilterPopup = ({ isOpen, onClose }) => {
     { label: '6점 이상 ~', icon: commentsIcon },
   ];
 
-  if (!isOpen) return null;
+  const priceRanges = [
+    { label: '10만원 이하', icon: priceIcon },
+    { label: '10만원 ~ 50만원', icon: priceIcon },
+    { label: '50만원 ~ 100만원', icon: priceIcon },
+    { label: '100만원 이상', icon: priceIcon },
+  ];
 
-  const handleStarRatingClick = (rating) => {
-    setSelectedStarRating(rating.label);
-  };
+  if (!isOpen) return null;
 
   const handleRatingClick = (rating) => {
     setSelectedRating(rating.label);
   };
 
+  const handlePriceClick = (priceRange) => {
+    setSelectedPrice(priceRange.label);
+  };
+
   const handleSearchClick = () => {
     console.log('검색 버튼 클릭');
-    console.log('선택된 호텔 등급:', selectedStarRating);
     console.log('선택된 호텔 평점:', selectedRating);
+    console.log('선택된 가격대:', selectedPrice);
     onClose(); // 팝업 닫기
   };
 
@@ -62,22 +62,6 @@ const HotelFilterPopup = ({ isOpen, onClose }) => {
         </Header>
         <Divider />
         <FilterSection>
-          <SectionTitle>호텔 등급</SectionTitle>
-          <ButtonContainer>
-            {starRatings.map((rating) => (
-              <FilterButton
-                key={rating.label}
-                isSelected={selectedStarRating === rating.label}
-                onClick={() => handleStarRatingClick(rating)}
-              >
-                <Icon src={rating.icon} alt={rating.label} />
-                {rating.label}
-              </FilterButton>
-            ))}
-          </ButtonContainer>
-        </FilterSection>
-        <Divider />
-        <FilterSection>
           <SectionTitle>호텔 평점</SectionTitle>
           <ButtonContainer>
             {ratings.map((rating) => (
@@ -88,6 +72,22 @@ const HotelFilterPopup = ({ isOpen, onClose }) => {
               >
                 <Icon src={rating.icon} alt={rating.label} />
                 {rating.label}
+              </FilterButton>
+            ))}
+          </ButtonContainer>
+        </FilterSection>
+        <Divider />
+        <FilterSection>
+          <SectionTitle>가격대</SectionTitle>
+          <ButtonContainer>
+            {priceRanges.map((priceRange) => (
+              <FilterButton
+                key={priceRange.label}
+                isSelected={selectedPrice === priceRange.label}
+                onClick={() => handlePriceClick(priceRange)}
+              >
+                <Icon src={priceRange.icon} alt={priceRange.label} />
+                {priceRange.label}
               </FilterButton>
             ))}
           </ButtonContainer>
