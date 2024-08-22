@@ -11,9 +11,10 @@ const flights = [
   {
     departure: '인천',
     destination: '푸꾸옥',
-    date: '2024-09-15',
-    price: '₩1,200,000',
+    date: '2024-09-28',
+    price: '₩237,000',
     image: Image1,
+    //https://www.agoda.com/ko-kr/flights/airport/ICN/PQC/Seoul-Phu-Quoc-Island.html?cid=1834243&tag=73702578-adda-4b97-a1c7-12c1b3b0745d&gad_source=1&gclid=CjwKCAjwoJa2BhBPEiwA0l0ImKyJCooCWxpQRcJz6rbqi4CRayKdjFnnS-irkdVw0WIWcfNeVvlrghoC6xIQAvD_BwE
   },
   {
     departure: '인천',

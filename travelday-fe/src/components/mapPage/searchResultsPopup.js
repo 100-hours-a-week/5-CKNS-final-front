@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import backIcon from '../../images/header/back.png';
 import heartIcon from '../../images/wishList/heart.png';
-import WishlistPopup from '../wishList/wishListPopup'; 
+import WishlistPopup from '../wishListPage/wishListPopup'; 
 
 const slideUp = keyframes`
   from {

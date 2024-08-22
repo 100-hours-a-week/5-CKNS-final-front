@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import backIcon from '../../images/header/back.png';  
-import SubPopup from '../wishList/wishListModal.js';  
+import SubPopup from './wishListModal.js';  
 
 
 // 애니메이션 키프레임
@@ -130,7 +130,7 @@ const RoomListItem = styled.div`
   border: 2px solid transparent; 
 
   &:hover {
-    border-color: #25c196; 
+    border-color: #f12e5e; 
 
   }
 `

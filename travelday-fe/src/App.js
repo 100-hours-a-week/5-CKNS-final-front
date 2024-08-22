@@ -41,7 +41,7 @@ function App() {
         <Route path="/flight" element={<FlightResultPage />} />
         <Route path="/hotel" element={<HotelResultPage />} /> 
         <Route path="/hotel/hotel-detail" element={<HotelDetailPage />} />
-        <Route path="/oauth2-login-success" element={<Callback />} />
+        <Route path="/login/oauth2/successs" element={<Callback />} />
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/schedule" element={<SchedulePage />} />
