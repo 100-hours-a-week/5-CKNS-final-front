@@ -8,6 +8,7 @@ import MainPage from './pages/mainPage/mainPage';
 import LoginPage from './pages/userPage/loginPage';
 import Callback from './pages/userPage/oAuth2LoginSuccessPage';
 import MyPage from './pages/userPage/myPage';
+import Nickname from './pages/userPage/nicknamePage';
 import MapPage from './pages/mapPage/mapPage'; 
 import SchedulePage from './pages/schedulePage/schedulePage';
 import AlarmPage from './pages/userPage/alarmPage';
@@ -43,6 +44,7 @@ function App() {
         <Route path="/hotel/hotel-detail" element={<HotelDetailPage />} />
         <Route path="/login/oauth2/successs" element={<Callback />} />
         <Route path="/mypage" element={<MyPage />} />
+        <Route path="/nickname" element={<Nickname />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/schedule" element={<SchedulePage />} />
         <Route path="/schedule/:id" element={<ScheduleDetail />} />
