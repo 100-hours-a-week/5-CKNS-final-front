@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import backIcon from '../../images/header/back.png';
 import heartIcon from '../../images/wishList/heart.png';
-import WishlistPopup from '../wishList/wishListPopup'; 
+import WishlistPopup from '../wishListPage/wishListPopup'; 
 
 const slideUp = keyframes`
   from {
@@ -20,18 +20,17 @@ const SearchResultsPopup = ({ isOpen, onClose, searchResults = [], onResultClick
   const [selectedResult, setSelectedResult] = useState(null);
 
   const handleHeartClick = (result) => {
-    setSelectedResult(result);
+    const locationData = {
+      latitude: result.geometry.location.lat(),
+      longitude: result.geometry.location.lng(),
+      name: result.name,
+    };
+    setSelectedResult(locationData);
     setIsPopupOpen(true);
   };
 
   const handlePopupClose = () => {
     setIsPopupOpen(false);
-  };
-
-  const handleRoomSelect = (room) => {
-    console.log(`Selected room: ${room}`);
-    setIsPopupOpen(false);
-    // 여행방 선택 후 처리 로직 구현
   };
 
   if (!isOpen) return null;
@@ -63,7 +62,7 @@ const SearchResultsPopup = ({ isOpen, onClose, searchResults = [], onResultClick
                     {result.rating && <ResultRating>평점: {result.rating}</ResultRating>}
                   </ResultDetails>
                   <HeartButton onClick={(e) => { e.stopPropagation(); handleHeartClick(result); }}>
-                    <img src={heartIcon} alt="위시리스트 추가" />
+                    <img src={heartIcon} alt="위시리스트 혹은 일정에 추가" />
                   </HeartButton>
                 </SearchResultItem>
               ))}
@@ -75,8 +74,7 @@ const SearchResultsPopup = ({ isOpen, onClose, searchResults = [], onResultClick
       <WishlistPopup 
         isOpen={isPopupOpen} 
         onClose={handlePopupClose} 
-        travelRooms={["공듀들의 일본 여행", "하이든의 네팔 여행"]} // 방 이름 예시
-        onRoomSelect={handleRoomSelect} 
+        selectedPlace={selectedResult}  // 선택된 장소의 위치 데이터 전달
       />
     </>
   );
@@ -84,7 +82,6 @@ const SearchResultsPopup = ({ isOpen, onClose, searchResults = [], onResultClick
 
 export default SearchResultsPopup;
 
-// Styled Components
 const PopupOverlay = styled.div`
   position: fixed;
   top: 0;
@@ -192,7 +189,7 @@ const ResultAddress = styled.div`
 
 const ResultRating = styled.div`
   font-size: 16px;
-  color: #ff9900;
+  color: #007bff;
 `;
 
 const HeartButton = styled.button`
@@ -209,19 +206,9 @@ const HeartButton = styled.button`
   transition: transform 200ms cubic-bezier(.2,0,.7,1), box-shadow 400ms cubic-bezier(.2,0,.7,1);
 
   img {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     transition: transform 200ms cubic-bezier(.2,0,.7,1);
   }
-
-  &:hover {
-    transform: rotate(45deg);
-    box-shadow: 0 0 1px 15px rgba(138, 59, 88, 0.4),
-                0 0 1px 30px rgba(138, 59, 88, 0.1),
-                0 0 1px 45px rgba(138, 59, 88, 0.1);
-  }
-
-  &:hover img {
-    transform: rotate(-45deg);
-  }
 `;
+

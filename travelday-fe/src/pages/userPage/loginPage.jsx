@@ -10,6 +10,7 @@ const LoginPage = () => {
 
     // OAuth 요청 URL
     const kakaoURL = `http://api.thetravelday.co.kr/oauth2/authorization/kakao`;
+    
 
     const handleLogin = () => {
         window.location.href = kakaoURL;

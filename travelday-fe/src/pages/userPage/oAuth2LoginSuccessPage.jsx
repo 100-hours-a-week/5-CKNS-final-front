@@ -11,10 +11,16 @@ const OAuth2LoginSuccessPage = () => {
           console.log("로그인 실패");
           return;
       }
+
+      // 로그인 성공 시 accessToken을 로컬 스토리지에 저장
+      localStorage.setItem('accessToken', accessToken);
       console.log("로그인 성공");
+
+      // 로그인 성공 후 메인 페이지로 이동
       navigate('/');
-  }, []);
-  return <div></div>;
+  }, [navigate, searchParams]);
+
+  return <div>로그인 처리 중...</div>;
 };
 
 export default OAuth2LoginSuccessPage;

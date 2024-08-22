@@ -271,7 +271,7 @@ const AddButton = styled.button`
   }
 
   &:disabled {
-    background-color: #ccc; /* 비활성화 상태의 배경색 */
-    cursor: not-allowed; /* 비활성화 상태의 커서 */
+    background-color: #ccc; 
+    cursor: not-allowed;
   }
 `;

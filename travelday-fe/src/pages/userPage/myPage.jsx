@@ -1,48 +1,127 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import SimpleHeader from '../../components/shared/simpleHeader.js';
-import BottomNav from '../../components/shared/bottomNav.js';
+import BottomNav from '../../components/shared/bottomNav.js';  
+import LogoImage from '../../images/logo/logo12.png';  
+import PenIcon from '../../images/pen.png'; 
 
-const LoginPage = () => {
-  const [nickname, setNickname] = useState('');
-  const [isButtonEnabled, setIsButtonEnabled] = useState(false);
+const MyPage = () => {
+  const navigate = useNavigate();
+  const [nickname, setNickname] = useState('collie'); // 기본값으로 'collie' 설정
+  const [showModal, setShowModal] = useState(false); // 모달 창 상태
 
-  const handleNicknameChange = (e) => {
-    setNickname(e.target.value);
-    setIsButtonEnabled(e.target.value.trim() !== '');  
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      fetchKakaoUserProfile(token);
+    }
+  }, []);
+
+  const fetchKakaoUserProfile = async (token) => {
+    try {
+      const response = await fetch('https://kapi.kakao.com/v2/user/me', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const nickname = data.kakao_account.profile.nickname;
+        setNickname(nickname);
+      } else {
+        console.error('카카오 사용자 정보 요청 실패:', response.statusText);
+      }
+    } catch (error) {
+      console.error('카카오 사용자 정보 요청 중 오류 발생:', error);
+    }
   };
 
-  const handleSubmit = () => {
-    // 닉네임 변경 로직
-    console.log('닉네임이 변경되었습니다:', nickname);
-    // 닉네임을 서버로 전송하거나 로컬 스토리지에 저장하는 등의 로직 추가
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken');
+    navigate('/login');
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch('http://api.thetravelday.co.kr/api/user', {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        console.log('회원 탈퇴 성공');
+        localStorage.removeItem('accessToken');
+        navigate('/intro');
+      } else {
+        console.error('회원 탈퇴 실패:', response.statusText);
+      }
+    } catch (error) {
+      console.error('회원 탈퇴 중 오류 발생:', error);
+    }
+  };
+
+  const handleRecommend = async () => {
+    try {
+      await navigator.clipboard.writeText('https://www.thetravelday.co.kr');
+      alert('링크가 복사되었습니다!');
+    } catch (error) {
+      console.error('링크 복사 실패:', error);
+    }
+  };
+
+  const handleNicknameClick = () => {
+    navigate('/nickname');
   };
 
   return (
     <PageContainer>
-      <Container>
-        <SimpleHeader title="닉네임 변경하기" showBackButton={true} />
-        
-        <Content>
-          <InputLabel>닉네임</InputLabel>
-          <Input
-            type="text"
-            value={nickname}
-            onChange={handleNicknameChange}
-            placeholder="collie"
-          />
-          <Button onClick={handleSubmit} disabled={!isButtonEnabled}>
-            변경하기
-          </Button>
-        </Content>
-        
-        <BottomNav />
-      </Container>
+      <SimpleHeader title="마이 페이지" showBackButton={true} />
+      
+      <Content>
+        <LogoWrapper>
+          <Logo src={LogoImage} alt="로고" />
+        </LogoWrapper>
+
+        <UserInfo>
+          <NicknameContainer>
+            <Value>{nickname}</Value>
+            <PenIconImage src={PenIcon} alt="닉네임 변경" onClick={handleNicknameClick} />
+          </NicknameContainer>
+        </UserInfo>
+
+        <Separator /> {/* 회색 가로선 추가 */}
+
+        <Button onClick={handleRecommend}>친구에게 추천하기</Button>
+        <Button onClick={handleLogout}>로그아웃</Button>
+        <DeleteButton onClick={() => setShowModal(true)}>회원 탈퇴</DeleteButton>
+      </Content>
+
+      <BottomNav />  
+
+      {showModal && (
+        <ModalOverlay>
+          <ModalContent>
+            <ModalTitle>정말 탈퇴하시겠습니까?</ModalTitle>
+            <ModalButtons>
+              <ModalButton onClick={handleDeleteAccount}>예</ModalButton>
+              <ModalButton onClick={() => setShowModal(false)}>아니오</ModalButton>
+            </ModalButtons>
+          </ModalContent>
+        </ModalOverlay>
+      )}
     </PageContainer>
   );
 };
 
-export default LoginPage;
+export default MyPage;
 
 const PageContainer = styled.div`
   display: flex;
@@ -53,51 +132,151 @@ const PageContainer = styled.div`
   background-color: #fafafa;
 `;
 
-const Container = styled.div`
-  width: 390px;
-  display: flex;
-  height: 100vh;
-  flex-direction: column;
-  align-items: center;
-  background-color: #fff;
-`;
-
 const Content = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin-top: 150px;
+  align-items: flex-start; /* 왼쪽 정렬 */
+  width: 390px;
+  height: 100%;
+  background-color: #fff;
+`;
+
+const LogoWrapper = styled.div`
+  margin-top: 20px; 
+  margin-bottom: 30px; 
+  display: flex;
+  justify-content: center;
   width: 100%;
 `;
 
-const InputLabel = styled.label`
-  font-size: 16px;
-  font-weight: bold;  // 닉네임 글씨를 두껍게
-  margin-bottom: 10px;
-  width:270px;
-  color: #333;
+const Logo = styled.img`
+  width: 100px; 
+  height: auto;
+  margin-top: 80px;
 `;
 
-const Input = styled.input`
-  padding: 10px;
-  font-size: 18px;
-  width: 250px;  // 입력란 너비 조정
-  height: 25px;  // 입력란 높이 조정
-  margin-bottom: 30px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+const UserInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+`;
+
+const NicknameContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const Value = styled.p`
+  font-size: 20px;
+  color: #000;
+  font-weight: bold;
+  margin-right: 10px;
+  margin-left: 30px;
+`;
+
+const PenIconImage = styled.img`
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+`;
+
+const Separator = styled.hr`
+  width: 100%;
+  border: none;
+  border-top: 8px solid #ddd;
+  margin-bottom: 20px;
+  margin-top: 20px;
 `;
 
 const Button = styled.button`
-  padding: 10px 20px;
-  font-size: 15px;
-  background-color: ${props => (props.disabled ? '#ccc' : '#007bff')}; // 비활성화 시 회색, 활성화 시 파란색
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')};  // 비활성화 시 커서 변경
+  padding: 10px 30px;
+  font-size: 16px;
+  background-color: #fff;
+  color: #000;
+  font-weight: bold;  
+  border: none; 
+  cursor: pointer;
+  margin: 10px 0;
+  width: 390px;  
+  text-align: left;  
+  transition: border-bottom 0.3s, color 0.3s;
 
   &:hover {
-    background-color: ${props => (props.disabled ? '#ccc' : '#0056b3')}; // 비활성화 시 색상 유지, 활성화 시 어두운 파란색
+    border-bottom: 2px solid #007bff;  
+    color: #0056b3; 
+  }
+
+  &:active {
+    background-color: #e6f7ff;
   }
 `;
+
+const DeleteButton = styled(Button)`
+  color: #808080; 
+  &:hover {
+    border-bottom: 2px solid #808080;  /* hover 시 아래쪽 테두리만 회색으로 나타남 */
+    color: #666666;
+  }
+`;
+
+// 모달 창 스타일
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+const ModalContent = styled.div`
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  width: 320px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+`;
+
+const ModalTitle = styled.h2`
+  margin-bottom: 20px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+`;
+
+const ModalButtons = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const ModalButton = styled.button`
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #fff;
+  transition: background-color 0.3s;
+  width: 45%;  
+
+  &:nth-child(1) {  
+    background-color: #808080; 
+    &:hover {
+      background-color: #666666;
+    }
+  }
+
+  &:nth-child(2) {  
+    background-color: #007bff;  
+    &:hover {
+      background-color: #0056b3;
+    }
+  }
+`;
+
