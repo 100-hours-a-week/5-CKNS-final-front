@@ -20,18 +20,17 @@ const SearchResultsPopup = ({ isOpen, onClose, searchResults = [], onResultClick
   const [selectedResult, setSelectedResult] = useState(null);
 
   const handleHeartClick = (result) => {
-    setSelectedResult(result);
+    const locationData = {
+      latitude: result.geometry.location.lat(),
+      longitude: result.geometry.location.lng(),
+      name: result.name,
+    };
+    setSelectedResult(locationData);
     setIsPopupOpen(true);
   };
 
   const handlePopupClose = () => {
     setIsPopupOpen(false);
-  };
-
-  const handleRoomSelect = (room) => {
-    console.log(`Selected room: ${room}`);
-    setIsPopupOpen(false);
-    // 여행방 선택 후 처리 로직 구현
   };
 
   if (!isOpen) return null;
@@ -63,7 +62,7 @@ const SearchResultsPopup = ({ isOpen, onClose, searchResults = [], onResultClick
                     {result.rating && <ResultRating>평점: {result.rating}</ResultRating>}
                   </ResultDetails>
                   <HeartButton onClick={(e) => { e.stopPropagation(); handleHeartClick(result); }}>
-                    <img src={heartIcon} alt="위시리스트 추가" />
+                    <img src={heartIcon} alt="위시리스트 혹은 일정에 추가" />
                   </HeartButton>
                 </SearchResultItem>
               ))}
@@ -75,8 +74,7 @@ const SearchResultsPopup = ({ isOpen, onClose, searchResults = [], onResultClick
       <WishlistPopup 
         isOpen={isPopupOpen} 
         onClose={handlePopupClose} 
-        travelRooms={["공듀들의 일본 여행", "하이든의 네팔 여행"]} // 방 이름 예시
-        onRoomSelect={handleRoomSelect} 
+        selectedPlace={selectedResult}  // 선택된 장소의 위치 데이터 전달
       />
     </>
   );
@@ -84,7 +82,6 @@ const SearchResultsPopup = ({ isOpen, onClose, searchResults = [], onResultClick
 
 export default SearchResultsPopup;
 
-// Styled Components
 const PopupOverlay = styled.div`
   position: fixed;
   top: 0;
@@ -213,5 +210,5 @@ const HeartButton = styled.button`
     height: 20px;
     transition: transform 200ms cubic-bezier(.2,0,.7,1);
   }
-
 `;
+

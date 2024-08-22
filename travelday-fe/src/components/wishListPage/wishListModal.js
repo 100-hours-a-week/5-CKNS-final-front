@@ -1,28 +1,59 @@
 import React from 'react';
 import styled from 'styled-components';
-import backIcon from '../../images/header/back.png';  // backIcon 이미지 가져오기
+import backIcon from '../../images/header/back.png';  
+import axios from 'axios';  
 
-const WishListModal = ({ onBack }) => (
-  <ModalOverlay>
-    <ModalContent>
-      <ModalHeader>
-        <BackButton onClick={onBack}>
-          <img src={backIcon} alt="뒤로가기" />
-        </BackButton>
-        <ModalTitle>어디에 추가하시겠습니까?</ModalTitle>
-      </ModalHeader>
-      <Divider />
-      <ButtonList>
-        <ButtonItem onClick={() => alert('일정에 추가')}>
-          일정에 추가
-        </ButtonItem>
-        <ButtonItem onClick={() => alert('위시리스트에 추가')}>
-          위시리스트에 추가
-        </ButtonItem>
-      </ButtonList>
-    </ModalContent>
-  </ModalOverlay>
-);
+const WishListModal = ({ onClose, selectedPlace, travelRoomId }) => {
+  const handleAddToSchedule = async () => {
+    try {
+      const response = await axios.post(`http://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan/list`, {
+        latitude: selectedPlace.latitude,
+        longitude: selectedPlace.longitude,
+        name: selectedPlace.name
+      });
+      console.log('일정에 추가 성공:', response.data);
+      onClose();
+    } catch (error) {
+      console.error('일정에 추가 실패:', error);
+    }
+  };
+
+  const handleAddToWishlist = async () => {
+    try {
+      const response = await axios.post(`http://api.thetravelday.co.kr/api/rooms/${travelRoomId}/wishlist`, {
+        latitude: selectedPlace.latitude,
+        longitude: selectedPlace.longitude,
+        name: selectedPlace.name
+      });
+      console.log('위시리스트에 추가 성공:', response.data);
+      onClose();
+    } catch (error) {
+      console.error('위시리스트에 추가 실패:', error);
+    }
+  };
+
+  return (
+    <ModalOverlay>
+      <ModalContent>
+        <ModalHeader>
+          <BackButton onClick={onClose}>
+            <img src={backIcon} alt="뒤로가기" />
+          </BackButton>
+          <ModalTitle>어디에 추가하시겠습니까?</ModalTitle>
+        </ModalHeader>
+        <Divider />
+        <ButtonList>
+          <ButtonItem onClick={handleAddToSchedule}>
+            일정에 추가
+          </ButtonItem>
+          <ButtonItem onClick={handleAddToWishlist}>
+            위시리스트에 추가
+          </ButtonItem>
+        </ButtonList>
+      </ModalContent>
+    </ModalOverlay>
+  );
+};
 
 export default WishListModal;
 
@@ -97,13 +128,13 @@ const ButtonItem = styled.div`
   transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 
   &:hover {
-    background-color: #f12e5e; /* 더 진한 핑크색으로 변경 */
-    color: #fff; /* 글씨를 하얀색으로 변경 */
-    transform: scale(1.05); /* 버튼이 살짝 커지도록 */
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* 약간의 그림자 추가 */
+    background-color: #f12e5e; 
+    color: #fff; 
+    transform: scale(1.05);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
   }
 
   &:active {
-    transform: scale(0.98); /* 버튼을 누를 때 살짝 작아지도록 */
+    transform: scale(0.98);
   }
 `;

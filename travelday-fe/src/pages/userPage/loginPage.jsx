@@ -9,7 +9,7 @@ import LogoImage from '../../images/logo/logo12.png'; // 로고 이미지 임포
 const LoginPage = () => {
 
     // OAuth 요청 URL
-    const kakaoURL = `http://localhost:8080/login/oauth2/code/kakao`;
+    const kakaoURL = `http://api.thetravelday.co.kr/oauth2/authorization/kakao`;
     
 
     const handleLogin = () => {
