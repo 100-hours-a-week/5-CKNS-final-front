@@ -1,18 +1,44 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
+import React, { useState, useEffect } from 'react';
+import styled, { keyframes } from 'styled-components';
 import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const CreateSchedulePage = () => {
   const [title, setTitle] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [isButtonEnabled, setIsButtonEnabled] = useState(false);
   const navigate = useNavigate();
 
-  const handleCreateSchedule = () => {
-    console.log('새로운 일정 생성:', { title, startDate, endDate });
-    navigate('/schedule'); 
+  const today = new Date().toISOString().split('T')[0];
+
+  useEffect(() => {
+    // 여행 이름, 시작 날짜, 종료 날짜가 모두 입력되었을 때만 버튼 활성화
+    if (title && startDate && endDate) {
+      setIsButtonEnabled(true);
+    } else {
+      setIsButtonEnabled(false);
+    }
+  }, [title, startDate, endDate]);
+
+  const handleCreateSchedule = async () => {
+    if (!isButtonEnabled) return; // 버튼이 활성화되지 않았을 경우 return
+    try {
+      const response = await axios.post('http://api.thetravelday.co.kr/api/rooms', {
+        name: title,
+        startDate: startDate.replace(/-/g, '.'),
+        endDate: endDate.replace(/-/g, '.')
+      });
+
+      if (response.status === 201) {  // 성공적으로 생성되었을 때
+        console.log('새로운 일정 생성:', response.data);
+        navigate('/schedule');  // 일정 페이지로 이동
+      }
+    } catch (error) {
+      console.error('일정 생성 중 오류 발생:', error);
+    }
   };
 
   return (
@@ -35,6 +61,7 @@ const CreateSchedulePage = () => {
             type="date" 
             value={startDate} 
             onChange={(e) => setStartDate(e.target.value)} 
+            min={today} // 시작 날짜의 최소값을 오늘로 설정
           />
         </InputField>
         <InputField>
@@ -43,9 +70,14 @@ const CreateSchedulePage = () => {
             type="date" 
             value={endDate} 
             onChange={(e) => setEndDate(e.target.value)} 
+            min={startDate || today} // 종료 날짜의 최소값을 시작 날짜로 설정
           />
         </InputField>
-        <CreateButton onClick={handleCreateSchedule}>
+        <CreateButton 
+          onClick={handleCreateSchedule} 
+          disabled={!isButtonEnabled} 
+          enabled={isButtonEnabled}
+        >
           일정 만들기
         </CreateButton>
       </ContentWrapper>
@@ -96,6 +128,7 @@ const Label = styled.label`
   margin-bottom: 5px;
   display: block;
 `;
+
 const Input = styled.input`
   width: 100%;
   padding: 10px;
@@ -106,7 +139,18 @@ const Input = styled.input`
   outline: none;  
 
   &:focus {
-   border: 2px solid #f12e5e;
+    border: 2px solid #f12e5e;
+  }
+`;
+
+const buttonEnableAnimation = keyframes`
+  from {
+    transform: scale(0.95);
+    opacity: 0.7;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
   }
 `;
 
@@ -114,15 +158,17 @@ const CreateButton = styled.button`
   width: 100%;
   padding: 15px;
   font-size: 18px;
-  background-color: #f12e5e;
+  background-color: ${({ enabled }) => (enabled ? '#f12e5e' : '#ccc')};
   color: #fff;
   border: 1px solid transparent;
   border-radius: 8px;
-  cursor: pointer;
+  cursor: ${({ enabled }) => (enabled ? 'pointer' : 'not-allowed')};
   margin-top: 30px;
-  outline: none;  
+  outline: none;
+  transition: background-color 0.3s ease;
+  animation: ${({ enabled }) => (enabled ? buttonEnableAnimation : 'none')} 0.3s ease;
 
   &:hover {
-    background-color: #d11a45;
+    background-color: ${({ enabled }) => (enabled ? '#d11a45' : '#ccc')};
+  }
 `;
-
