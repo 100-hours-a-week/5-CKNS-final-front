@@ -10,13 +10,19 @@ const MyPage = () => {
   const navigate = useNavigate();
   const [nickname, setNickname] = useState('collie'); // 기본값으로 'collie' 설정
   const [showModal, setShowModal] = useState(false); // 모달 창 상태
+  const [errorMessage, setErrorMessage] = useState(''); // 오류 메시지 상태
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
-    if (token) {
-      fetchKakaoUserProfile(token);
+    
+    if (!token) {
+      setErrorMessage('로그인이 필요합니다.');
+      navigate('/login');
+      return;
     }
-  }, []);
+
+    fetchKakaoUserProfile(token);
+  }, [navigate]);
 
   const fetchKakaoUserProfile = async (token) => {
     try {
@@ -33,10 +39,11 @@ const MyPage = () => {
         const nickname = data.kakao_account.profile.nickname;
         setNickname(nickname);
       } else {
-        console.error('카카오 사용자 정보 요청 실패:', response.statusText);
+        throw new Error('사용자 정보 요청 실패');
       }
     } catch (error) {
-      console.error('카카오 사용자 정보 요청 중 오류 발생:', error);
+      setErrorMessage('사용자 정보를 불러오는 중 오류가 발생했습니다.');
+      alert('사용자 정보를 불러오는 중 오류가 발생했습니다.'); // 사용자에게 알림
     }
   };
 
@@ -61,10 +68,11 @@ const MyPage = () => {
         localStorage.removeItem('accessToken');
         navigate('/intro');
       } else {
-        console.error('회원 탈퇴 실패:', response.statusText);
+        throw new Error('회원 탈퇴 실패');
       }
     } catch (error) {
-      console.error('회원 탈퇴 중 오류 발생:', error);
+      setErrorMessage('회원 탈퇴 중 오류가 발생했습니다.');
+      alert('회원 탈퇴 중 오류가 발생했습니다.'); // 사용자에게 알림
     }
   };
 
@@ -74,6 +82,7 @@ const MyPage = () => {
       alert('링크가 복사되었습니다!');
     } catch (error) {
       console.error('링크 복사 실패:', error);
+      alert('링크 복사 중 오류가 발생했습니다.'); // 사용자에게 알림
     }
   };
 
@@ -117,6 +126,8 @@ const MyPage = () => {
           </ModalContent>
         </ModalOverlay>
       )}
+
+      {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
     </PageContainer>
   );
 };
@@ -278,5 +289,11 @@ const ModalButton = styled.button`
       background-color: #0056b3;
     }
   }
+`;
+
+const ErrorMessage = styled.p`
+  color: red;
+  margin-top: 10px;
+  font-size: 14px;
 `;
 
