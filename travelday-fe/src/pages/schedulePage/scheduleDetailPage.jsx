@@ -20,6 +20,7 @@ const ScheduleDetail = () => {
 
   const [scheduleDetails, setScheduleDetails] = useState([]);
   const [fetchedSchedule, setFetchedSchedule] = useState(null);
+  const [mapMarkers, setMapMarkers] = useState([]); // 구글 맵에 표시할 마커 데이터를 저장할 상태
 
   const mapCenter = { lat: 37.5400456, lng: 126.9921017 };
 
@@ -111,7 +112,6 @@ const ScheduleDetail = () => {
           withCredentials: true,
         });
 
-        // 업데이트된 상태를 계산
         const updatedDetails = scheduleDetails.map(day => {
           const dayDetails = { ...day };
           dayDetails.schedules = response.data
@@ -121,6 +121,14 @@ const ScheduleDetail = () => {
         });
 
         setScheduleDetails(updatedDetails);
+
+        // 지도에 표시할 마커 데이터 설정
+        const markers = response.data.map(detail => ({
+          lat: detail.latitude,
+          lng: detail.longitude,
+        }));
+        setMapMarkers(markers);
+
       } catch (error) {
         console.error('일정 데이터를 불러오는 중 오류 발생:', error);
       }
@@ -161,7 +169,9 @@ const ScheduleDetail = () => {
                   center={mapCenter}
                   zoom={10}
                 >
-                  <Marker position={mapCenter} />
+                  {mapMarkers.map((marker, index) => (
+                    <Marker key={index} position={marker} />
+                  ))}
                 </GoogleMap>
               </MapContainer>
               <ButtonWrapper>
@@ -185,7 +195,6 @@ const ScheduleDetail = () => {
 };
 
 export default ScheduleDetail;
-
 
 
 const Container = styled.div`
