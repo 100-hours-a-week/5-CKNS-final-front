@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter'; 
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { GoogleMap, Marker } from '@react-google-maps/api';
@@ -8,55 +9,106 @@ import BottomNav from '../../components/shared/bottomNav.js';
 import calendarIcon from '../../images/filter/calendar.png';
 import ScheduleDetailList from '../../components/schedulePage/scheduleDetailList'; 
 
+// Axios mock setup
+const mock = new MockAdapter(axios);
+
 const ScheduleDetail = () => {
-  const { travelRoomId } = useParams(); // useParams를 통해 URL에서 travelRoomId 가져옴
+  const { travelRoomId } = useParams(); 
   const navigate = useNavigate();
   const location = useLocation();
   const { schedule } = location.state || {}; 
 
   const [scheduleDetails, setScheduleDetails] = useState([]);
-  const [fetchedSchedule, setFetchedSchedule] = useState(null); // 서버에서 받아온 데이터를 저장할 state 추가
+  const [fetchedSchedule, setFetchedSchedule] = useState(null); 
 
-  const mapCenter = { lat: 37.5400456, lng: 126.9921017 }; // 초기 지도 센터
+  const mapCenter = { lat: 37.5400456, lng: 126.9921017 };
+
+  // 목 데이터 설정
+  useEffect(() => {
+    mock.onGet(`http://api.thetravelday.co.kr/api/rooms/${travelRoomId}`).reply(200, {
+      travelRoomId: 0,
+      name: '구라쟁이의 여행',
+      date: '2024-01-01 ~ 2024-01-03',
+    });
+
+    mock.onGet(`http://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan`).reply(200, [
+      {
+        id: travelRoomId,
+        name: 'Place 1',
+        scheduledDay: '2024-01-01',
+        position: 1,
+        latitude: 37.5400456,
+        longitude: 126.9921017,
+      },
+      {
+        id: travelRoomId,
+        name: 'Place 2',
+        scheduledDay: '2024-01-01',
+        position: 2,
+        latitude: 37.5400456,
+        longitude: 126.9921017,
+      },
+      {
+        id: travelRoomId,
+        name: 'Place 3',
+        scheduledDay: '2024-01-02',
+        position: 1,
+        latitude: 37.5400456,
+        longitude: 126.9921017,
+      },
+    ]);
+  }, [travelRoomId]);
 
   useEffect(() => {
-    const fetchScheduleDetails = async () => {
+    const fetchRoomDetails = async () => {
       try {
         const token = localStorage.getItem('accessToken');
         const response = await axios.get(`http://api.thetravelday.co.kr/api/rooms/${travelRoomId}`, {
           headers: {
             Authorization: `Bearer ${token}`
           },
-          withCredentials: true // 크로스 도메인 요청 시 쿠키를 보내기 위해 추가
+          withCredentials: true 
         });
-        
+
         setFetchedSchedule(response.data); // 서버에서 받은 데이터로 fetchedSchedule 상태 업데이트
       } catch (error) {
         console.error('여행방 정보 로드 중 오류 발생:', error);
       }
     };
 
-    fetchScheduleDetails();
+    fetchRoomDetails();
   }, [travelRoomId]);
 
   useEffect(() => {
-    const currentSchedule = fetchedSchedule || schedule;
-    if (currentSchedule) {
-      const [startDateStr, endDateStr] = currentSchedule.date.split(' ~ ');
-      const startDate = new Date(startDateStr);
-      const endDate = new Date(endDateStr);
-      const details = [];
+    const fetchScheduleDetails = async () => {
+      try {
+        const token = localStorage.getItem('accessToken');
+        const response = await axios.get(`http://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        });
 
-      let currentDate = new Date(startDate);
+        // 데이터를 날짜별로 그룹화
+        const groupedDetails = response.data.reduce((acc, detail) => {
+          const { scheduledDay } = detail;
+          if (!acc[scheduledDay]) {
+            acc[scheduledDay] = [];
+          }
+          acc[scheduledDay].push(detail);
+          return acc;
+        }, {});
 
-      while (currentDate <= endDate) {
-        details.push(currentDate.toISOString().split('T')[0]);
-        currentDate.setDate(currentDate.getDate() + 1);
+        const detailsArray = Object.keys(groupedDetails).map(date => groupedDetails[date]);
+        setScheduleDetails(detailsArray);
+      } catch (error) {
+        console.error('일정 데이터를 불러오는 중 오류 발생:', error);
       }
+    };
 
-      setScheduleDetails(details);
-    }
-  }, [fetchedSchedule, schedule]);
+    fetchScheduleDetails();
+  }, [travelRoomId]);
 
   const handleAddFromWish = () => {
     navigate(`/wishlist/${travelRoomId}`, { state: { schedule: fetchedSchedule || schedule } });
@@ -75,7 +127,7 @@ const ScheduleDetail = () => {
         {currentSchedule ? (
           <>
             <TitleWrapper>
-              <Title>{currentSchedule.title}</Title>
+              <Title>{currentSchedule.name}</Title>
               <ScheduleDateWrapper>
                 <Icon src={calendarIcon} alt="달력 아이콘" />
                 <ScheduleDate>{currentSchedule.date}</ScheduleDate>
@@ -112,7 +164,6 @@ const ScheduleDetail = () => {
 };
 
 export default ScheduleDetail;
-
 
 const Container = styled.div`
   display: flex;
