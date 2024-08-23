@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import axios from 'axios';
+import TrashIcon from '../../images/trash.png';
 
-const ScheduleList = ({ schedules, onItemClick }) => {
+
+const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
   const [sortedSchedules, setSortedSchedules] = useState([]);
   const [sortOrder, setSortOrder] = useState('nearest');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedScheduleId, setSelectedScheduleId] = useState(null);
 
   useEffect(() => {
     const today = new Date();
@@ -29,6 +34,27 @@ const ScheduleList = ({ schedules, onItemClick }) => {
 
     setSortedSchedules([...sortedUpcoming, { type: 'pastLabel' }, ...pastSchedules]);
   }, [schedules, sortOrder]);
+
+  const handleDeleteClick = (id) => {
+    setSelectedScheduleId(id);
+    setIsModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (selectedScheduleId) {
+      try {
+        await axios.delete(`https://api.thetravelday.co.kr/api/rooms/${selectedScheduleId}`);
+        onDeleteClick(selectedScheduleId); 
+        setIsModalOpen(false); 
+      } catch (error) {
+        console.error("일정 삭제 중 오류 발생:", error);
+      }
+    }
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   return (
     <Container>
@@ -57,22 +83,37 @@ const ScheduleList = ({ schedules, onItemClick }) => {
           return (
             <ScheduleItem
               key={index}
-              onClick={() => onItemClick(schedule.id)}
               isPast={isPast}
             >
-              <ScheduleTitle isPast={isPast}>{schedule.title}</ScheduleTitle>
-              <ScheduleDate isPast={isPast}>{schedule.date}</ScheduleDate>
+              <ScheduleContent onClick={() => onItemClick(schedule.id)}>
+                <ScheduleTitle isPast={isPast}>{schedule.title}</ScheduleTitle>
+                <ScheduleDate isPast={isPast}>{schedule.date}</ScheduleDate>
+              </ScheduleContent>
+              <TrashIconWrapper onClick={() => handleDeleteClick(schedule.id)}>
+                <img src={TrashIcon} alt="Delete" />
+              </TrashIconWrapper>
             </ScheduleItem>
           );
         })}
       </ListContainer>
+
+      {/* 모달 */}
+      {isModalOpen && (
+        <ModalOverlay>
+          <ModalContent>
+            <ModalMessage>정말 일정을 삭제하시겠습니까?</ModalMessage>
+            <ModalButtons>
+              <ModalButton onClick={confirmDelete}>예</ModalButton>
+              <ModalButton onClick={closeModal}>아니오</ModalButton>
+            </ModalButtons>
+          </ModalContent>
+        </ModalOverlay>
+      )}
     </Container>
   );
 };
 
 export default ScheduleList;
-
-// 스타일 컴포넌트는 이전과 동일합니다.
 
 const Container = styled.div`
   width: 100%;
@@ -121,6 +162,9 @@ const PastLabel = styled.div`
 `;
 
 const ScheduleItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   background-color: #ffffff;
   padding: 20px;
   border-radius: 8px;
@@ -132,8 +176,12 @@ const ScheduleItem = styled.div`
   &:hover {
     transform: scale(1.05);  
     border: 2px solid #f12e5e; 
-    background-color: ${(props) => (props.isPast ? '#ffffff' : '#fffff')}; 
   }
+`;
+
+const ScheduleContent = styled.div`
+  flex: 1;
+  margin-right: 10px;
 `;
 
 const ScheduleTitle = styled.h2`
@@ -146,4 +194,76 @@ const ScheduleTitle = styled.h2`
 const ScheduleDate = styled.p`
   font-size: 13px;
   color: ${(props) => (props.isPast ? '#aaa' : '#666')}; 
+`;
+
+const TrashIconWrapper = styled.div`
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+
+  img {
+    width: 20px;
+    height: auto;
+    object-fit: contain;
+  }
+
+  &:hover img {
+    filter: brightness(0.8);
+  }
+`;
+
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+const ModalContent = styled.div`
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  text-align: center;
+`;
+
+const ModalMessage = styled.p`
+  font-size: 16px;
+  margin-bottom: 20px;
+`;
+
+const ModalButtons = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const ModalButton = styled.button`
+  background: linear-gradient(135deg, #ff7e79, #ff9a8b); 
+  color: white;
+  border: none;
+  width:82px;
+  padding: 10px 20px;
+  border-radius: 50px; 
+  cursor: pointer;
+  font-size: 16px;
+  margin: 0 10px;
+  transition: all 0.3s ease; 
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+
+  &:hover {
+    background: linear-gradient(135deg, #ff9a8b, #ff7e79);  
+    transform: translateY(-2px);  
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); 
+  }
+
+  &:active {
+    transform: translateY(0); 
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1); 
+  }
 `;

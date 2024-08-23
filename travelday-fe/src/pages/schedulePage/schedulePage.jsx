@@ -5,19 +5,35 @@ import BottomNav from '../../components/shared/bottomNav.js';
 import ScheduleList from '../../components/schedulePage/scheduleList';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
 
 const SchedulePage = () => {
   const [schedules, setSchedules] = useState([]);
-  const [isLoading, setIsLoading] = useState(true); // 로딩 상태 추가
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
 
-    // if (!token) {
-    //   navigate('/login');
-    //   return;
-    // }
+    // Mock data 설정
+    const mock = new MockAdapter(axios);
+
+    const mockData = [
+      {
+        travelRoomId: 1,
+        name: '서울 여행',
+        startDate: '2024-08-30',
+        endDate: '2024-09-01',
+      },
+      {
+        travelRoomId: 2,
+        name: '부산 여행',
+        startDate: '2023-09-10',
+        endDate: '2023-09-15T00:00:00',
+      },
+    ];
+
+    mock.onGet('http://api.thetravelday.co.kr/api/rooms').reply(200, mockData);
 
     const fetchSchedules = async () => {
       try {
@@ -30,7 +46,7 @@ const SchedulePage = () => {
 
         if (response.status === 200) {
           const formattedSchedules = response.data.map((schedule) => ({
-            id: schedule.travelRoomId,  // travelRoomId를 id로 사용
+            id: schedule.travelRoomId,
             title: schedule.name,
             date: `${schedule.startDate.replace(/-/g, '.')} ~ ${schedule.endDate.split('T')[0].replace(/-/g, '.')}`,
           }));
@@ -41,7 +57,7 @@ const SchedulePage = () => {
       } catch (error) {
         console.error('일정 목록을 불러오는 중 오류가 발생했습니다:', error);
       } finally {
-        setIsLoading(false); // 로딩 완료
+        setIsLoading(false);
       }
     };
 
@@ -159,4 +175,3 @@ const NoScheduleText = styled.div`
   color: #999;
   margin-top: 20px;
 `;
-

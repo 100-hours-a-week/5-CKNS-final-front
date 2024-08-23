@@ -7,14 +7,13 @@ import { GoogleMap, Marker, InfoWindow } from '@react-google-maps/api';
 import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import calendarIcon from '../../images/filter/calendar.png';
+import penIcon from '../../images/pen.png'; // 펜 아이콘 임포트
 import ScheduleDetailList from '../../components/schedulePage/scheduleDetailList';
 
-// Axios mock setup
 const mock = new MockAdapter(axios);
 
 const ScheduleDetail = () => {
   const { travelRoomId } = useParams();
-  console.log(travelRoomId);
   const navigate = useNavigate();
   const location = useLocation();
   const { schedule } = location.state || {};
@@ -100,7 +99,7 @@ const ScheduleDetail = () => {
     fetchRoomDetails();
   }, [travelRoomId]);
 
-  // 일정 데이터 로드 및 일차별 정렬
+
   useEffect(() => {
     const fetchScheduleDetails = async () => {
       try {
@@ -149,6 +148,10 @@ const ScheduleDetail = () => {
     navigate(`/maplocation/${travelRoomId}`, { state: { schedule: fetchedSchedule || schedule } });
   };
 
+  const handleEditClick = () => {
+    navigate(`/fixschedule/${travelRoomId}`, { state: { schedule: fetchedSchedule || schedule } });
+  };
+
   const currentSchedule = fetchedSchedule || schedule;
 
   return (
@@ -159,6 +162,9 @@ const ScheduleDetail = () => {
           <>
             <TitleWrapper>
               <Title>{currentSchedule.name}</Title>
+              <IconButton onClick={handleEditClick}>
+                <EditIcon src={penIcon} alt="편집 아이콘" />
+              </IconButton>
               <ScheduleDateWrapper>
                 <Icon src={calendarIcon} alt="달력 아이콘" />
                 <ScheduleDate>{currentSchedule.date}</ScheduleDate>
@@ -175,8 +181,8 @@ const ScheduleDetail = () => {
                     <Marker 
                       key={index} 
                       position={marker} 
-                      label={marker.label} // 마커에 라벨 추가
-                      onClick={() => setSelectedMarker(marker)} // 마커 클릭 시 InfoWindow 설정
+                      label={marker.label} 
+                      onClick={() => setSelectedMarker(marker)} 
                     />
                   ))}
 
@@ -246,6 +252,7 @@ const TitleWrapper = styled.div`
   flex-direction: column;
   align-items: flex-start;
   background-color: #fff;
+  position: relative;
 `;
 
 const Title = styled.h1`
@@ -253,6 +260,20 @@ const Title = styled.h1`
   font-weight: bold;
   margin: 100px 0 10px 20px;
   text-align: left;
+`;
+
+const IconButton = styled.button`
+  position: absolute;
+  top: 100px;
+  right: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+`;
+
+const EditIcon = styled.img`
+  width: 20px;
+  height: 20px;
 `;
 
 const ScheduleDateWrapper = styled.div`
@@ -337,4 +358,3 @@ const PlusIcon = styled.span`
     transform: scale(1.2);
   }
 `;
-

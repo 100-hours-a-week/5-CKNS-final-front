@@ -18,6 +18,7 @@ import ScheduleDetail from './pages/schedulePage/scheduleDetailPage';
 import WishListPage from './pages/schedulePage/wishListPage';
 import MapLocationPage from './pages/schedulePage/mapLocationPage';
 import CreateSchedulePage from './pages/schedulePage/createSchedulePage';  
+import FixSchedulePage from './pages/schedulePage/fixschedulePage';  
 
 import './App.css';
 
@@ -52,7 +53,8 @@ function App() {
         <Route path="/maplocation/:travelRoomId" element={<MapLocationPage />} /> 
         <Route path="/alarm" element={<AlarmPage />} />
         <Route path="/intro" element={<IntroPage />} /> 
-        <Route path="/createschedule" element={<CreateSchedulePage />} /> {/* CreateSchedulePage 경로 추가 */}
+        <Route path="/createschedule" element={<CreateSchedulePage />} /> 
+        <Route path="/fixschedule/:travelRoomId" element={<FixSchedulePage />} />
       </Routes>
     </Router>
   );
