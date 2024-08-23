@@ -1,25 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter'; 
+import MockAdapter from 'axios-mock-adapter';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { GoogleMap, Marker } from '@react-google-maps/api';
 import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import calendarIcon from '../../images/filter/calendar.png';
-import ScheduleDetailList from '../../components/schedulePage/scheduleDetailList'; 
+import ScheduleDetailList from '../../components/schedulePage/scheduleDetailList';
 
 // Axios mock setup
 const mock = new MockAdapter(axios);
 
 const ScheduleDetail = () => {
-  const { travelRoomId } = useParams(); 
+  const { travelRoomId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { schedule } = location.state || {}; 
+  const { schedule } = location.state || {};
 
   const [scheduleDetails, setScheduleDetails] = useState([]);
-  const [fetchedSchedule, setFetchedSchedule] = useState(null); 
+  const [fetchedSchedule, setFetchedSchedule] = useState(null);
 
   const mapCenter = { lat: 37.5400456, lng: 126.9921017 };
 
@@ -59,6 +59,7 @@ const ScheduleDetail = () => {
     ]);
   }, [travelRoomId]);
 
+  // 여행방 정보 로드 및 일자 계산
   useEffect(() => {
     const fetchRoomDetails = async () => {
       try {
@@ -67,10 +68,29 @@ const ScheduleDetail = () => {
           headers: {
             Authorization: `Bearer ${token}`
           },
-          withCredentials: true 
+          withCredentials: true
         });
 
-        setFetchedSchedule(response.data); // 서버에서 받은 데이터로 fetchedSchedule 상태 업데이트
+        setFetchedSchedule(response.data);
+
+        // 일자 계산
+        const { date } = response.data;
+        const [startDateStr, endDateStr] = date.split(' ~ ');
+        const startDate = new Date(startDateStr);
+        const endDate = new Date(endDateStr);
+
+        const tempDetails = [];
+        let currentDate = new Date(startDate);
+
+        while (currentDate <= endDate) {
+          tempDetails.push({
+            date: currentDate.toISOString().split('T')[0],
+            schedules: []
+          });
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        setScheduleDetails(tempDetails);
       } catch (error) {
         console.error('여행방 정보 로드 중 오류 발생:', error);
       }
@@ -79,6 +99,7 @@ const ScheduleDetail = () => {
     fetchRoomDetails();
   }, [travelRoomId]);
 
+  // 일정 데이터 로드 및 일차별 정렬
   useEffect(() => {
     const fetchScheduleDetails = async () => {
       try {
@@ -90,30 +111,30 @@ const ScheduleDetail = () => {
           withCredentials: true,
         });
 
-        // 데이터를 날짜별로 그룹화
-        const groupedDetails = response.data.reduce((acc, detail) => {
-          const { scheduledDay } = detail;
-          if (!acc[scheduledDay]) {
-            acc[scheduledDay] = [];
-          }
-          acc[scheduledDay].push(detail);
-          return acc;
-        }, {});
+        // 업데이트된 상태를 계산
+        const updatedDetails = scheduleDetails.map(day => {
+          const dayDetails = { ...day };
+          dayDetails.schedules = response.data
+            .filter(detail => detail.scheduledDay === day.date)
+            .sort((a, b) => a.position - b.position);
+          return dayDetails;
+        });
 
-        const detailsArray = Object.keys(groupedDetails).map(date => groupedDetails[date]);
-        setScheduleDetails(detailsArray);
+        setScheduleDetails(updatedDetails);
       } catch (error) {
         console.error('일정 데이터를 불러오는 중 오류 발생:', error);
       }
     };
 
-    fetchScheduleDetails();
-  }, [travelRoomId]);
+    if (fetchedSchedule) {
+      fetchScheduleDetails();
+    }
+  }, [fetchedSchedule]);
 
   const handleAddFromWish = () => {
     navigate(`/wishlist/${travelRoomId}`, { state: { schedule: fetchedSchedule || schedule } });
   };
-  
+
   const handleAddFromMap = () => {
     navigate(`/maplocation/${travelRoomId}`, { state: { schedule: fetchedSchedule || schedule } });
   };
@@ -137,7 +158,7 @@ const ScheduleDetail = () => {
               <MapContainer>
                 <GoogleMap
                   mapContainerStyle={containerStyle}
-                  center={mapCenter} 
+                  center={mapCenter}
                   zoom={10}
                 >
                   <Marker position={mapCenter} />
@@ -164,6 +185,8 @@ const ScheduleDetail = () => {
 };
 
 export default ScheduleDetail;
+
+
 
 const Container = styled.div`
   display: flex;

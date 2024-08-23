@@ -12,8 +12,8 @@ const ScheduleDetailList = ({ scheduleDetails }) => {
       <Title>일정 보기</Title>
       {scheduleDetails.map((day, index) => (
         <div key={index}>
-          <Day>{index + 1}일차</Day> 
-          {day.map((detail) => (
+          <Day>{`${index + 1}일차 (${day.date})`}</Day> 
+          {day.schedules.map((detail) => (
             <ListItem key={detail.id}>
               <Position>#{detail.position}</Position>
               <Date>{detail.name}</Date> 
@@ -29,7 +29,7 @@ export default ScheduleDetailList;
 
 const ListContainer = styled.div`
   width: 100%;
-  background-color: #f9f9f9;
+  background-color: #fff;
   margin-top: 20px;
 `;
 
@@ -52,8 +52,10 @@ const ListItem = styled.div`
 `;
 
 const Day = styled.div`
+  display: flex;
   font-weight: bold;
-  margin: 20px 0 10px 0;
+  width : 390px;
+  margin: 20px 0px 10px 20px;
   font-size: 18px;
   color: #333;
 `;
