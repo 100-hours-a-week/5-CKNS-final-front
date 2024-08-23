@@ -1,25 +1,59 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import ScheduleList from '../../components/schedulePage/scheduleList';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const SchedulePage = () => {
-  const schedules = [
-    { title: '공듀들의 일본 여행', date: '2024.09.01 ~ 2024.09.04' },
-    { title: '하이든의 배낭 여행', date: '2024.11.12 ~ 2024.12.05' },
-    { title: '콜리의 호치민 한달살이', date: '2024.03.15 ~ 2024.04.14' },
-  ];
-
+  const [schedules, setSchedules] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // 로딩 상태 추가
   const navigate = useNavigate();
 
-  const handleItemClick = (index) => {
-    navigate(`/schedule/${index}`, { state: { schedule: schedules[index], id: index } });
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+
+    // if (!token) {
+    //   navigate('/login');
+    //   return;
+    // }
+
+    const fetchSchedules = async () => {
+      try {
+        const response = await axios.get('http://api.thetravelday.co.kr/api/rooms', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.status === 200) {
+          const formattedSchedules = response.data.map((schedule) => ({
+            id: schedule.travelRoomId,  // travelRoomId를 id로 사용
+            title: schedule.name,
+            date: `${schedule.startDate.replace(/-/g, '.')} ~ ${schedule.endDate.split('T')[0].replace(/-/g, '.')}`,
+          }));
+          setSchedules(formattedSchedules);
+        } else {
+          console.error('일정 목록을 불러오는 데 실패했습니다:', response.statusText);
+        }
+      } catch (error) {
+        console.error('일정 목록을 불러오는 중 오류가 발생했습니다:', error);
+      } finally {
+        setIsLoading(false); // 로딩 완료
+      }
+    };
+
+    fetchSchedules();
+  }, [navigate]);
+
+  const handleItemClick = (id) => {
+    navigate(`/schedule/${id}`, { state: { schedule: schedules.find(schedule => schedule.id === id) } });
   };
 
   const handleCreateButtonClick = () => {
-    navigate('/createschedule'); // CreateSchedulePage로 이동
+    navigate('/createschedule');
   };
 
   return (
@@ -32,7 +66,13 @@ const SchedulePage = () => {
           <BoldText>여행 일정 만들기</BoldText>
           <Subtitle>새로운 여행을 떠나보세요!</Subtitle>
         </CreateButton>
-        <ScheduleList schedules={schedules} onItemClick={handleItemClick} />
+        {isLoading ? (
+          <NoScheduleText>로딩 중...</NoScheduleText>
+        ) : schedules.length > 0 ? (
+          <ScheduleList schedules={schedules} onItemClick={handleItemClick} />
+        ) : (
+          <NoScheduleText>여행방이 없습니다! 일정을 추가해 주세요.</NoScheduleText>
+        )}
       </ContentWrapper>
       <BottomNav />
     </Container>
@@ -40,7 +80,6 @@ const SchedulePage = () => {
 };
 
 export default SchedulePage;
-
 
 const Container = styled.div`
   display: flex;
@@ -76,7 +115,7 @@ const CreateButton = styled.button`
   font-size: 15px;
   margin-bottom: 30px;
   text-align: center;
-  border: 2px solid #ddd; 
+  border: 2px solid #ddd;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -114,3 +153,10 @@ const Subtitle = styled.div`
   font-size: 14px;
   color: #ccc;
 `;
+
+const NoScheduleText = styled.div`
+  font-size: 16px;
+  color: #999;
+  margin-top: 20px;
+`;
+

@@ -11,13 +11,12 @@ const ScheduleList = ({ schedules, onItemClick }) => {
     const upcomingSchedules = [];
     const pastSchedules = [];
 
-    schedules.forEach((schedule, index) => {
+    schedules.forEach((schedule) => {
       const date = new Date(schedule.date.split(' ~ ')[0]);
-      const scheduleWithIndex = { ...schedule, originalIndex: index }; 
       if (date < today) {
-        pastSchedules.push(scheduleWithIndex);
+        pastSchedules.push(schedule);
       } else {
-        upcomingSchedules.push(scheduleWithIndex);
+        upcomingSchedules.push(schedule);
       }
     });
 
@@ -58,7 +57,7 @@ const ScheduleList = ({ schedules, onItemClick }) => {
           return (
             <ScheduleItem
               key={index}
-              onClick={() => onItemClick(schedule.originalIndex)} // 원래 인덱스를 사용
+              onClick={() => onItemClick(schedule.id)}
               isPast={isPast}
             >
               <ScheduleTitle isPast={isPast}>{schedule.title}</ScheduleTitle>
@@ -72,6 +71,8 @@ const ScheduleList = ({ schedules, onItemClick }) => {
 };
 
 export default ScheduleList;
+
+// 스타일 컴포넌트는 이전과 동일합니다.
 
 const Container = styled.div`
   width: 100%;

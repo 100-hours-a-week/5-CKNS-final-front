@@ -10,7 +10,7 @@ import ScheduleDetailList from '../../components/schedulePage/scheduleDetailList
 const ScheduleDetail = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { schedule, id } = location.state; // 'id'는 고유 여행 방 ID
+  const { schedule, id } = location.state; 
 
   const mapCenter = { lat: 37.5400456, lng: 126.9921017 };
 
