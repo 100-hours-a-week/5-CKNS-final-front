@@ -101,7 +101,7 @@ function MapLocationPage() {
           <BackIcon src={backIcon} alt="뒤로가기 아이콘" />
         </BackButton>
         <TitleWrapper>
-          <Title>{schedule.title || 'Map Location'}</Title>
+          <Title>{schedule.name || 'Map Location'}</Title>
           <ScheduleDateWrapper>
             <Icon src={calendarIcon} alt="달력 아이콘" />
             <ScheduleDate>{schedule.date}</ScheduleDate>
@@ -173,7 +173,7 @@ function MapLocationPage() {
 
 export default React.memo(MapLocationPage);
 
-// Styled Components remain the same
+
 const containerStyle = {
   width: '390px',
   height: '760px'  

@@ -17,10 +17,10 @@ const WishListModal = ({ onClose, selectedPlace, travelRoomId }) => {
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`, // 토큰을 헤더에 추가
+            Authorization: `Bearer ${token}`, 
             'Content-Type': 'application/json',
           },
-          withCredentials: true // withCredentials 추가
+          withCredentials: true 
         }
       );
       console.log('일정에 추가 성공:', response.data);
@@ -31,7 +31,7 @@ const WishListModal = ({ onClose, selectedPlace, travelRoomId }) => {
   };
 
   const handleAddToWishlist = async () => {
-    const token = localStorage.getItem('accessToken'); // 토큰 가져오기
+    const token = localStorage.getItem('accessToken'); 
 
     try {
       const response = await axios.post(
@@ -43,10 +43,10 @@ const WishListModal = ({ onClose, selectedPlace, travelRoomId }) => {
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`, // 토큰을 헤더에 추가
+            Authorization: `Bearer ${token}`, 
             'Content-Type': 'application/json',
           },
-          withCredentials: true // withCredentials 추가
+          withCredentials: true 
         }
       );
       console.log('위시리스트에 추가 성공:', response.data);

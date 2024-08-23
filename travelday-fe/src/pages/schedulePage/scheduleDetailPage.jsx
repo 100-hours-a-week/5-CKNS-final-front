@@ -3,7 +3,7 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
-import { GoogleMap, Marker } from '@react-google-maps/api';
+import { GoogleMap, Marker, InfoWindow } from '@react-google-maps/api';
 import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import calendarIcon from '../../images/filter/calendar.png';
@@ -14,20 +14,21 @@ const mock = new MockAdapter(axios);
 
 const ScheduleDetail = () => {
   const { travelRoomId } = useParams();
+  console.log(travelRoomId);
   const navigate = useNavigate();
   const location = useLocation();
   const { schedule } = location.state || {};
 
   const [scheduleDetails, setScheduleDetails] = useState([]);
   const [fetchedSchedule, setFetchedSchedule] = useState(null);
-  const [mapMarkers, setMapMarkers] = useState([]); // 구글 맵에 표시할 마커 데이터를 저장할 상태
-
+  const [mapMarkers, setMapMarkers] = useState([]);
+  const [selectedMarker, setSelectedMarker] = useState(null);
   const mapCenter = { lat: 37.5400456, lng: 126.9921017 };
 
   // 목 데이터 설정
   useEffect(() => {
     mock.onGet(`http://api.thetravelday.co.kr/api/rooms/${travelRoomId}`).reply(200, {
-      travelRoomId: 0,
+      travelRoomId: 1,
       name: '구라쟁이의 여행',
       date: '2024-01-01 ~ 2024-01-03',
     });
@@ -35,32 +36,31 @@ const ScheduleDetail = () => {
     mock.onGet(`http://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan`).reply(200, [
       {
         id: travelRoomId,
-        name: 'Place 1',
+        name: '롯데월드',
         scheduledDay: '2024-01-01',
         position: 1,
-        latitude: 37.5400456,
+        latitude: 37.6000456,
         longitude: 126.9921017,
       },
       {
         id: travelRoomId,
-        name: 'Place 2',
+        name: '롯데월드',
         scheduledDay: '2024-01-01',
         position: 2,
-        latitude: 37.5400456,
+        latitude: 37.5000456,
         longitude: 126.9921017,
       },
       {
         id: travelRoomId,
-        name: 'Place 3',
+        name: '에버랜드',
         scheduledDay: '2024-01-02',
         position: 1,
-        latitude: 37.5400456,
+        latitude: 37.00456,
         longitude: 126.9921017,
       },
     ]);
   }, [travelRoomId]);
 
-  // 여행방 정보 로드 및 일자 계산
   useEffect(() => {
     const fetchRoomDetails = async () => {
       try {
@@ -126,6 +126,8 @@ const ScheduleDetail = () => {
         const markers = response.data.map(detail => ({
           lat: detail.latitude,
           lng: detail.longitude,
+          label: `${detail.position}`, // 위치를 라벨로 설정
+          name: detail.name, // 장소 이름 추가
         }));
         setMapMarkers(markers);
 
@@ -170,8 +172,31 @@ const ScheduleDetail = () => {
                   zoom={10}
                 >
                   {mapMarkers.map((marker, index) => (
-                    <Marker key={index} position={marker} />
+                    <Marker 
+                      key={index} 
+                      position={marker} 
+                      label={marker.label} // 마커에 라벨 추가
+                      onClick={() => setSelectedMarker(marker)} // 마커 클릭 시 InfoWindow 설정
+                    />
                   ))}
+
+                  {selectedMarker && (
+                    <InfoWindow
+                      position={selectedMarker}
+                      onCloseClick={() => setSelectedMarker(null)} // InfoWindow 닫기
+                    >
+                      <div>
+                        <h4>{selectedMarker.name}</h4> {/* 장소 이름 표시 */}
+                        <a
+                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedMarker.name)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Google Maps로 이동
+                        </a>
+                      </div>
+                    </InfoWindow>
+                  )}
                 </GoogleMap>
               </MapContainer>
               <ButtonWrapper>
@@ -195,7 +220,6 @@ const ScheduleDetail = () => {
 };
 
 export default ScheduleDetail;
-
 
 const Container = styled.div`
   display: flex;
@@ -280,21 +304,37 @@ const ActionButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 0;
-  font-size: 13px;
-  background-color: #fff;
-  color: #000;
+  padding: 12px 0;
+  font-size: 14px;
+  background-color: #ffffff;
+  color: #333;
   border: 2px solid #ddd;
-  border-radius: 50px;
+  border-radius: 25px;
   cursor: pointer;
   margin: 0 5px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 
   &:hover {
-    border: 2px solid #f12e5e;
+    background-color: #f12e5e;
+    color: #fff;
+    border-color: #f12e5e;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: translateY(2px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
   }
 `;
 
 const PlusIcon = styled.span`
-  margin-right: 8px;
-  font-size: 20px;
+  margin-right: 10px;
+  font-size: 22px;
+  transition: transform 0.3s ease;
+
+  ${ActionButton}:hover & {
+    transform: scale(1.2);
+  }
 `;
+
