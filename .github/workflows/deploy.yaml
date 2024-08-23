@@ -36,6 +36,8 @@ jobs:
           npm ci
           CI=false npm run build
         working-directory: travelday-fe
+        env:
+          REACT_APP_GOOGLE_MAP_KEY: ${{ secrets.REACT_APP_GOOGLE_MAP_KEY }}
 
       - name: AWS IAM 사용자 설정
         uses: aws-actions/configure-aws-credentials@v2
