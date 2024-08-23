@@ -15,7 +15,7 @@ const CreateSchedulePage = () => {
   const today = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
-    // 여행 이름, 시작 날짜, 종료 날짜가 모두 입력되었을 때만 버튼 활성화
+    
     if (title && startDate && endDate) {
       setIsButtonEnabled(true);
     } else {
@@ -24,17 +24,29 @@ const CreateSchedulePage = () => {
   }, [title, startDate, endDate]);
 
   const handleCreateSchedule = async () => {
-    if (!isButtonEnabled) return; // 버튼이 활성화되지 않았을 경우 return
-    try {
-      const response = await axios.post('http://api.thetravelday.co.kr/api/rooms', {
-        name: title,
-        startDate: startDate.replace(/-/g, '.'),
-        endDate: endDate.replace(/-/g, '.')
-      });
+    if (!isButtonEnabled) return;
 
-      if (response.status === 201) {  // 성공적으로 생성되었을 때
+    const token = localStorage.getItem('accessToken'); 
+
+    try {
+      const response = await axios.post(
+        'http://api.thetravelday.co.kr/api/rooms', 
+        {
+          name: title,
+          startDate: startDate.replace(/-/g, '.'),
+          endDate: endDate.replace(/-/g, '.'),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (response.status === 201) { 
         console.log('새로운 일정 생성:', response.data);
-        navigate('/schedule');  // 일정 페이지로 이동
+        navigate('/schedule');
       }
     } catch (error) {
       console.error('일정 생성 중 오류 발생:', error);
