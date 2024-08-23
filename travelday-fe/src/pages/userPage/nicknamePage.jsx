@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import SimpleHeader from '../../components/shared/simpleHeader.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import axios from 'axios';
@@ -8,6 +9,40 @@ const LoginPage = () => {
   const [nickname, setNickname] = useState('');
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
   const [nicknameError, setNicknameError] = useState('');
+  const navigate = useNavigate(); // useNavigate 훅을 사용하여 navigate 함수 가져오기
+
+  useEffect(() => {
+    const checkTokenAndFetchProfile = async () => {
+      const token = localStorage.getItem('accessToken');
+
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      try {
+        const response = await fetch('https://kapi.kakao.com/v2/user/me', {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const currentNickname = data.kakao_account.profile.nickname;
+          setNickname(currentNickname);
+        } else {
+          console.error('사용자 정보 요청 실패:', response.statusText);
+        }
+      } catch (error) {
+        console.error('사용자 정보 요청 중 오류 발생:', error);
+      }
+    };
+
+    checkTokenAndFetchProfile();
+  }, [navigate]);
 
   const handleNicknameChange = async (e) => {
     const newNickname = e.target.value.trim();
@@ -34,8 +69,34 @@ const LoginPage = () => {
     }
   };
 
-  const handleSubmit = () => {
-    console.log('닉네임이 변경되었습니다:', nickname);
+  const handleSubmit = async () => {
+    const token = localStorage.getItem('accessToken');
+
+    if (!token) {
+      return;
+    }
+
+    try {
+      const response = await axios.put(
+        'http://api.thetravelday.co.kr/api/nickname',
+        { nickname }, // 서버로 보낼 새로운 닉네임
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        console.log('닉네임이 성공적으로 변경되었습니다:', response.data);
+        localStorage.setItem('nickname', nickname); // 로컬 스토리지에 닉네임 저장
+      } else {
+        console.error('닉네임 변경 실패:', response.statusText);
+      }
+    } catch (error) {
+      console.error('닉네임 변경 중 오류 발생:', error);
+    }
   };
 
   return (
@@ -48,7 +109,7 @@ const LoginPage = () => {
             type="text"
             value={nickname}
             onChange={handleNicknameChange}
-            placeholder="collie"
+            placeholder="새로운 닉네임을 입력하세요"
           />
           <ErrorText>{nicknameError || '\u00A0'}</ErrorText> {/* 비어 있을 때는 공백을 사용 */}
           <Button onClick={handleSubmit} disabled={!isButtonEnabled}>
@@ -63,6 +124,8 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+
+// Styled Components
 
 const PageContainer = styled.div`
   display: flex;
@@ -112,8 +175,11 @@ const Input = styled.input`
     border-width: 2px; 
     outline: none; 
   }
-`;
 
+  &:disabled {
+    background-color: #f0f0f0;  // 로딩 중 비활성화 시 배경색
+  }
+`;
 
 const ErrorText = styled.p`
   color: red;

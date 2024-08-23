@@ -74,7 +74,7 @@ const SearchResultsPopup = ({ isOpen, onClose, searchResults = [], onResultClick
       <WishlistPopup 
         isOpen={isPopupOpen} 
         onClose={handlePopupClose} 
-        selectedPlace={selectedResult}  // 선택된 장소의 위치 데이터 전달
+        selectedPlace={selectedResult}  
       />
     </>
   );

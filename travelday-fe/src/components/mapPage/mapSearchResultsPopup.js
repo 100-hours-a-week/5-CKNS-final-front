@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
+import axios from 'axios';
 import backIcon from '../../images/header/back.png';
 import heartIcon from '../../images/wishList/heart.png';
 
@@ -14,7 +15,7 @@ const slideUp = keyframes`
   }
 `;
 
-const MapSearchResultsPopup = ({ isOpen, onClose, searchResults = [], onResultClick }) => {
+const MapSearchResultsPopup = ({ isOpen, onClose, searchResults = [], onResultClick, travelRoomId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedResult, setSelectedResult] = useState(null);
 
@@ -27,11 +28,34 @@ const MapSearchResultsPopup = ({ isOpen, onClose, searchResults = [], onResultCl
     setIsModalOpen(false);
   };
 
-  const handleAddToSchedule = () => {
-    // Logic to add the selected place to the schedule
-    console.log(`Added to schedule: ${selectedResult.name}`);
-    setIsModalOpen(false);
-    // Proceed with adding to the schedule
+  const handleAddToSchedule = async () => {
+    if (!selectedResult) return;
+
+    const token = localStorage.getItem('accessToken');
+
+    try {
+      const response = await axios.post(
+        `http://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan/direct`,
+        {
+          travelroom_id: travelRoomId,
+          name: selectedResult.name,
+          latitude: selectedResult.geometry.location.lat(),
+          longitude: selectedResult.geometry.location.lng(),
+          day: 1,  //scheduleDetailPage 구현하고 변경예정
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        }
+      );
+      console.log('일정에 추가 성공:', response.data);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error('일정에 추가 실패:', error);
+    }
   };
 
   if (!isOpen) return null;
@@ -89,7 +113,7 @@ const MapSearchResultsPopup = ({ isOpen, onClose, searchResults = [], onResultCl
 
 export default MapSearchResultsPopup;
 
-// Styled Components
+
 const PopupOverlay = styled.div`
   position: fixed;
   top: 0;
@@ -218,20 +242,9 @@ const HeartButton = styled.button`
     height: 24px;
     transition: transform 200ms cubic-bezier(.2,0,.7,1);
   }
-
-  &:hover {
-    transform: rotate(45deg);
-    box-shadow: 0 0 1px 15px rgba(138, 59, 88, 0.4),
-                0 0 1px 30px rgba(138, 59, 88, 0.1),
-                0 0 1px 45px rgba(138, 59, 88, 0.1);
-  }
-
-  &:hover img {
-    transform: rotate(-45deg);
-  }
 `;
 
-// Modal Styled Components
+
 const ModalOverlay = styled.div`
   position: fixed;
   top: 0;

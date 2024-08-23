@@ -5,66 +5,110 @@ import SimpleHeader from '../../components/shared/simpleHeader.js';
 import BottomNav from '../../components/shared/bottomNav.js';  
 import LogoImage from '../../images/logo/logo12.png';  
 import PenIcon from '../../images/pen.png'; 
+import axios from 'axios';
 
 const MyPage = () => {
   const navigate = useNavigate();
-  const [nickname, setNickname] = useState('collie'); // 기본값으로 'collie' 설정
-  const [showModal, setShowModal] = useState(false); // 모달 창 상태
+  const [nickname, setNickname] = useState('collie');
+  const [showModal, setShowModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(''); 
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
-    if (token) {
-      fetchKakaoUserProfile(token);
-    }
-  }, []);
+    
+    // if (!token) {
+    //   setErrorMessage('로그인이 필요합니다.');
+    //   navigate('/login');
+    //   return;
+    // }
+
+    fetchKakaoUserProfile(token);
+  }, [navigate]);
 
   const fetchKakaoUserProfile = async (token) => {
     try {
-      const response = await fetch('https://kapi.kakao.com/v2/user/me', {
-        method: 'GET',
+      const response = await axios.get('https://kapi.kakao.com/v2/user/me', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
-        },
+        }
       });
 
-      if (response.ok) {
-        const data = await response.json();
+      if (response.status === 200) {
+        const data = response.data;
         const nickname = data.kakao_account.profile.nickname;
         setNickname(nickname);
       } else {
-        console.error('카카오 사용자 정보 요청 실패:', response.statusText);
+        throw new Error('사용자 정보 요청 실패');
       }
     } catch (error) {
-      console.error('카카오 사용자 정보 요청 중 오류 발생:', error);
+      setErrorMessage('사용자 정보를 불러오는 중 오류가 발생했습니다.');
+    
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('accessToken');
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      await axios.post('http://localhost:8080/api/user/logout', {}, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        withCredentials: true
+      });
+  
+      localStorage.removeItem('accessToken');
+      navigate('/');
+    } catch (error) {
+      console.error('로그아웃 중 오류 발생:', error);
+      alert('로그아웃 중 오류가 발생했습니다.'); // 사용자에게 알림
+    }
   };
-
+  
   const handleDeleteAccount = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch('http://api.thetravelday.co.kr/api/user', {
-        method: 'DELETE',
+      const response = await axios.delete('http://api.thetravelday.co.kr/api/user', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        withCredentials: true
       });
 
-      if (response.ok) {
+      if (response.status === 200) {
         console.log('회원 탈퇴 성공');
         localStorage.removeItem('accessToken');
         navigate('/intro');
       } else {
-        console.error('회원 탈퇴 실패:', response.statusText);
+        throw new Error('회원 탈퇴 실패');
       }
     } catch (error) {
-      console.error('회원 탈퇴 중 오류 발생:', error);
+      setErrorMessage('회원 탈퇴 중 오류가 발생했습니다.');
+      alert('회원 탈퇴 중 오류가 발생했습니다.'); // 사용자에게 알림
+    }
+  };
+
+  const handleNicknameCheck = async (nickname) => {
+    try {
+      const response = await axios.get(`http://api.thetravelday.co.kr/api/nickname/check`, {
+        params: { nickname },
+        withCredentials: true,
+      });
+
+      if (response.status === 200) {
+        const isAvailable = response.data.isAvailable;
+        if (!isAvailable) {
+          alert('이미 사용 중인 닉네임입니다.');
+        } else {
+          alert('사용 가능한 닉네임입니다.');
+        }
+      } else {
+        throw new Error('닉네임 중복 확인 실패');
+      }
+    } catch (error) {
+      console.error('닉네임 중복 확인 중 오류 발생:', error);
+      alert('닉네임 중복 확인 중 오류가 발생했습니다.'); // 사용자에게 알림
     }
   };
 
@@ -74,6 +118,7 @@ const MyPage = () => {
       alert('링크가 복사되었습니다!');
     } catch (error) {
       console.error('링크 복사 실패:', error);
+      alert('링크 복사 중 오류가 발생했습니다.'); // 사용자에게 알림
     }
   };
 
@@ -117,11 +162,15 @@ const MyPage = () => {
           </ModalContent>
         </ModalOverlay>
       )}
+
+      {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
     </PageContainer>
   );
 };
 
 export default MyPage;
+
+
 
 const PageContainer = styled.div`
   display: flex;
@@ -278,5 +327,11 @@ const ModalButton = styled.button`
       background-color: #0056b3;
     }
   }
+`;
+
+const ErrorMessage = styled.p`
+  color: red;
+  margin-top: 10px;
+  font-size: 14px;
 `;
 

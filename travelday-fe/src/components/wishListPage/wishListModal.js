@@ -5,12 +5,24 @@ import axios from 'axios';
 
 const WishListModal = ({ onClose, selectedPlace, travelRoomId }) => {
   const handleAddToSchedule = async () => {
+    const token = localStorage.getItem('accessToken'); // 토큰 가져오기
+
     try {
-      const response = await axios.post(`http://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan/list`, {
-        latitude: selectedPlace.latitude,
-        longitude: selectedPlace.longitude,
-        name: selectedPlace.name
-      });
+      const response = await axios.post(
+        `http://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan/list`, 
+        {
+          latitude: selectedPlace.latitude,
+          longitude: selectedPlace.longitude,
+          name: selectedPlace.name,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, 
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true 
+        }
+      );
       console.log('일정에 추가 성공:', response.data);
       onClose();
     } catch (error) {
@@ -19,12 +31,24 @@ const WishListModal = ({ onClose, selectedPlace, travelRoomId }) => {
   };
 
   const handleAddToWishlist = async () => {
+    const token = localStorage.getItem('accessToken'); 
+
     try {
-      const response = await axios.post(`http://api.thetravelday.co.kr/api/rooms/${travelRoomId}/wishlist`, {
-        latitude: selectedPlace.latitude,
-        longitude: selectedPlace.longitude,
-        name: selectedPlace.name
-      });
+      const response = await axios.post(
+        `http://api.thetravelday.co.kr/api/rooms/${travelRoomId}/wishlist`,
+        {
+          latitude: selectedPlace.latitude,
+          longitude: selectedPlace.longitude,
+          name: selectedPlace.name,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, 
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true 
+        }
+      );
       console.log('위시리스트에 추가 성공:', response.data);
       onClose();
     } catch (error) {

@@ -47,9 +47,9 @@ function App() {
         <Route path="/nickname" element={<Nickname />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/schedule" element={<SchedulePage />} />
-        <Route path="/schedule/:id" element={<ScheduleDetail />} />
-        <Route path="/wishlist/:id" element={<WishListPage />} /> 
-        <Route path="/maplocation/:id" element={<MapLocationPage />} /> 
+        <Route path="/schedule/:travelRoomId" element={<ScheduleDetail />} />
+        <Route path="/wishlist/:travelRoomId" element={<WishListPage />} /> 
+        <Route path="/maplocation/:travelRoomId" element={<MapLocationPage />} /> 
         <Route path="/alarm" element={<AlarmPage />} />
         <Route path="/intro" element={<IntroPage />} /> 
         <Route path="/createschedule" element={<CreateSchedulePage />} /> {/* CreateSchedulePage 경로 추가 */}

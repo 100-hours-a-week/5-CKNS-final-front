@@ -14,12 +14,17 @@ const Header = ({ showBackButton = false, onBackClick }) => {
     if (onBackClick) {
       onBackClick();
     } else {
-      navigate('/'); // 기본 동작: /로 이동
+      navigate('/'); 
     }
   };
 
   const handleUserIconClick = () => {
-    navigate('/login'); 
+    const accessToken = localStorage.getItem('accessToken');
+    if (accessToken) {
+      navigate('/mypage'); 
+    } else {
+      navigate('/login'); 
+    }
   };
 
   const handleLogoClick = () => {
@@ -47,7 +52,6 @@ const Header = ({ showBackButton = false, onBackClick }) => {
 export default Header;
 
 // 스타일 컴포넌트 그대로 유지
-
 
 const HeaderContainer = styled.div`
     display: flex;

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import axios from 'axios';  // axios 임포트
 import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
@@ -14,8 +15,27 @@ const WishListPage = () => {
   // location.state가 null일 경우를 대비해 기본값 설정
   const { schedule } = location.state || { schedule: { title: 'Default Title', date: '2024-01-01 ~ 2024-01-07', details: [] } };
 
-  const wishListItems = getWishListForSchedule(id);
+  const [wishListItems, setWishListItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
+
+  useEffect(() => {
+    // travelRoomId를 이용해 API 호출
+    const fetchWishList = async () => {
+      try {
+        const response = await axios.get(`http://api.thetravelday.co.kr/api/rooms/${id}/wishlist`);
+        if (response.status === 200) {
+          // API에서 받은 데이터를 state에 저장
+          setWishListItems(response.data.data[0].wishlist);
+        } else {
+          console.error('데이터를 불러오는 데 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('API 요청 중 에러 발생:', error);
+      }
+    };
+
+    fetchWishList();
+  }, [id]);
 
   const handleItemClick = (index) => {
     setSelectedItems((prevSelected) => {
@@ -59,7 +79,7 @@ const WishListPage = () => {
           <BackIcon src={backIcon} alt="뒤로가기 아이콘" />
         </BackButton>
         <TitleWrapper>
-          <Title>{schedule.title || '위시 리스트'}</Title>
+          <Title>{schedule.name || '위시 리스트'}</Title>
           <ScheduleDateWrapper>
             <Icon src={calendarIcon} alt="달력 아이콘" />
             <ScheduleDate>{schedule.date}</ScheduleDate>
@@ -77,7 +97,7 @@ const WishListPage = () => {
         <WishList>
           {wishListItems.map((item, index) => (
             <WishListItem
-              key={index}
+              key={item.wishId}  // 고유한 키로 설정
               onClick={() => handleItemClick(index)}
               selected={selectedItems.includes(index)}
             >
@@ -96,20 +116,6 @@ const WishListPage = () => {
       <BottomNav />
     </Container>
   );
-};
-
-const getWishListForSchedule = (id) => {
-  const wishLists = {
-    '0': [
-      { title: '도쿄 스카이트리', location: '관광지' },
-      { title: '도쿄역', location: '관광지' },
-    ],
-    '1': [
-      { title: '에펠탑', location: '프랑스 파리' },
-      { title: '로마 콜로세움', location: '이탈리아 로마' },
-    ],
-  };
-  return wishLists[id] || [];
 };
 
 export default WishListPage;
