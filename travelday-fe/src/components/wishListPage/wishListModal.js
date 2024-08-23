@@ -20,6 +20,7 @@ const WishListModal = ({ onClose, selectedPlace, travelRoomId }) => {
             Authorization: `Bearer ${token}`, // 토큰을 헤더에 추가
             'Content-Type': 'application/json',
           },
+          withCredentials: true // withCredentials 추가
         }
       );
       console.log('일정에 추가 성공:', response.data);
@@ -45,6 +46,7 @@ const WishListModal = ({ onClose, selectedPlace, travelRoomId }) => {
             Authorization: `Bearer ${token}`, // 토큰을 헤더에 추가
             'Content-Type': 'application/json',
           },
+          withCredentials: true // withCredentials 추가
         }
       );
       console.log('위시리스트에 추가 성공:', response.data);

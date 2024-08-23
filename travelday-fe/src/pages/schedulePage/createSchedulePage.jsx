@@ -15,7 +15,13 @@ const CreateSchedulePage = () => {
   const today = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
-    
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      navigate('/login');
+    }
+  }, [navigate]);
+
+  useEffect(() => {
     if (title && startDate && endDate) {
       setIsButtonEnabled(true);
     } else {
@@ -41,6 +47,7 @@ const CreateSchedulePage = () => {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
+          withCredentials: true 
         }
       );
 
