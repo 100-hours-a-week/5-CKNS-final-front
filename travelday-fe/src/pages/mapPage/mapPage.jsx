@@ -170,7 +170,7 @@ const Container = styled.div`
   align-items: center;
   width: 390px;
   height: 100%;
-  background-color: #fff;  /* 전체 배경색을 흰색으로 설정 */
+  background-color: #fff; 
 `;
 
 const Content = styled.div`

@@ -22,6 +22,7 @@ import CreateSchedulePage from './pages/schedulePage/createSchedulePage';
 import FixSchedulePage from './pages/schedulePage/fixschedulePage';  
 
 import './App.css';
+import './i18n'; 
 
 const libraries = ['places']; 
 
