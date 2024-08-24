@@ -26,13 +26,13 @@ const ScheduleDetail = () => {
 
   // 목 데이터 설정
   useEffect(() => {
-    mock.onGet(`http://api.thetravelday.co.kr/api/rooms/${travelRoomId}`).reply(200, {
+    mock.onGet(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}`).reply(200, {
       travelRoomId: 1,
       name: '구라쟁이의 여행',
       date: '2024-01-01 ~ 2024-01-03',
     });
 
-    mock.onGet(`http://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan`).reply(200, [
+    mock.onGet(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan`).reply(200, [
       {
         id: travelRoomId,
         name: '롯데월드',
@@ -64,7 +64,7 @@ const ScheduleDetail = () => {
     const fetchRoomDetails = async () => {
       try {
         const token = localStorage.getItem('accessToken');
-        const response = await axios.get(`http://api.thetravelday.co.kr/api/rooms/${travelRoomId}`, {
+        const response = await axios.get(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}`, {
           headers: {
             Authorization: `Bearer ${token}`
           },
@@ -104,7 +104,7 @@ const ScheduleDetail = () => {
     const fetchScheduleDetails = async () => {
       try {
         const token = localStorage.getItem('accessToken');
-        const response = await axios.get(`http://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan`, {
+        const response = await axios.get(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

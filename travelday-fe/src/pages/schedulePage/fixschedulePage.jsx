@@ -34,7 +34,7 @@ const FixSchedulePage = () => {
 
     try {
       const response = await axios.put(
-        `http://api.thetravelday.co.kr/api/rooms/${travelRoomId}`, 
+        `https://api.thetravelday.co.kr/api/rooms/${travelRoomId}`, 
         {
           name: title,
           startDate: startDate.replace(/-/g, '.'),

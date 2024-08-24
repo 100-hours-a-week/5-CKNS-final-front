@@ -50,7 +50,7 @@ const LoginPage = () => {
 
     if (newNickname) {
       try {
-        const response = await axios.get(`http://api.thetravelday.co.kr/api/nickname/check?nickname=${newNickname}`);
+        const response = await axios.get(`https://api.thetravelday.co.kr/api/nickname/check?nickname=${newNickname}`);
         if (response.data.exists) {
           setNicknameError('이미 사용 중인 닉네임입니다.');
           setIsButtonEnabled(false);
@@ -78,7 +78,7 @@ const LoginPage = () => {
 
     try {
       const response = await axios.put(
-        'http://api.thetravelday.co.kr/api/nickname',
+        'https://api.thetravelday.co.kr/api/nickname',
         { nickname }, // 서버로 보낼 새로운 닉네임
         {
           headers: {
@@ -90,7 +90,7 @@ const LoginPage = () => {
 
       if (response.status === 200) {
         console.log('닉네임이 성공적으로 변경되었습니다:', response.data);
-        localStorage.setItem('nickname', nickname); // 로컬 스토리지에 닉네임 저장
+        localStorage.setItem('nickname', nickname); 
       } else {
         console.error('닉네임 변경 실패:', response.statusText);
       }
@@ -111,7 +111,7 @@ const LoginPage = () => {
             onChange={handleNicknameChange}
             placeholder="새로운 닉네임을 입력하세요"
           />
-          <ErrorText>{nicknameError || '\u00A0'}</ErrorText> {/* 비어 있을 때는 공백을 사용 */}
+          <ErrorText>{nicknameError || '\u00A0'}</ErrorText>
           <Button onClick={handleSubmit} disabled={!isButtonEnabled}>
             변경하기
           </Button>

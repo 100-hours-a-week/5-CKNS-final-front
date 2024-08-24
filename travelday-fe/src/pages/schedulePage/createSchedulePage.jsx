@@ -36,7 +36,7 @@ const CreateSchedulePage = () => {
 
     try {
       const response = await axios.post(
-        'http://api.thetravelday.co.kr/api/rooms', 
+        'https://api.thetravelday.co.kr/api/rooms', 
         {
           name: title,
           startDate: startDate.replace(/-/g, '.'),
