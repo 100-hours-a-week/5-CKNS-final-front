@@ -9,7 +9,7 @@ const WishListModal = ({ onClose, selectedPlace, travelRoomId }) => {
 
     try {
       const response = await axios.post(
-        `http://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan/list`, 
+        `https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan/list`, 
         {
           latitude: selectedPlace.latitude,
           longitude: selectedPlace.longitude,
@@ -35,7 +35,7 @@ const WishListModal = ({ onClose, selectedPlace, travelRoomId }) => {
 
     try {
       const response = await axios.post(
-        `http://api.thetravelday.co.kr/api/rooms/${travelRoomId}/wishlist`,
+        `https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/wishlist`,
         {
           latitude: selectedPlace.latitude,
           longitude: selectedPlace.longitude,

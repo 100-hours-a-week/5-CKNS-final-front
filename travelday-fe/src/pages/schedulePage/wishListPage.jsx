@@ -31,7 +31,7 @@ const WishListPage = () => {
     ];
 
     // 모킹된 GET 요청 처리
-    mock.onGet(`http://api.thetravelday.co.kr/api/rooms/${id}/wishlist`).reply(200, {
+    mock.onGet(`https://api.thetravelday.co.kr/api/rooms/${id}/wishlist`).reply(200, {
       data: [
         {
           wishlist: mockData,
@@ -42,7 +42,7 @@ const WishListPage = () => {
     // 실제 API 호출
     const fetchWishList = async () => {
       try {
-        const response = await axios.get(`http://api.thetravelday.co.kr/api/rooms/${id}/wishlist`);
+        const response = await axios.get(`https://api.thetravelday.co.kr/api/rooms/${id}/wishlist`);
         if (response.status === 200) {
           setWishListItems(response.data.data[0].wishlist);
         } else {
@@ -76,7 +76,7 @@ const WishListPage = () => {
     }
 
     try {
-      const response = await axios.delete(`http://api.thetravelday.co.kr/api/rooms/${id}/wishlist/${itemToRemove.wishId}`, {
+      const response = await axios.delete(`https://api.thetravelday.co.kr/api/rooms/${id}/wishlist/${itemToRemove.wishId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },

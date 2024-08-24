@@ -33,11 +33,11 @@ const SchedulePage = () => {
       },
     ];
 
-    mock.onGet('http://api.thetravelday.co.kr/api/rooms').reply(200, mockData);
+    mock.onGet('https://api.thetravelday.co.kr/api/rooms').reply(200, mockData);
 
     const fetchSchedules = async () => {
       try {
-        const response = await axios.get('http://api.thetravelday.co.kr/api/rooms', {
+        const response = await axios.get('https://api.thetravelday.co.kr/api/rooms', {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
