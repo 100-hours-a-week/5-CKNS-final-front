@@ -68,7 +68,12 @@ const WishListPage = () => {
 
   const handleRemoveItem = async (index) => {
     const itemToRemove = wishListItems[index];
-    const accessToken = 'your-access-token-here'; // 실제로는 안전한 방식으로 토큰을 저장 및 관리하세요.
+    const accessToken = localStorage.getItem('accessToken');
+
+    if (!accessToken) {
+      console.error('액세스 토큰이 없습니다.');
+      return;
+    }
 
     try {
       const response = await axios.delete(`http://api.thetravelday.co.kr/api/rooms/${id}/wishlist/${itemToRemove.wishId}`, {

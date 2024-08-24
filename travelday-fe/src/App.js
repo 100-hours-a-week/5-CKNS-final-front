@@ -5,6 +5,7 @@ import FindPage from './pages/searchPage/searchingPage';
 import FlightResultPage from './pages/resultPage/flightResultPage';
 import HotelResultPage from './pages/resultPage/hotelResultPage';
 import MainPage from './pages/mainPage/mainPage';
+import MainDetailPage from './pages/mainPage/mainDetailPage';
 import LoginPage from './pages/userPage/loginPage';
 import Callback from './pages/userPage/oAuth2LoginSuccessPage';
 import MyPage from './pages/userPage/myPage';
@@ -38,12 +39,13 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<MainPage />} />
+        <Route path="/maindetail/:id" element={<MainDetailPage />} />
         <Route path="/login" element={<LoginPage />} /> 
         <Route path="/search" element={<FindPage />} />
         <Route path="/flight" element={<FlightResultPage />} />
         <Route path="/hotel" element={<HotelResultPage />} /> 
         <Route path="/hotel/hotel-detail" element={<HotelDetailPage />} />
-        <Route path="/login/oauth2/successs" element={<Callback />} />
+        <Route path="/login/oauth2/success" element={<Callback />} />
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/nickname" element={<Nickname />} />
         <Route path="/map" element={<MapPage />} />

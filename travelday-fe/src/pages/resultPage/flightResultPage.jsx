@@ -9,7 +9,7 @@ import FilterPopup from '../../components/shared/filterPopup.js';
 import calendarIcon from '../../images/filter/calendar.png';
 import filterIcon from '../../images/filter/filter.png'; 
 import useFlightStore from '../../store/useFlightStore.js';
-import { getFlights } from '../../utils/flightSearch'; // Flight API 가져오기
+import { getFlights } from '../../utils/flightSearch'; 
 
 const FlightResultPage = () => {
   const { departure, arrival, dates, setDates, adults, children } = useFlightStore(); 
@@ -18,7 +18,7 @@ const FlightResultPage = () => {
   const [isDatePopupOpen, setIsDatePopupOpen] = useState(false);
   const [localDates, setLocalDates] = useState(dates); 
   const [isFilterPopupOpen, setIsFilterPopupOpen] = useState(false); 
-  const [flights, setFlights] = useState([]); // 항공편 데이터 상태 추가
+  const [flights, setFlights] = useState([]); 
 
   useEffect(() => {
     console.log("출발지:", departure);
@@ -42,7 +42,7 @@ const FlightResultPage = () => {
         children,
       };
       const data = await getFlights(params);
-      setFlights(data); // 가져온 데이터를 상태에 저장
+      setFlights(data); 
     } catch (error) {
       console.error('Failed to fetch flights:', error);
     }
@@ -96,7 +96,7 @@ const FlightResultPage = () => {
       </FilterContainer>
 
       <ContentContainer>
-        <FlightResultList flights={flights} /> {/* 받아온 항공편 데이터 전달 */}
+        <FlightResultList flights={flights} /> 
       </ContentContainer>
       <BottomPadding />
       <BottomNav />
