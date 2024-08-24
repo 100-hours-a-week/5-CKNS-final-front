@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import Image1 from '../../images/main/list1/1.png';
 import Image2 from '../../images/main/list1/2.png';
 import Image3 from '../../images/main/list1/3.png';
@@ -9,14 +10,15 @@ import Image6 from '../../images/main/list1/6.png';
 
 const flights = [
   {
+    id: 1,
     departure: '인천',
     destination: '푸꾸옥',
     date: '2024-09-28',
     price: '₩237,000',
     image: Image1,
-    //https://www.agoda.com/ko-kr/flights/airport/ICN/PQC/Seoul-Phu-Quoc-Island.html?cid=1834243&tag=73702578-adda-4b97-a1c7-12c1b3b0745d&gad_source=1&gclid=CjwKCAjwoJa2BhBPEiwA0l0ImKyJCooCWxpQRcJz6rbqi4CRayKdjFnnS-irkdVw0WIWcfNeVvlrghoC6xIQAvD_BwE
   },
   {
+    id: 2,
     departure: '인천',
     destination: '오이타',
     date: '2024-10-05',
@@ -24,6 +26,7 @@ const flights = [
     image: Image2,
   },
   {
+    id: 3,
     departure: '인천',
     destination: '발리',
     date: '2024-11-10',
@@ -31,6 +34,7 @@ const flights = [
     image: Image3,
   },
   {
+    id: 4,
     departure: '인천',
     destination: '도쿄',
     date: '2024-09-15',
@@ -38,6 +42,7 @@ const flights = [
     image: Image4,
   },
   {
+    id: 5,
     departure: '부산',
     destination: '치앙마이',
     date: '2024-10-05',
@@ -45,6 +50,7 @@ const flights = [
     image: Image5,
   },
   {
+    id: 6,
     departure: '청주',
     destination: '타이베이',
     date: '2024-11-10',
@@ -54,11 +60,17 @@ const flights = [
 ];
 
 const NewFlightList = () => {
+  const navigate = useNavigate();
+
+  const handleItemClick = (flight) => {
+    navigate(`/maindetail/${flight.id}`, { state: { flight } });
+  };
+
   return (
     <Wrapper>
       <ListContainer>
-        {flights.map((flight, index) => (
-          <ListItem key={index}>
+        {flights.map((flight) => (
+          <ListItem key={flight.id} onClick={() => handleItemClick(flight)}>
             <FlightImage src={flight.image} alt={`${flight.destination} image`} />
             <FlightDetails>
               <FlightRoute>{`${flight.departure} - ${flight.destination}`}</FlightRoute>
@@ -78,10 +90,10 @@ const Wrapper = styled.div`
   width: 100%;
   overflow-x: auto;
   padding-bottom: 10px; 
-  -webkit-overflow-scrolling: touch; /* 스크롤에 부드러운 효과를 주기 위한 속성 */
-  scrollbar-width: none; /* Firefox에서 스크롤바 숨기기 */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; 
   &::-webkit-scrollbar {
-    display: none; /* Webkit 기반 브라우저에서 스크롤바 숨기기 */
+    display: none;
   }
 `;
 
@@ -96,13 +108,14 @@ const ListItem = styled.div`
   display: flex;
   align-items: center;
   background-color: #ffffff;
+  cursor: pointer; /* 클릭 가능하도록 커서 변경 */
 `;
 
 const FlightImage = styled.img`
   width: 120px;
   height: 120px;
   border-radius: 5px;
-  object-fit: cover; /* 이미지가 박스에 맞게 크기 조정 */
+  object-fit: cover;
 `;
 
 const FlightDetails = styled.div`

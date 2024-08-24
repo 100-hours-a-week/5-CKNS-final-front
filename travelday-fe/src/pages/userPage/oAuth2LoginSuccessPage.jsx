@@ -21,7 +21,7 @@ const OAuth2LoginSuccessPage = () => {
 
     const fetchUserProfile = async () => {
       try {
-        const response = await fetch('https://kapi.kakao.com/v2/user/me', {
+        const response = await fetch('http://api.thetravelday.co.kr/api/user', {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${accessToken}`,
