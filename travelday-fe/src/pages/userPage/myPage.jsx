@@ -50,7 +50,7 @@ const MyPage = () => {
   const handleLogout = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      await axios.post('http://localhost:8080/api/user/logout', {}, {
+      await axios.post('http://api.thetravelday.co.kr/api/user/logout', {}, {
         headers: {
           Authorization: `Bearer ${token}`
         },
