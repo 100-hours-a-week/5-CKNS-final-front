@@ -13,8 +13,7 @@ import PriceIcon from '../../images/filter/price.png';
 import ScheduleIcon from '../../images/footer/schedule.png';
 import PplIcon from '../../images/main/detail/ppl.png';
 
-import TipsPopup from '../../components/mainPage/tipsPopup.js';
-import QuestionPopup from '../../components/mainPage/questionPopup.js';
+
 
 const airportNames = {
   ICN: '인천국제공항',
@@ -49,8 +48,6 @@ const MainDetailPage = () => {
   const { id } = useParams();
   const { t } = useTranslation();
   const [flight, setFlight] = useState(null);
-  const [showTipsPopup, setShowTipsPopup] = useState(false);
-  const [showQuestionPopup, setShowQuestionPopup] = useState(false);
 
   useEffect(() => {
     const mock = new MockAdapter(axios);
@@ -238,13 +235,8 @@ const MainDetailPage = () => {
           <BookingInfo>{t('bookingInfo.lastTicketingDate')}: {flight.lastTicketingDate}</BookingInfo>
         </FlightItem>
         <PplImage src={PplIcon} alt="People" onClick={handlePplImageClick} />
-        <ButtonContainer>
-        <Button onClick={() => setShowTipsPopup(true)}>{t('자주 묻는 질문')}</Button>
-        <Button onClick={() => setShowQuestionPopup(true)}>{t('원하는 지역이 없어요!')}</Button>
-      </ButtonContainer>
-      {showTipsPopup && <PopupContainer><TipsPopup /></PopupContainer>}
-      {showQuestionPopup && <PopupContainer><QuestionPopup /></PopupContainer>}
       </Content>
+      
       <BottomNav />
     </PageContainer>
   );
@@ -258,7 +250,7 @@ const PageContainer = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   background-color: #fafafa;
 `;
 
@@ -405,42 +397,3 @@ const BookingInfo = styled.div`
   text-align: left;
   margin-top: 10px;
 `;
-
-// styled-components를 사용한 스타일 정의
-const ButtonContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-top: 20px;
-  margin-bottom: 20px;
-`;
-
-const Button = styled.button`
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s;
-
-  &:hover {
-    background-color: #0056b3;
-  }
-`;
-
-const PopupContainer = styled.div`
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 90%;
-  max-width: 400px;
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-`;
-
