@@ -39,7 +39,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/main" element={<MainPage />} />
+        <Route path="/" element={<MainPage />} />
         <Route path="/maindetail/:id" element={<MainDetailPage />} />
         <Route path="/login" element={<LoginPage />} /> 
         <Route path="/search" element={<FindPage />} />
@@ -55,7 +55,7 @@ function App() {
         <Route path="/wishlist/:travelRoomId" element={<WishListPage />} /> 
         <Route path="/maplocation/:travelRoomId" element={<MapLocationPage />} /> 
         <Route path="/alarm" element={<AlarmPage />} />
-        <Route path="/" element={<IntroPage />} /> 
+        <Route path="/intro" element={<IntroPage />} /> 
         <Route path="/createschedule" element={<CreateSchedulePage />} /> 
         <Route path="/fixschedule/:travelRoomId" element={<FixSchedulePage />} />
       </Routes>

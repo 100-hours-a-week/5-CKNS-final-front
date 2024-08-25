@@ -15,7 +15,7 @@ const BottomNav = () => {
         <NavIcon src={airplaneIcon} alt="검색" />
         <NavText isActive={location.pathname === '/search'}>검색</NavText>
       </NavItem>
-      <NavItem href="/" isActive={location.pathname === '/main'}>
+      <NavItem href="/" isActive={location.pathname === '/'}>
         <NavIcon src={homeIcon} alt="메인" />
         <NavText isActive={location.pathname === '/'}>메인</NavText>
       </NavItem>
