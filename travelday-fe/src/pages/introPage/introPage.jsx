@@ -6,7 +6,7 @@ const Intro = () => {
   const navigate = useNavigate(); 
 
   const handleButtonClick = () => {
-    navigate('/main'); 
+    navigate('/'); 
   };
 
   return (

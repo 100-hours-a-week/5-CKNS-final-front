@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
 import { useJsApiLoader } from '@react-google-maps/api';
 import FindPage from './pages/searchPage/searchingPage';
 import FlightResultPage from './pages/resultPage/flightResultPage';
@@ -39,27 +39,45 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<MainPage />} />
-        <Route path="/maindetail/:id" element={<MainDetailPage />} />
-        <Route path="/login" element={<LoginPage />} /> 
-        <Route path="/search" element={<FindPage />} />
-        <Route path="/flight" element={<FlightResultPage />} />
-        <Route path="/hotel" element={<HotelResultPage />} /> 
-        <Route path="/hotel/hotel-detail" element={<HotelDetailPage />} />
-        <Route path="/login/oauth2/success" element={<Callback />} />
-        <Route path="/mypage" element={<MyPage />} />
-        <Route path="/nickname" element={<Nickname />} />
-        <Route path="/map" element={<MapPage />} />
-        <Route path="/schedule" element={<SchedulePage />} />
-        <Route path="/schedule/:travelRoomId" element={<ScheduleDetail />} />
-        <Route path="/wishlist/:travelRoomId" element={<WishListPage />} /> 
-        <Route path="/maplocation/:travelRoomId" element={<MapLocationPage />} /> 
-        <Route path="/alarm" element={<AlarmPage />} />
-        <Route path="/intro" element={<IntroPage />} /> 
-        <Route path="/createschedule" element={<CreateSchedulePage />} /> 
-        <Route path="/fixschedule/:travelRoomId" element={<FixSchedulePage />} />
+        <Route path="/*" element={<MainRouter />} />
       </Routes>
     </Router>
+  );
+}
+
+function MainRouter() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const isFirstVisit = !localStorage.getItem('visited');
+    if (isFirstVisit) {
+      localStorage.setItem('visited', 'true');
+      navigate('/intro');
+    }
+  }, [navigate]);
+
+  return (
+    <Routes>
+      <Route path="/" element={<MainPage />} />
+      <Route path="/maindetail/:id" element={<MainDetailPage />} />
+      <Route path="/login" element={<LoginPage />} /> 
+      <Route path="/search" element={<FindPage />} />
+      <Route path="/flight" element={<FlightResultPage />} />
+      <Route path="/hotel" element={<HotelResultPage />} /> 
+      <Route path="/hotel/hotel-detail" element={<HotelDetailPage />} />
+      <Route path="/login/oauth2/success" element={<Callback />} />
+      <Route path="/mypage" element={<MyPage />} />
+      <Route path="/nickname" element={<Nickname />} />
+      <Route path="/map" element={<MapPage />} />
+      <Route path="/schedule" element={<SchedulePage />} />
+      <Route path="/schedule/:travelRoomId" element={<ScheduleDetail />} />
+      <Route path="/wishlist/:travelRoomId" element={<WishListPage />} /> 
+      <Route path="/maplocation/:travelRoomId" element={<MapLocationPage />} /> 
+      <Route path="/alarm" element={<AlarmPage />} />
+      <Route path="/intro" element={<IntroPage />} /> 
+      <Route path="/createschedule" element={<CreateSchedulePage />} /> 
+      <Route path="/fixschedule/:travelRoomId" element={<FixSchedulePage />} />
+    </Routes>
   );
 }
 
