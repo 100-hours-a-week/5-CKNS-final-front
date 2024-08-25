@@ -156,21 +156,21 @@ export default React.memo(MapPage);
 
 const containerStyle = {
   width: '390px',
-  height: '910px'  
+  height: '80vh'  
 };
 
 const containerStyleWithButton = {
   width: '390px',
-  height: '860px'  
+  height: '70vh'  
 };
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 390px;
-  height: 100%;
-  background-color: #fff;  /* 전체 배경색을 흰색으로 설정 */
+  width: 390px;ㄴㄴ
+  height: 100vh;
+  background-color: #fff; 
 `;
 
 const Content = styled.div`

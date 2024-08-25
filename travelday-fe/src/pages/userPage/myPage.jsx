@@ -50,7 +50,7 @@ const MyPage = () => {
   const handleLogout = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      await axios.post('http://api.thetravelday.co.kr/api/user/logout', {}, {
+      await axios.post('https://api.thetravelday.co.kr/api/user/logout', {}, {
         headers: {
           Authorization: `Bearer ${token}`
         },
@@ -68,7 +68,7 @@ const MyPage = () => {
   const handleDeleteAccount = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await axios.delete('http://api.thetravelday.co.kr/api/user', {
+      const response = await axios.delete('https://api.thetravelday.co.kr/api/user', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -91,7 +91,7 @@ const MyPage = () => {
 
   // const handleNicknameCheck = async (nickname) => {
   //   try {
-  //     const response = await axios.get(`http://api.thetravelday.co.kr/api/nickname/check`, {
+  //     const response = await axios.get(`https://api.thetravelday.co.kr/api/nickname/check`, {
   //       params: { nickname },
   //       withCredentials: true,
   //     });

@@ -36,12 +36,12 @@ const VideoContainer = styled.div`
 
 const BackgroundVideo = styled.video`
   width: 500px;
-  height: 1352px;
+  height: 2100px;
 `;
 
 const OverlayButton = styled.button`
   position: absolute;
-  top: 36%;
+  top: 22%;
   left: 50%;
   transform: translateX(-50%);
   background: #000;
