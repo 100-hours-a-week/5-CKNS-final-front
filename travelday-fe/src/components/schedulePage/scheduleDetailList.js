@@ -75,8 +75,8 @@ const ScheduleDetailList = ({ travelRoomId }) => {
   }
 
   useEffect(() => {
-    const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzNjc3MTkwMDk3IiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcyNDYyNjgyNX0.G378OTGCnwRpBH-ck7I-d7-jpuF3thsY4l1x6AtIYfg"
-
+    const token= localStorage.getItem("accessToken");
+    
       // useEffect 내부에서 axios GET 요청 수행
     axios.get(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan`, {
       headers: {Authorization: `Bearer ${token}`},
