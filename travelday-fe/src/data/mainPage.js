@@ -1,23 +1,23 @@
-import Image1 from '../images/main/list1/1.png';
-import Image2 from '../images/main/list1/2.png';
-import Image3 from '../images/main/list1/3.png';
-import Image4 from '../images/main/list1/4.png';
-import Image5 from '../images/main/list1/5.png';
-import Image6 from '../images/main/list1/6.png';
-import Image7 from '../images/main/list2/7.png';
-import Image8 from '../images/main/list2/8.png';
-import Image9 from '../images/main/list2/9.png';
-import Image10 from '../images/main/list2/10.png';
+import Image1 from '../images/main/list1/PQC.png';
+import Image2 from '../images/main/list1/OIT.png';
+import Image3 from '../images/main/list1/DPS.png';
+import Image4 from '../images/main/list1/HND.png';
+import Image5 from '../images/main/list1/CNX.png';
+import Image6 from '../images/main/list1/TPE.png';
+import Image7 from '../images/main/list2/KIX.png';
+import Image8 from '../images/main/list2/OKA.png';
+import Image9 from '../images/main/list2/FUK.png';
+import Image10 from '../images/main/list2/NGO.png';
 
 export const images = {
-  1: Image1,
-  2: Image2,
-  3: Image3,
-  4: Image4,
-  5: Image5,
-  6: Image6,
-  7: Image7,
-  8: Image8,
-  9: Image9,
-  10: Image10,
+  PQC: Image1,
+  OIT: Image2,
+  DPS: Image3,
+  HND: Image4,
+  CNX: Image5,
+  TPE: Image6,
+  KIX: Image7,
+  OKA: Image8,
+  FUK: Image9,
+  NGO: Image10,
 };

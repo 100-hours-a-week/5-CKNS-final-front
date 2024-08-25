@@ -4,7 +4,7 @@ import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';  
 import ImageSlider from '../../components/mainPage/imageSlider.js';
 import NewFlightList from '../../components/mainPage/newFlightList.js'; 
-import JapanSaleList from '../../components/mainPage/japanSaleList.js';  // 일본 세일 리스트 컴포넌트 임포트
+import JapanSaleList from '../../components/mainPage/japanSaleList.js';  
 
 const MainPage = () => {
   return (
