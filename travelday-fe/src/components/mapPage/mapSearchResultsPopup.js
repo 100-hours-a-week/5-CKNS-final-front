@@ -35,13 +35,12 @@ const MapSearchResultsPopup = ({ isOpen, onClose, searchResults = [], onResultCl
 
     try {
       const response = await axios.post(
-        `http://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan/direct`,
+        `https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan/direct`,
         {
           travelroom_id: travelRoomId,
           name: selectedResult.name,
           latitude: selectedResult.geometry.location.lat(),
           longitude: selectedResult.geometry.location.lng(),
-          day: 1,  //scheduleDetailPage 구현하고 변경예정
         },
         {
           headers: {

@@ -1,106 +1,29 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 const FlightResultList = () => {
-  const [flights, setFlights] = useState([]); // 상태를 사용하여 데이터를 관리
-  const [isLoading, setIsLoading] = useState(true); // 로딩 상태 관리
-
-  const mockData = [
-    {
-      airline: '아시아나항공',
-      segments: [
-        {
-          departure: {
-            iataCode: 'ICN',
-            at: '10:00',
-          },
-          arrival: {
-            iataCode: 'NRT',
-            at: '12:00',
-          },
-          duration: '2시간 0분',
-        },
-        {
-          departure: {
-            iataCode: 'NRT',
-            at: '14:00',
-          },
-          arrival: {
-            iataCode: 'LAX',
-            at: '16:00',
-          },
-          duration: '10시간 0분',
-        },
-      ],
-      returnSegments: [
-        {
-          departure: {
-            iataCode: 'LAX',
-            at: '18:00',
-          },
-          arrival: {
-            iataCode: 'ICN',
-            at: '22:00',
-          },
-          duration: '11시간 0분',
-        }
-      ],
-      price: '850,000원',
-    },
-    {
-      airline: '제주항공',
-      segments: [
-        {
-          departure: {
-            iataCode: 'INC',
-            at: '12:30',
-          },
-          arrival: {
-            iataCode: 'KIX',
-            at: '14:30',
-          },
-          duration: '2시간 0분',
-        },
-      ],
-      returnSegments: [
-        {
-          departure: {
-            iataCode: 'KIX',
-            at: '16:30',
-          },
-          arrival: {
-            iataCode: 'INC',
-            at: '18:30',
-          },
-          duration: '2시간 0분',
-        }
-      ],
-      price: '130,000원',
-    },
-  ];
+  const [flights, setFlights] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // Track loading state
 
   useEffect(() => {
     const fetchFlights = async () => {
       try {
         const response = await fetch('http://travelday-env.eba-zmxjim7g.ap-northeast-2.elasticbeanstalk.com/api/flights');
         const data = await response.json();
-
-        // 만약 flights 데이터가 존재하지 않거나 빈 배열일 경우 목업 데이터를 사용
         if (data.flights && data.flights.length > 0) {
           setFlights(data.flights);
         } else {
-          setFlights(mockData); // 목업 데이터 사용
+          console.error("No flights data available.");
         }
       } catch (error) {
         console.error("Error fetching flights:", error);
-        setFlights(mockData); // 오류가 발생할 경우에도 목업 데이터를 사용
       } finally {
-        setIsLoading(false); // 데이터 로딩 완료
+        setIsLoading(false); // Ensure loading is set to false
       }
     };
 
-    fetchFlights(); // 컴포넌트 마운트 시 데이터 가져오기
-  }, []); // 빈 배열을 넣어서 컴포넌트가 마운트될 때만 실행되도록 설정
+    fetchFlights();
+  }, []);
 
   const formatDuration = (duration) => {
     return duration.replace(/ 0분$/, '');
@@ -123,15 +46,14 @@ const FlightResultList = () => {
   );
 
   if (isLoading) {
-    return <div>Loading...</div>; // 로딩 중일 때 표시할 내용
+    return <div>Loading...</div>;
   }
 
   return (
     <ListContainer>
-      {flights.map((flight, index) => (
+      {flights.length > 0 ? flights.map((flight, index) => (
         <FlightItem key={index}>
           <Airline>{flight.airline}</Airline>
-
           <RouteLabel>가는편</RouteLabel>
           {flight.segments.map((segment, segIndex) => (
             <FlightSegment key={segIndex}>
@@ -139,7 +61,6 @@ const FlightResultList = () => {
               {segIndex === flight.segments.length - 1 && renderFlightInfo(formatDuration(segment.duration), flight.segments.length - 1)}
             </FlightSegment>
           ))}
-
           <RouteLabel>오는편</RouteLabel>
           {flight.returnSegments.map((segment, segIndex) => (
             <FlightSegment key={segIndex}>
@@ -147,16 +68,18 @@ const FlightResultList = () => {
               {segIndex === flight.returnSegments.length - 1 && renderFlightInfo(formatDuration(segment.duration), flight.returnSegments.length - 1)}
             </FlightSegment>
           ))}
-
           <HorizontalLine />
           <Price>{flight.price}</Price>
         </FlightItem>
-      ))}
+      )) : <p>No flights found.</p>}
     </ListContainer>
   );
 };
 
 export default FlightResultList;
+
+// Styled components definitions remain the same as previously given.
+
 
 // styled-components 그대로 유지
 

@@ -1,22 +1,22 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import Image7 from '../../images/main/list2/7.png';
-import Image8 from '../../images/main/list2/8.png';
-import Image9 from '../../images/main/list2/9.png';
-import Image10 from '../../images/main/list2/10.png';
+import Image7 from '../../images/main/list2/KIX.png';
+import Image8 from '../../images/main/list2/OKA.png';
+import Image9 from '../../images/main/list2/FUK.png';
+import Image10 from '../../images/main/list2/NGO.png';
 
 const JapanSaleList = () => {
   const navigate = useNavigate();
   const images = [
-    { src: Image7, id: 7 }, 
-    { src: Image8, id: 8 },
-    { src: Image9, id: 9 },
-    { src: Image10, id: 10 }
+    { src: Image7, id: 'KIX' },  
+    { src: Image8, id: 'OKA' },
+    { src: Image9, id: 'FUK' },
+    { src: Image10, id: 'NGO' }
   ];
 
   const handleImageClick = (flightId) => {
-    navigate(`/maindetail/${flightId}`); 
+    navigate(`/maindetail/${flightId}`);
   };
 
   return (
@@ -24,7 +24,7 @@ const JapanSaleList = () => {
       <ListContainer>
         {images.map((image, index) => (
           <ListItem key={index} onClick={() => handleImageClick(image.id)}>
-            <Image src={image.src} alt={`sale-${index}`} />
+            <Image src={image.src} alt={`sale-${image.id.toLowerCase()}`} />
           </ListItem>
         ))}
       </ListContainer>

@@ -5,7 +5,6 @@ import BottomNav from '../../components/shared/bottomNav.js';
 import ScheduleList from '../../components/schedulePage/scheduleList';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
 
 const SchedulePage = () => {
   const [schedules, setSchedules] = useState([]);
@@ -14,27 +13,6 @@ const SchedulePage = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
-
-    // Mock data 설정
-    const mock = new MockAdapter(axios);
-
-    const mockData = [
-      {
-        travelRoomId: 1,
-        name: '서울 여행',
-        startDate: '2024-08-30',
-        endDate: '2024-09-01',
-      },
-      {
-        travelRoomId: 2,
-        name: '부산 여행',
-        startDate: '2023-09-10',
-        endDate: '2023-09-15T00:00:00',
-      },
-    ];
-
-    mock.onGet('https://api.thetravelday.co.kr/api/rooms').reply(200, mockData);
-
     const fetchSchedules = async () => {
       try {
         const response = await axios.get('https://api.thetravelday.co.kr/api/rooms', {
@@ -52,10 +30,10 @@ const SchedulePage = () => {
           }));
           setSchedules(formattedSchedules);
         } else {
-          console.error('일정 목록을 불러오는 데 실패했습니다:', response.statusText);
+          console.error('Failed to load schedules:', response.statusText);
         }
       } catch (error) {
-        console.error('일정 목록을 불러오는 중 오류가 발생했습니다:', error);
+        console.error('Error fetching schedules:', error);
       } finally {
         setIsLoading(false);
       }
@@ -80,14 +58,14 @@ const SchedulePage = () => {
         <CreateButton onClick={handleCreateButtonClick}>
           <PlusCircle>+</PlusCircle>
           <BoldText>여행 일정 만들기</BoldText>
-          <Subtitle>새로운 여행을 떠나보세요!</Subtitle>
+          <Subtitle>새로운 여행을 떠나세요!</Subtitle>
         </CreateButton>
         {isLoading ? (
-          <NoScheduleText>로딩 중...</NoScheduleText>
+          <NoScheduleText>Loading...</NoScheduleText>
         ) : schedules.length > 0 ? (
           <ScheduleList schedules={schedules} onItemClick={handleItemClick} />
         ) : (
-          <NoScheduleText>여행방이 없습니다! 일정을 추가해 주세요.</NoScheduleText>
+          <NoScheduleText>등록된 일정이 없습니다! 만들어 주세요.</NoScheduleText>
         )}
       </ContentWrapper>
       <BottomNav />

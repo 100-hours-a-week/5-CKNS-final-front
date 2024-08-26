@@ -79,7 +79,7 @@ const LoginPage = () => {
     try {
       const response = await axios.put(
         'https://api.thetravelday.co.kr/api/nickname',
-        { nickname }, // 서버로 보낼 새로운 닉네임
+        { nickname }, 
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -177,7 +177,7 @@ const Input = styled.input`
   }
 
   &:disabled {
-    background-color: #f0f0f0;  // 로딩 중 비활성화 시 배경색
+    background-color: #f0f0f0; 
   }
 `;
 

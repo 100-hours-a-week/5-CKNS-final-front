@@ -1,37 +1,71 @@
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
 import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 import Header from '../../components/shared/header.js'; 
 import BottomNav from '../../components/shared/bottomNav.js';  
 import { images } from '../../data/mainPage.js'; 
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
-import { useTranslation } from 'react-i18next';
-
 import TakeoffIcon from '../../images/filter/takeoff.png';
 import PriceIcon from '../../images/filter/price.png';
 import ScheduleIcon from '../../images/footer/schedule.png';
 import PplIcon from '../../images/main/detail/ppl.png';
 
-
-
 const airportNames = {
-  ICN: '인천국제공항',
-  JFK: '존 F. 케네디 국제공항',
-  DAD: '다낭 국제공항',
-};
+    PQC: '푸꾸옥 국제공항',
+    OIT: '오이타 공항',
+    CNX: '치앙마이 국제공항',
+    TPE: '타이완 타오위안 국제공항',
+    KIX: '간사이 국제공항',
+    HND: '하네다 공항',
+    DPS: '응우라라이 국제공항',
+    OKA: '나하 공항',
+    FUK: '후쿠오카 공항',
+    JFK: '존 F. 케네디 국제공항',
+    NGO: '츄부 센트레아 국제공항',
+    CDG: '샤를 드 골 국제공항',
+    SYD: '시드니 킹스포드 스미스 국제공항',
+    MAD: '마드리드 바라하스 국제공항',
+    LHR: '런던 히드로 공항',
+    VIE: '비엔나 국제공항',
+    FRA: '프랑크푸르트 공항',
+    FCO: '피우미치노 공항',
+    ICN: '인천국제공항',
+  };
+  
 
-const airlineNames = {
-  KE: '대한항공',
-};
+  const airlineNames = {
+    KE: '대한항공',
+    OZ: '아시아나항공',
+    JL: '일본항공',
+    NH: '전일본공수',
+    AA: '아메리칸 항공',
+    UA: '유나이티드 항공',
+    DL: '델타 항공',
+    SQ: '싱가포르 항공',
+    CX: '캐세이퍼시픽 항공',
+    QF: '콴타스 항공',
+    BA: '영국항공',
+    AF: '에어프랑스',
+    LH: '루프트한자',
+    EK: '에미레이트 항공',
+    QR: '카타르 항공',
+    TG: '타이 항공',
+    MH: '말레이시아 항공',
+    BR: '에바 항공',
+    CI: '중화항공',
+    CZ: '중국남방항공',
+    MU: '중국동방항공',
+    CA: '중국국제항공',
+    NZ: '에어 뉴질랜드',
+    TK: '터키항공',
+    SU: '아에로플로트',
+  };
+  
+  
 
-const getAirportName = (iataCode) => {
-  return airportNames[iataCode] || iataCode;
-};
-
-const getAirlineName = (carrierCode) => {
-  return airlineNames[carrierCode] || carrierCode;
-};
+const getAirportName = (iataCode) => airportNames[iataCode] || iataCode;
+const getAirlineName = (carrierCode) => airlineNames[carrierCode] || carrierCode;
 
 const formatDate = (dateTime) => {
   const date = new Date(dateTime);
@@ -50,112 +84,6 @@ const MainDetailPage = () => {
   const [flight, setFlight] = useState(null);
 
   useEffect(() => {
-    const mock = new MockAdapter(axios);
-
-    mock.onGet(`https://api.thetravelday.co.kr/api/flights/${id}`).reply(200, {
-      data: {
-        type: "flight-offer",
-        id: "1",
-        lastTicketingDate: "2024-08-27",
-        lastTicketingDateTime: "2024-08-27T23:59:00",
-        numberOfBookableSeats: 9,
-        itineraries: [
-          {
-            duration: "PT4H35M",
-            segments: [
-              {
-                departure: {
-                  iataCode: "ICN",
-                  at: "2024-08-24T15:25:00"
-                },
-                arrival: {
-                  iataCode: "DAD",
-                  at: "2024-08-24T19:00:00"
-                },
-                carrierCode: "KE",
-                number: "3618",
-                aircraft: {
-                  code: "789"
-                },
-                duration: "PT3H35M",
-                numberOfStops: 0
-              }
-            ]
-          },
-          {
-            duration: "PT4H30M",
-            segments: [
-              {
-                departure: {
-                  iataCode: "DAD",
-                  at: "2024-08-30T11:00:00"
-                },
-                arrival: {
-                  iataCode: "ICN",
-                  at: "2024-08-30T14:30:00"
-                },
-                carrierCode: "KE",
-                number: "3619",
-                aircraft: {
-                  code: "789"
-                },
-                duration: "PT4H30M",
-                numberOfStops: 0
-              }
-            ]
-          }
-        ],
-        price: {
-          currency: "USD",
-          total: "899.99",
-          base: "700.00",
-          fees: [
-            {
-              amount: "0.00",
-              type: "SUPPLIER"
-            },
-            {
-              amount: "0.00",
-              type: "TICKETING"
-            }
-          ],
-          grandTotal: "899.99"
-        },
-        travelerPricings: [
-          {
-            travelerId: "1",
-            fareOption: "STANDARD",
-            travelerType: "ADULT",
-            price: {
-              currency: "USD",
-              total: "450.00",
-              base: "350.00"
-            },
-            fareDetailsBySegment: [
-              {
-                segmentId: "1",
-                cabin: "ECONOMY",
-                fareBasis: "YCNV1",
-                class: "Y",
-                includedCheckedBags: {
-                  quantity: 1
-                }
-              },
-              {
-                segmentId: "2",
-                cabin: "ECONOMY",
-                fareBasis: "YCNV1",
-                class: "Y",
-                includedCheckedBags: {
-                  quantity: 1
-                }
-              }
-            ]
-          }
-        ]
-      }
-    });
-
     axios.get(`https://api.thetravelday.co.kr/api/flights/${id}`)
       .then(response => {
         setFlight(response.data.data);
@@ -164,10 +92,11 @@ const MainDetailPage = () => {
         console.error('항공 데이터 가져오는데 오류가 있습니다', error);
       });
   }, [id]);
+  
 
   const image = images[id];
 
-  const renderFlightDetails = (departure, arrival, carrierCode) => (
+  const renderFlightDetails = (departure, arrival) => (
     <FlightDetails>
       <TimeBold>{formatDate(departure.at)}</TimeBold>
       <Route>{getAirportName(departure.iataCode)} ({departure.iataCode}) → {getAirportName(arrival.iataCode)} ({arrival.iataCode})</Route>
@@ -179,10 +108,6 @@ const MainDetailPage = () => {
       <InfoItem>{formatDuration(duration)}, {stops > 0 ? `${t('stops', { count: stops })}` : t('nonStop')}</InfoItem>
     </FlightInfo>
   );
-
-  const handlePplImageClick = () => {
-    window.location.href = "https://air.gmarket.co.kr/gm/init/lp/lpMain.do?cosemkid=ov17128974211865606&jaehuid=200012886&gad_source=1&gclid=CjwKCAjwiaa2BhAiEiwAQBgyHu1gIeblGLOlGjnggp0j71uxJcmXX_6QxLqVYw2HcDJDIzjeFOezCRoC2kgQAvD_BwE&gate_id=ED9298F9-E43D-4BD0-B2FE-A5F9DC062212";
-  };
 
   if (!flight) {
     return <p>{t('loading')}</p>;
@@ -198,35 +123,35 @@ const MainDetailPage = () => {
             {t('항공 정보')}
             <Icon src={TakeoffIcon} alt="Takeoff" />
           </SectionTitle>
-  
+
           <RouteLabel>{t('가는편')}</RouteLabel>
           <Airline>{getAirlineName(flight.itineraries[0].segments[0].carrierCode)}</Airline>
           {flight.itineraries[0].segments.map((segment, segIndex) => (
             <FlightSegment key={segIndex}>
-              {renderFlightDetails(segment.departure, segment.arrival, segment.carrierCode)}
+              {renderFlightDetails(segment.departure, segment.arrival)}
               {segIndex === flight.itineraries[0].segments.length - 1 && renderFlightInfo(segment.duration, segment.numberOfStops)}
             </FlightSegment>
           ))}
-  
+
           <HorizontalLine />
-  
+
           <RouteLabel>{t('오는편')}</RouteLabel>
           <Airline>{getAirlineName(flight.itineraries[1].segments[0].carrierCode)}</Airline>
           {flight.itineraries[1].segments.map((segment, segIndex) => (
             <FlightSegment key={segIndex}>
-              {renderFlightDetails(segment.departure, segment.arrival, segment.carrierCode)}
+              {renderFlightDetails(segment.departure, segment.arrival)}
               {segIndex === flight.itineraries[1].segments.length - 1 && renderFlightInfo(segment.duration, segment.numberOfStops)}
             </FlightSegment>
           ))}
           <HorizontalLine />
-  
+
           <SectionTitle>
             {t('가격 정보')}
             <Icon src={PriceIcon} alt="Price" />
           </SectionTitle>
           <Price>{t('price.perAdult')}: {flight.travelerPricings[0].price.total} {flight.price.currency} ({flight.travelerPricings[0].fareDetailsBySegment[0].cabin})</Price>
           <Price>{t('includedCheckedBags')}: {flight.travelerPricings[0].fareDetailsBySegment[0].includedCheckedBags.quantity} {t('bags')}</Price>
-  
+
           <SectionTitle>
             {t('예약 정보')}
             <Icon src={ScheduleIcon} alt="Schedule" />
@@ -234,7 +159,13 @@ const MainDetailPage = () => {
           <BookingInfo>{t('bookingInfo.availableSeats')}: {flight.numberOfBookableSeats}</BookingInfo>
           <BookingInfo>{t('bookingInfo.lastTicketingDate')}: {flight.lastTicketingDate}</BookingInfo>
         </FlightItem>
-        <PplImage src={PplIcon} alt="People" onClick={handlePplImageClick} />
+        <PplImage src={PplIcon} alt="People" onClick={() => {
+          window.location.href = "https://air.gmarket.co.kr/gm/init/lp/lpMain.do?cosemkid=ov17128974211865606&jaehuid=200012886&gad_source=1&gclid=CjwKCAjwiaa2BhAiEiwAQBgyHu1gIeblGLOlGjnggp0j71uxJcmXX_6QxLqVYw2HcDJDIzjeFOezCRoC2kgQAvD_BwE&gate_id=ED9298F9-E43D-4BD0-B2FE-A5F9DC062212";
+        }} />
+         <SectionTitle>
+            {t('자주 묻는 질문')}
+            <Icon src={ScheduleIcon} alt="Schedule" />
+          </SectionTitle>
       </Content>
       
       <BottomNav />
@@ -244,7 +175,6 @@ const MainDetailPage = () => {
 
 export default MainDetailPage;
 
-// styled-components
 const PageContainer = styled.div`
   display: flex;
   flex-direction: column;

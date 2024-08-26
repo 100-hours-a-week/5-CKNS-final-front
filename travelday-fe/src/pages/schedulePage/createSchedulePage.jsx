@@ -14,12 +14,12 @@ const CreateSchedulePage = () => {
 
   const today = new Date().toISOString().split('T')[0];
 
-  useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      navigate('/login');
-    }
-  }, [navigate]);
+  // useEffect(() => {
+  //   const token = localStorage.getItem('accessToken');
+  //   if (!token) {
+  //     navigate('/login');
+  //   }
+  // }, [navigate]);
 
   useEffect(() => {
     if (title && startDate && endDate) {
@@ -29,14 +29,14 @@ const CreateSchedulePage = () => {
     }
   }, [title, startDate, endDate]);
 
-  const handleCreateSchedule = async () => {
+  
+  const handleCreateSchedule =  () => {
     if (!isButtonEnabled) return;
 
-    const token = localStorage.getItem('accessToken'); 
-
+    const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzNjc2NjE1MzkyIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcyNDYwMTQxOH0.m7-jJ6lUIA6ZfMN16S2xr72Fr-L8SMr30GvtjAkyMKo"
     try {
-      const response = await axios.post(
-        'https://api.thetravelday.co.kr/api/rooms', 
+      axios.post(
+        'https://api.thetravelday.co.kr/api/rooms',
         {
           name: title,
           startDate: startDate.replace(/-/g, '.'),
@@ -49,16 +49,40 @@ const CreateSchedulePage = () => {
           },
           withCredentials: true 
         }
+      ).then(response =>{
+        console.log(response)
+      }
       );
 
-      if (response.status === 201) { 
-        console.log('새로운 일정 생성:', response.data);
-        navigate('/schedule');
-      }
+      // if (response.status === 201) { 
+      //   console.log('새로운 일정 생성:', response.data);
+      //   navigate('/schedule');
+      // }
     } catch (error) {
       console.error('일정 생성 중 오류 발생:', error);
     }
   };
+  
+  const api1 = async () => {
+    const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzNjc2NjE1MzkyIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcyNDYwMTQxOH0.m7-jJ6lUIA6ZfMN16S2xr72Fr-L8SMr30GvtjAkyMKo"
+
+    const response = await axios.post(
+        `https://api.thetravelday.co.kr/api/rooms`,
+        {
+            name: "123",
+            startDate: "2024-09-01",
+            EndDate: "2024-09-02",
+        },
+        // {
+        //   headers: {
+        //     Authorization: `Bearer ${token}`,
+        //     'Content-Type': 'application/json',
+        //   },
+        //   withCredentials: true 
+        // }
+    )
+console.log(response)
+}
 
   return (
     <Container>
@@ -93,7 +117,7 @@ const CreateSchedulePage = () => {
           />
         </InputField>
         <CreateButton 
-          onClick={handleCreateSchedule} 
+          onClick={api1} 
           disabled={!isButtonEnabled} 
           enabled={isButtonEnabled}
         >
