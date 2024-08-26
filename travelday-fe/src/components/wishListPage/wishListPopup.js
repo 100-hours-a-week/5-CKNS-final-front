@@ -24,19 +24,39 @@ const WishlistPopup = ({ isOpen, onClose, selectedPlace }) => {
   const setTravelRooms = useTravelStore((state) => state.setTravelRooms);
 
   useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      console.error('토큰이 없습니다. 로그인 페이지로 이동하세요.');
+      return;
+    }
+
     const fetchTravelRooms = async () => {
       try {
-        const response = await axios.get('https://api.thetravelday.co.kr/api/rooms');
-        setTravelRooms(response.data);  
-      } catch (error) {
-        console.error('여행방 목록 불러오기 실패:', error);
+        console.log('여행방 목록을 불러오는 중...');
+        const response = await axios.get('https://api.thetravelday.co.kr/api/rooms', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
 
-        ;
+        console.log('여행방 API 응답:', response.data);
+
+        if (response.status === 200) {
+          const formattedRooms = response.data.data.map((room) => ({
+            id: room.id,
+            name: room.name,
+            startDate: room.startDate,
+            endDate: room.endDate,
+          }));
+          setTravelRooms(formattedRooms);
+        } else {
+          console.error('여행방 로딩 실패:', response.statusText);
+        }
+      } catch (error) {
+        console.error('여행방 불러오기 중 오류 발생:', error);
       }
     };
-
-    
-
 
     fetchTravelRooms();
   }, [setTravelRooms]);
