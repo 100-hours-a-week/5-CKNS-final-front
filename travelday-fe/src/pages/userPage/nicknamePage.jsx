@@ -57,7 +57,6 @@ const LoginPage = () => {
 
       if (response.status === 200) {
         console.log('닉네임이 성공적으로 변경되었습니다:', response.data);
-        localStorage.setItem('nickname', nickname); 
       } else {
         console.error('닉네임 변경 실패:', response.statusText);
       }

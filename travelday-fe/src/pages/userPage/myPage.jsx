@@ -22,8 +22,8 @@ const MyPage = () => {
       return;
     }
 
-    fetchKakaoUserProfile(token); // 로그인 확인 후 닉네임 가져오기
-
+    fetchKakaoUserProfile(token); 
+    
   }, [navigate]);
 
   const fetchKakaoUserProfile = async (token) => {
