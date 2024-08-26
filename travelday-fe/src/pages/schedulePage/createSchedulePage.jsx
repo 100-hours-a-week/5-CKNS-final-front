@@ -30,6 +30,16 @@ const CreateSchedulePage = () => {
     }
   }, [title, startDate, endDate]);
 
+  useEffect(() => {
+    if (showSuccessMessage) {
+      // 메시지가 성공적으로 표시된 후 2초 후에 리다이렉트
+      const timer = setTimeout(() => {
+        navigate('/schedule');
+      }, 2000);
+      return () => clearTimeout(timer);  // 컴포넌트가 언마운트될 때 타이머를 정리합니다.
+    }
+  }, [showSuccessMessage, navigate]);
+
   const handleCreateSchedule = async () => {
     if (!isButtonEnabled) return;
 
@@ -54,9 +64,7 @@ const CreateSchedulePage = () => {
 
       if (response.status === 200) { 
         setShowSuccessMessage(true); // 성공 메시지 표시
-        setTimeout(() => {
-          navigate('/schedule'); // 일정 생성 후 일정 페이지로 리다이렉트
-        }, 2000); // 2초 후 리다이렉트
+        // 리다이렉션을 useEffect에서 처리
       }
     } catch (error) {
       console.error('일정 생성 중 오류 발생:', error);
@@ -111,8 +119,6 @@ const CreateSchedulePage = () => {
 
 export default CreateSchedulePage;
 
-// 스타일 컴포넌트 정의
-// 여기에 SuccessMessage 스타일 추가
 
 const SuccessMessage = styled.p`
   margin-top: 20px;
