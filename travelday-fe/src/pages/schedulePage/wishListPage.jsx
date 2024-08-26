@@ -2,16 +2,18 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import calendarIcon from '../../images/filter/calendar.png';
 import backIcon from '../../images/header/back.png';
 
 const WishListPage = () => {
-  const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
 
+  // URL에서 ID 추출
+  const id = window.location.pathname.split('/').pop();
+  
   const { schedule } = location.state || { schedule: { title: 'Default Title', date: '2024-01-01 ~ 2024-01-07', details: [] } };
   const [wishListItems, setWishListItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
@@ -134,7 +136,7 @@ const WishListPage = () => {
               </WishListItemContent>
               <RemoveButton
                 onClick={(e) => {
-                  e.stopPropagation(); // Prevent event bubbling
+                  e.stopPropagation(); 
                   handleRemoveItem(index);
                 }}
               >
