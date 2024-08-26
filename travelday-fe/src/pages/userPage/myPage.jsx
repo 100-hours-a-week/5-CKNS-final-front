@@ -37,8 +37,8 @@ const MyPage = () => {
       });
   
       if (response.status === 200) {
-        const data = response.data;
-        const nickname = data.nickname; 
+        console.log("API Response:", response.data);
+        const nickname = response.data.data.nickname; 
         setNickname(nickname);
         setIsLoading(false); 
         console.log("Fetched Nickname:", nickname); 
@@ -50,6 +50,7 @@ const MyPage = () => {
       setIsLoading(false); 
     }
   };
+  
   
   const handleLogout = async () => {
     try {
