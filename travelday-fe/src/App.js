@@ -20,7 +20,6 @@ import ScheduleDetail from './pages/schedulePage/scheduleDetailPage';
 import WishListPage from './pages/schedulePage/wishListPage';
 import MapLocationPage from './pages/schedulePage/mapLocationPage';
 import CreateSchedulePage from './pages/schedulePage/createSchedulePage';  
-import FixSchedulePage from './pages/schedulePage/fixschedulePage';  
 
 import './App.css';
 import './i18n'; 
