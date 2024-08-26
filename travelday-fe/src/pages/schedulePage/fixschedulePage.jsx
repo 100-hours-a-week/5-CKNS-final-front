@@ -55,7 +55,7 @@ const FixSchedulePage = () => {
         }
       );
 
-      // 서버 응답 확인을 위한 로그 추가
+   
       console.log('서버 응답 상태 코드:', response.status);
       console.log('서버 응답 데이터:', response.data);
 
@@ -64,7 +64,7 @@ const FixSchedulePage = () => {
         navigate(`/schedule/${travelRoomId}`);
       }
     } catch (error) {
-      // 오류 발생 시 로그 추가
+   
       console.error('일정 수정 중 오류 발생:', error);
 
       if (error.response) {
