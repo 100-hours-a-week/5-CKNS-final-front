@@ -56,7 +56,8 @@ const LoginPage = () => {
       );
 
       if (response.status === 200) {
-        console.log('닉네임이 성공적으로 변경되었습니다:', response.data);
+        alert('닉네임이 성공적으로 변경되었습니다.');
+        navigate('/mypage');  // 닉네임 변경 후 마이페이지로 리다이렉트
       } else {
         console.error('닉네임 변경 실패:', response.statusText);
       }
