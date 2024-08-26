@@ -16,7 +16,7 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
     const pastSchedules = [];
 
     schedules.forEach((schedule) => {
-      const date = new Date(schedule.startDate);
+      const date = new Date(schedule.date.split(' ~ ')[0]);
       if (date < today) {
         pastSchedules.push(schedule);
       } else {
@@ -25,8 +25,8 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
     });
 
     const sortedUpcoming = upcomingSchedules.sort((a, b) => {
-      const dateA = new Date(a.startDate);
-      const dateB = new Date(b.startDate);
+      const dateA = new Date(a.date.split(' ~ ')[0]);
+      const dateB = new Date(b.date.split(' ~ ')[0]);
 
       return sortOrder === 'nearest' ? dateA - dateB : dateB - dateA;
     });
@@ -42,7 +42,7 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
   const confirmDelete = async () => {
     if (selectedScheduleId) {
       try {
-        // Using the selectedScheduleId in the DELETE request URL
+        // Replace {travelRoomId} with the actual ID in the endpoint
         await axios.delete(`https://api.thetravelday.co.kr/api/rooms/${selectedScheduleId}`);
         setSortedSchedules(sortedSchedules.filter(schedule => schedule.id !== selectedScheduleId));
         onDeleteClick(selectedScheduleId);
@@ -52,6 +52,7 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
       }
     }
   };
+  
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -79,7 +80,7 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
             return <PastLabel key={index}>지나간 여행</PastLabel>;
           }
 
-          const isPast = new Date(schedule.startDate) < new Date();
+          const isPast = new Date(schedule.date.split(' ~ ')[0]) < new Date();
 
           return (
             <ScheduleItem
@@ -87,8 +88,8 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
               isPast={isPast}
             >
               <ScheduleContent onClick={() => onItemClick(schedule.id)}>
-                <ScheduleTitle isPast={isPast}>{schedule.name}</ScheduleTitle>
-                <ScheduleDate isPast={isPast}>{`${schedule.startDate} ~ ${schedule.endDate}`}</ScheduleDate>
+                <ScheduleTitle isPast={isPast}>{schedule.title}</ScheduleTitle>
+                <ScheduleDate isPast={isPast}>{schedule.date}</ScheduleDate>
               </ScheduleContent>
               <TrashIconWrapper onClick={() => handleDeleteClick(schedule.id)}>
                 <img src={TrashIcon} alt="Delete" />
