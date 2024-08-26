@@ -42,6 +42,7 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
   const confirmDelete = async () => {
     if (selectedScheduleId) {
       try {
+        // Replace {travelRoomId} with the actual ID in the endpoint
         await axios.delete(`https://api.thetravelday.co.kr/api/rooms/${selectedScheduleId}`);
         setSortedSchedules(sortedSchedules.filter(schedule => schedule.id !== selectedScheduleId));
         onDeleteClick(selectedScheduleId);
@@ -51,6 +52,7 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
       }
     }
   };
+  
 
   const closeModal = () => {
     setIsModalOpen(false);
