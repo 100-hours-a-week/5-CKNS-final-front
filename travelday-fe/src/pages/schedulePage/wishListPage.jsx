@@ -111,7 +111,7 @@ const WishListPage = () => {
           <BackIcon src={backIcon} alt="Back Icon" />
         </BackButton>
         <TitleWrapper>
-          <Title>{schedule.title || 'Wishlist'}</Title>
+          <Title>{schedule.name || 'Wishlist'}</Title>
           <ScheduleDateWrapper>
             <Icon src={calendarIcon} alt="Calendar Icon" />
             <ScheduleDate>{schedule.date}</ScheduleDate>
