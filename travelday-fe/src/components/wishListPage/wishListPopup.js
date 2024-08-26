@@ -27,13 +27,16 @@ const WishlistPopup = ({ isOpen, onClose, selectedPlace }) => {
     const fetchTravelRooms = async () => {
       try {
         const response = await axios.get('https://api.thetravelday.co.kr/api/rooms');
-        setTravelRooms(response.data);  // 가져온 데이터를 store에 저장
+        setTravelRooms(response.data);  
       } catch (error) {
         console.error('여행방 목록 불러오기 실패:', error);
 
         ;
       }
     };
+
+    
+
 
     fetchTravelRooms();
   }, [setTravelRooms]);
