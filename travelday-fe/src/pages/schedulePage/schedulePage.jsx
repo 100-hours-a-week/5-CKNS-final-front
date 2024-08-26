@@ -33,9 +33,9 @@ const SchedulePage = () => {
 
         if (response.status === 200) {
           const formattedSchedules = response.data.map((schedule) => ({
-            id: schedule.travelRoomId,
+            id: schedule.id, // 여기서 id 필드를 사용
             title: schedule.name,
-            date: `${schedule.startDate.replace(/-/g, '.')} ~ ${schedule.endDate.split('T')[0].replace(/-/g, '.')}`,
+            date: `${schedule.startDate.replace(/-/g, '.')} ~ ${schedule.endDate.replace(/-/g, '.')}`,
           }));
           setSchedules(formattedSchedules);
         } else {
