@@ -52,8 +52,8 @@ const CreateSchedulePage = () => {
       );
 
       if (response.status === 201) { 
-        console.log('새로운 일정 생성:', response.data);
-        navigate('/schedule');
+        alert('일정이 성공적으로 생성되었습니다.');
+        navigate('/schedule');  // 일정 생성 후 schedule 페이지로 리다이렉트
       }
     } catch (error) {
       console.error('일정 생성 중 오류 발생:', error);
