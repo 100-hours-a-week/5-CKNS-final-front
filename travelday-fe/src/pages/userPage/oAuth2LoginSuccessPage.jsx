@@ -19,7 +19,7 @@ const OAuth2LoginSuccessPage = () => {
       console.log("로그인 성공");
     };
 
-    const fetchUserProfile = async () => {
+    const fetchNickname = async () => {
       try {
         const response = await fetch('https://api.thetravelday.co.kr/api/user', { 
           method: 'GET',
@@ -31,14 +31,12 @@ const OAuth2LoginSuccessPage = () => {
 
         if (response.ok) {
           const data = await response.json();
-          const { id, kakao_account: { profile: { nickname } } } = data;
+          const { nickname } = data;  // 닉네임만 가져오기
 
-          // 사용자 정보 로컬 스토리지에 저장
-          localStorage.setItem('userId', id);
+          // 닉네임 로컬 스토리지에 저장
           localStorage.setItem('nickname', nickname);
 
-          // 사용자 정보 확인
-          console.log("User ID:", id);
+          // 닉네임 확인
           console.log("Nickname:", nickname);
         } else {
           console.error('사용자 정보 요청 실패:', response.statusText);
@@ -49,7 +47,7 @@ const OAuth2LoginSuccessPage = () => {
     };
 
     storeAccessToken();   
-    fetchUserProfile();     
+    fetchNickname();     
 
     // 로그인 성공 후 메인 페이지로 이동
     navigate('/');

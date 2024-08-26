@@ -45,7 +45,7 @@ const LoginPage = () => {
 
     try {
       const response = await axios.put(
-        'https://api.thetravelday.co.kr/api/nickname',
+        'https://api.thetravelday.co.kr/api/user/nickname',
         { nickname }, 
         {
           headers: {
