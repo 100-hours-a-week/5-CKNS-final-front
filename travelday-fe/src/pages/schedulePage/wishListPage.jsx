@@ -139,7 +139,7 @@ const WishListPage = () => {
 
 export default WishListPage;
 
-// Styled components definitions can remain as provided in your initial setup.
+
 
 
 const Container = styled.div`
