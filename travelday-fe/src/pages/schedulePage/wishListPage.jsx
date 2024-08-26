@@ -20,6 +20,10 @@ const WishListPage = () => {
     const fetchWishList = async () => {
       try {
         const accessToken = localStorage.getItem('accessToken');
+        
+        // 디버깅 로그 추가
+        console.log('위시리스트 가져오기 시작, 방 ID:', id);
+        
         const response = await axios.get(`https://api.thetravelday.co.kr/api/rooms/${id}/wishlist`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -27,13 +31,21 @@ const WishListPage = () => {
           },
         });
 
+        // 응답에 대한 디버깅 로그 추가
+        console.log('위시리스트 가져오기 응답:', response);
+
         if (response.status === 200) {
-          setWishListItems(response.data);
+          setWishListItems(response.data.data);
         } else {
-          console.error('Failed to fetch wishlist:', response.statusText);
+          console.error('위시리스트 가져오기 실패:', response.statusText);
         }
       } catch (error) {
-        console.error('Error fetching wishlist:', error);
+        // 오류에 대한 디버깅 로그 추가
+        console.error('위시리스트 가져오는 중 오류 발생:', error);
+        if (error.response) {
+          console.error('서버 에러 응답 데이터:', error.response.data);
+          console.error('서버 에러 상태 코드:', error.response.status);
+        }
       }
     };
 
@@ -117,8 +129,8 @@ const WishListPage = () => {
               selected={selectedItems.includes(index)}
             >
               <WishListItemContent>
-                <WishListItemTitle>{item.title}</WishListItemTitle>
-                <WishListItemLocation>{item.location}</WishListItemLocation>
+                <WishListItemTitle>{item.name}</WishListItemTitle>
+                <WishListItemLocation>{`Lat: ${item.latitude}, Lng: ${item.longitude}`}</WishListItemLocation>
               </WishListItemContent>
               <RemoveButton
                 onClick={(e) => {
@@ -138,9 +150,6 @@ const WishListPage = () => {
 };
 
 export default WishListPage;
-
-
-
 
 const Container = styled.div`
   display: flex;
