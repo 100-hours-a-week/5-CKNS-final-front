@@ -9,9 +9,10 @@ import axios from 'axios';
 
 const MyPage = () => {
   const navigate = useNavigate();
-  const [nickname, setNickname] = useState('collie');
+  const [nickname, setNickname] = useState(''); // 초기값을 빈 문자열로 설정
   const [showModal, setShowModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState(''); 
+  const [isLoading, setIsLoading] = useState(true); // 로딩 상태 추가
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
@@ -21,6 +22,8 @@ const MyPage = () => {
       navigate('/login');
       return;
     }
+
+    fetchKakaoUserProfile(token); 
 
   }, [navigate]);
 
@@ -37,11 +40,14 @@ const MyPage = () => {
         const data = response.data;
         const nickname = data.nickname; 
         setNickname(nickname);
+        setIsLoading(false); // 닉네임을 받아온 후 로딩 상태를 false로 설정
+        console.log("Fetched Nickname:", nickname); // 닉네임이 제대로 들어오는지 확인
       } else {
         throw new Error('사용자 정보 요청 실패');
       }
     } catch (error) {
       setErrorMessage('사용자 정보를 불러오는 중 오류가 발생했습니다.');
+      setIsLoading(false); // 오류 발생 시에도 로딩 상태를 false로 설정
     }
   };
   
@@ -59,7 +65,7 @@ const MyPage = () => {
       navigate('/');
     } catch (error) {
       console.error('로그아웃 중 오류 발생:', error);
-      alert('로그아웃 중 오류가 발생했습니다.'); // 사용자에게 알림
+      alert('로그아웃 중 오류가 발생했습니다.'); 
     }
   };
   
@@ -87,30 +93,6 @@ const MyPage = () => {
     }
   };
 
-  // const handleNicknameCheck = async (nickname) => {
-  //   try {
-  //     const response = await axios.get(`https://api.thetravelday.co.kr/api/nickname/check`, {
-  //       params: { nickname },
-  //       withCredentials: true,
-  //     });
-
-  //     if (response.status === 200) {
-  //       const isAvailable = response.data.isAvailable;
-  //       if (!isAvailable) {
-  //         alert('이미 사용 중인 닉네임입니다.');
-  //       } else {
-  //         alert('사용 가능한 닉네임입니다.');
-  //       }
-  //     } else {
-  //       throw new Error('닉네임 중복 확인 실패');
-  //     }
-  //   } catch (error) {
-  //     console.error('닉네임 중복 확인 중 오류 발생:', error);
-  //     alert('닉네임 중복 확인 중 오류가 발생했습니다.'); // 사용자에게 알림
-  //   }
-  // };
-  //닉네임 설정 부분
-
   const handleRecommend = async () => {
     try {
       await navigator.clipboard.writeText('https://www.thetravelday.co.kr');
@@ -124,6 +106,10 @@ const MyPage = () => {
   const handleNicknameClick = () => {
     navigate('/nickname');
   };
+
+  if (isLoading) {
+    return <div>로딩 중...</div>; // 로딩 상태일 때 표시할 내용
+  }
 
   return (
     <PageContainer>
@@ -141,7 +127,7 @@ const MyPage = () => {
           </NicknameContainer>
         </UserInfo>
 
-        <Separator /> {/* 회색 가로선 추가 */}
+        <Separator /> 
 
         <Button onClick={handleRecommend}>친구에게 추천하기</Button>
         <Button onClick={handleLogout}>로그아웃</Button>
@@ -168,6 +154,7 @@ const MyPage = () => {
 };
 
 export default MyPage;
+
 
 
 
