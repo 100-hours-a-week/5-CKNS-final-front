@@ -41,6 +41,7 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
 
   const confirmDelete = async () => {
     if (selectedScheduleId) {
+      const token = localStorage.getItem('accessToken');
       try {
         // 삭제 요청 전에 로그 추가
         console.log('삭제하려는 일정 ID:', selectedScheduleId);
