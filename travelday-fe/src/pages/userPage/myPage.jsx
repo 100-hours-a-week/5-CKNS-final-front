@@ -27,26 +27,25 @@ const MyPage = () => {
 
   const fetchKakaoUserProfile = async (token) => {
     try {
-      const response = await axios.get('https://kapi.kakao.com/v2/user/me', {
+      const response = await axios.get('https://www.thetravelday.co.kr/api/user', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         }
       });
-
+  
       if (response.status === 200) {
         const data = response.data;
-        const nickname = data.kakao_account.profile.nickname;
+        const nickname = data.nickname; // 데이터 구조에 맞게 수정
         setNickname(nickname);
       } else {
         throw new Error('사용자 정보 요청 실패');
       }
     } catch (error) {
       setErrorMessage('사용자 정보를 불러오는 중 오류가 발생했습니다.');
-    
     }
   };
-
+  
   const handleLogout = async () => {
     try {
       const token = localStorage.getItem('accessToken');
