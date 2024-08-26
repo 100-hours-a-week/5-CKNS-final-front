@@ -9,10 +9,10 @@ import axios from 'axios';
 
 const MyPage = () => {
   const navigate = useNavigate();
-  const [nickname, setNickname] = useState(''); // 초기값을 빈 문자열로 설정
+  const [nickname, setNickname] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState(''); 
-  const [isLoading, setIsLoading] = useState(true); // 로딩 상태 추가
+  const [isLoading, setIsLoading] = useState(true); 
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
@@ -29,7 +29,7 @@ const MyPage = () => {
 
   const fetchKakaoUserProfile = async (token) => {
     try {
-      const response = await axios.get('https://www.thetravelday.co.kr/api/user', {
+      const response = await axios.get('https://api.thetravelday.co.kr/api/user', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -40,14 +40,14 @@ const MyPage = () => {
         const data = response.data;
         const nickname = data.nickname; 
         setNickname(nickname);
-        setIsLoading(false); // 닉네임을 받아온 후 로딩 상태를 false로 설정
-        console.log("Fetched Nickname:", nickname); // 닉네임이 제대로 들어오는지 확인
+        setIsLoading(false); 
+        console.log("Fetched Nickname:", nickname); 
       } else {
         throw new Error('사용자 정보 요청 실패');
       }
     } catch (error) {
       setErrorMessage('사용자 정보를 불러오는 중 오류가 발생했습니다.');
-      setIsLoading(false); // 오류 발생 시에도 로딩 상태를 false로 설정
+      setIsLoading(false); 
     }
   };
   
