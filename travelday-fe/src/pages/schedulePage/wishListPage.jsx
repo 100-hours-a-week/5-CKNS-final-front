@@ -111,16 +111,16 @@ const WishListPage = () => {
           <BackIcon src={backIcon} alt="Back Icon" />
         </BackButton>
         <TitleWrapper>
-          <Title>{schedule.title || 'Wishlist'}</Title>
+          <Title>{schedule.name || 'Wishlist'}</Title>
           <ScheduleDateWrapper>
             <Icon src={calendarIcon} alt="Calendar Icon" />
             <ScheduleDate>{schedule.date}</ScheduleDate>
           </ScheduleDateWrapper>
         </TitleWrapper>
         <SectionWrapper>
-          <SectionTitle>Wishlist</SectionTitle>
+          <SectionTitle>위시리스트</SectionTitle>
           <AddButton onClick={handleAddItems} disabled={selectedItems.length === 0}>
-            Add Items
+            추가하기
           </AddButton>
         </SectionWrapper>
         <WishList>
