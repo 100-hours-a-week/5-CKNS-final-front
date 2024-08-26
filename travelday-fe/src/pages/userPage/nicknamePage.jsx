@@ -39,9 +39,9 @@ const LoginPage = () => {
   const handleSubmit = async () => {
     const token = localStorage.getItem('accessToken');
 
-    // if (!token) {
-    //   return;
-    // }
+    if (!token) {
+      return;
+    }
 
     try {
       const response = await axios.put(

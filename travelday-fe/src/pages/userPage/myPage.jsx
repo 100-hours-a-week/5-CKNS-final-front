@@ -22,6 +22,8 @@ const MyPage = () => {
       return;
     }
 
+    fetchKakaoUserProfile(token); // 로그인 확인 후 닉네임 가져오기
+
   }, [navigate]);
 
   const fetchKakaoUserProfile = async (token) => {
@@ -86,30 +88,6 @@ const MyPage = () => {
       alert('회원 탈퇴 중 오류가 발생했습니다.'); // 사용자에게 알림
     }
   };
-
-  // const handleNicknameCheck = async (nickname) => {
-  //   try {
-  //     const response = await axios.get(`https://api.thetravelday.co.kr/api/nickname/check`, {
-  //       params: { nickname },
-  //       withCredentials: true,
-  //     });
-
-  //     if (response.status === 200) {
-  //       const isAvailable = response.data.isAvailable;
-  //       if (!isAvailable) {
-  //         alert('이미 사용 중인 닉네임입니다.');
-  //       } else {
-  //         alert('사용 가능한 닉네임입니다.');
-  //       }
-  //     } else {
-  //       throw new Error('닉네임 중복 확인 실패');
-  //     }
-  //   } catch (error) {
-  //     console.error('닉네임 중복 확인 중 오류 발생:', error);
-  //     alert('닉네임 중복 확인 중 오류가 발생했습니다.'); // 사용자에게 알림
-  //   }
-  // };
-  //닉네임 설정 부분
 
   const handleRecommend = async () => {
     try {
