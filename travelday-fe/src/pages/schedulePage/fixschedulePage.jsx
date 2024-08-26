@@ -33,7 +33,7 @@ const FixSchedulePage = () => {
     const token = localStorage.getItem('accessToken'); 
 
     try {
-      const response = await axios.put(
+      const response = await axios.post(
         `https://api.thetravelday.co.kr/api/rooms/${travelRoomId}`, 
         {
           name: title,
@@ -43,7 +43,7 @@ const FixSchedulePage = () => {
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json', 
           },
           withCredentials: true 
         }
