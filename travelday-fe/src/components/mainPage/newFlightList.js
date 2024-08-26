@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import Image1 from '../../images/main/list1/PQC.png';
 import Image2 from '../../images/main/list1/OIT.png';
 import Image3 from '../../images/main/list1/DPS.png';
-import Image4 from '../../images/main/list1/HND.png';
+import Image4 from '../../images/main/list1/NRT.png';
 import Image5 from '../../images/main/list1/CNX.png';
 import Image6 from '../../images/main/list1/TPE.png';
 
@@ -18,7 +18,6 @@ const IATACodeToCity = {
   'NRT': '도쿄',
   'TPE': '타이베이',
   'KIX': '오사카',
-  'HND': '도쿄',
   'DPS': '발리',
   'OKA': '오키나와',
   'FUK': '후쿠오카',
