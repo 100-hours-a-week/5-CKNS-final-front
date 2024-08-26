@@ -15,6 +15,7 @@ const IATACodeToCity = {
   'PQC': '푸꾸옥',
   'OIT': '오이타',
   'CNX': '치앙마이',
+  'NRT': '도쿄',
   'TPE': '타이베이',
   'KIX': '오사카',
   'HND': '도쿄',
@@ -43,30 +44,32 @@ const NewFlightList = () => {
         const response = await axios.get('https://api.thetravelday.co.kr/api/flights/lowest-price/list');
         console.log(response.data); 
         if (response.status === 200) {
-          // const flightsData = response.data.data;
-          // console.log(flightsData);
-          const formattedFlights = response.data.data.map((flight, index) => {
-            const destinationCode = flight.itineraries[0].segments[flight.itineraries[0].segments.length - 1].arrival.iataCode;
-            const departureCode = flight.itineraries[0].segments[0].departure.iataCode;
-            const imageMap = {
-              'PQC': Image1,
-              'OIT': Image2,
-              'DPS': Image3,
-              'HND': Image4,
-              'CNX': Image5,
-              'TPE': Image6,
-            };
+          const imageMap = {
+            'PQC': Image1,
+            'OIT': Image2,
+            'DPS': Image3,
+            'HND': Image4,
+            'NRT': Image5,
+            'TPE': Image6,
+          };
 
-            return {
-              id: index + 1,
-              destination: IATACodeToCity[destinationCode] || destinationCode,
-              departure: IATACodeToCity[departureCode] || departureCode,
-              date: flight.lastTicketingDate,
-              price: `${flight.price.grandTotal} ${flight.price.currency}`,
-              image: imageMap[destinationCode] || null,
-              iataCode: destinationCode, 
-            };
-          });
+          const formattedFlights = response.data.data
+            .map((flight, index) => {
+              const destinationCode = flight.itineraries[0].segments[flight.itineraries[0].segments.length - 1].arrival.iataCode;
+              const departureCode = flight.itineraries[0].segments[0].departure.iataCode;
+
+              return {
+                id: index + 1,
+                destination: IATACodeToCity[destinationCode] || destinationCode,
+                departure: IATACodeToCity[departureCode] || departureCode,
+                date: flight.lastTicketingDate,
+                price: `${flight.price.grandTotal} ${flight.price.currency}`,
+                image: imageMap[destinationCode] || null,
+                iataCode: destinationCode, 
+              };
+            })
+            .filter(flight => flight.image); // 이미지가 없는 항목은 필터링
+
           setFlights(formattedFlights);
         }
       } catch (error) {
