@@ -25,12 +25,6 @@ const WishListPage = () => {
         
         // 디버깅 로그 추가
         console.log('위시리스트 가져오기 시작, 방 ID:', id);
-
-        // id 값이 올바르게 설정되어 있는지 확인
-        if (!id) {
-          console.error("유효하지 않은 방 ID:", id);
-          return;
-        }
         
         const response = await axios.get(`https://api.thetravelday.co.kr/api/rooms/${id}/wishlist`, {
           headers: {
