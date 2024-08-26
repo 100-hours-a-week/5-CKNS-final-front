@@ -6,14 +6,13 @@ import { GoogleMap, Marker, InfoWindow } from '@react-google-maps/api';
 import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import calendarIcon from '../../images/filter/calendar.png';
-import penIcon from '../../images/pen.png'; // 펜 아이콘 임포트
+import penIcon from '../../images/pen.png'; 
 import ScheduleDetailList from '../../components/schedulePage/scheduleDetailList';
 
 const ScheduleDetail = () => {
   const { travelRoomId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { schedule } = location.state || {};
 
   const [scheduleDetails, setScheduleDetails] = useState([]);
   const [fetchedSchedule, setFetchedSchedule] = useState(null);
@@ -27,19 +26,16 @@ const ScheduleDetail = () => {
       try {
         const response = await axios.get(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}`, {
           headers: { Authorization: `Bearer ${token}` },
-          withCredentials: true
+          withCredentials: true,
         });
-        
-        // 데이터를 가져올 때 response.data.data로 접근합니다.
-        const roomData = response.data.data;
 
-        // startDate와 endDate를 결합하여 date를 생성합니다.
+        const roomData = response.data.data;
         const startDateStr = roomData.startDate.replace(/-/g, '.');
         const endDateStr = roomData.endDate.replace(/-/g, '.');
 
         setFetchedSchedule({
           ...roomData,
-          date: `${startDateStr} ~ ${endDateStr}`
+          date: `${startDateStr} ~ ${endDateStr}`,
         });
 
         const tempDetails = [];
@@ -49,7 +45,7 @@ const ScheduleDetail = () => {
         while (currentDate <= endDate) {
           tempDetails.push({
             date: currentDate.toISOString().split('T')[0],
-            schedules: []
+            schedules: [],
           });
           currentDate.setDate(currentDate.getDate() + 1);
         }
@@ -69,23 +65,24 @@ const ScheduleDetail = () => {
       try {
         const response = await axios.get(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan`, {
           headers: { Authorization: `Bearer ${token}` },
-          withCredentials: true
+          withCredentials: true,
         });
 
-        const updatedDetails = scheduleDetails.map(day => ({
+        const updatedDetails = scheduleDetails.map((day) => ({
           ...day,
-          schedules: response.data.filter(detail => detail.scheduledDay === day.date)
-                                   .sort((a, b) => a.position - b.position)
+          schedules: response.data
+            .filter((detail) => detail.scheduledDay === day.date)
+            .sort((a, b) => a.position - b.position),
         }));
 
         setScheduleDetails(updatedDetails);
 
         // Set markers for map display
-        const markers = response.data.map(detail => ({
+        const markers = response.data.map((detail) => ({
           lat: detail.latitude,
           lng: detail.longitude,
           label: `${detail.position}`,
-          name: detail.name
+          name: detail.name,
         }));
         setMapMarkers(markers);
       } catch (error) {
@@ -96,7 +93,20 @@ const ScheduleDetail = () => {
     if (fetchedSchedule) {
       fetchScheduleDetails();
     }
-  }, [fetchedSchedule, travelRoomId]);
+  }, [fetchedSchedule]);
+
+  // 이 함수들은 useEffect 외부에 정의되어야 합니다.
+  const handleAddFromWish = () => {
+    navigate(`/wishlist/${travelRoomId}`, { state: { schedule: fetchedSchedule } });
+  };
+
+  const handleAddFromMap = () => {
+    navigate(`/maplocation/${travelRoomId}`, { state: { schedule: fetchedSchedule } });
+  };
+
+  const handleEditClick = () => {
+    navigate(`/fixschedule/${travelRoomId}`, { state: { schedule: fetchedSchedule } });
+  };
 
   return (
     <Container>
@@ -106,7 +116,7 @@ const ScheduleDetail = () => {
           <>
             <TitleWrapper>
               <Title>{fetchedSchedule.name}</Title>
-              <IconButton onClick={() => navigate(`/edit/${travelRoomId}`, { state: { schedule: fetchedSchedule } })}>
+              <IconButton onClick={handleEditClick}>
                 <EditIcon src={penIcon} alt="Edit Icon" />
               </IconButton>
               <ScheduleDateWrapper>
@@ -121,9 +131,9 @@ const ScheduleDetail = () => {
                 zoom={10}
               >
                 {mapMarkers.map((marker, index) => (
-                  <Marker 
-                    key={index} 
-                    position={{ lat: marker.lat, lng: marker.lng }} 
+                  <Marker
+                    key={index}
+                    position={{ lat: marker.lat, lng: marker.lng }}
                     label={marker.label}
                     onClick={() => setSelectedMarker(marker)}
                   />
@@ -147,9 +157,19 @@ const ScheduleDetail = () => {
                 )}
               </GoogleMap>
             </MapContainer>
+            <ButtonWrapper>
+              <ActionButton onClick={handleAddFromWish}>
+                <PlusIcon>+</PlusIcon>위시에서 장소 추가
+              </ActionButton>
+              <ActionButton onClick={handleAddFromMap}>
+                <PlusIcon>+</PlusIcon>지도에서 장소 추가
+              </ActionButton>
+            </ButtonWrapper>
             <ScheduleDetailList scheduleDetails={scheduleDetails} />
           </>
-        ) : <p>Loading...</p>}
+        ) : (
+          <p>Loading...</p>
+        )}
       </ContentWrapper>
       <BottomNav />
     </Container>
@@ -157,9 +177,6 @@ const ScheduleDetail = () => {
 };
 
 export default ScheduleDetail;
-
-// Styled components definitions remain the same
-
 
 const Container = styled.div`
   display: flex;
@@ -227,25 +244,11 @@ const ScheduleDate = styled.p`
   color: #666;
 `;
 
-const ContentContainer = styled.div`
-  width: 390px;
-  flex: 1;
-  background-color: #fff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
 const MapContainer = styled.div`
   width: 350px;
   height: 240px;
   margin-top: 20px;
 `;
-
-const containerStyle = {
-  width: '100%',
-  height: '100%',
-};
 
 const ButtonWrapper = styled.div`
   display: flex;
