@@ -45,12 +45,20 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
         // 삭제 요청 전에 로그 추가
         console.log('삭제하려는 일정 ID:', selectedScheduleId);
         
-        // 수정된 엔드포인트
-        const response = await axios.delete(`https://api.thetravelday.co.kr/api/rooms/${selectedScheduleId}`);
+        // 수정된 엔드포인트와 헤더 추가
+        const response = await axios.delete(
+          `https://api.thetravelday.co.kr/api/rooms/${selectedScheduleId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
         
         // 응답 확인을 위한 로그 추가
         console.log('삭제 요청에 대한 서버 응답:', response);
-
+  
         // 삭제 후 상태 업데이트
         setSortedSchedules(sortedSchedules.filter(schedule => schedule.id !== selectedScheduleId));
         onDeleteClick(selectedScheduleId);
@@ -69,6 +77,7 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
       console.error("selectedScheduleId가 설정되지 않았습니다.");
     }
   };
+  
 
   const closeModal = () => {
     setIsModalOpen(false);
