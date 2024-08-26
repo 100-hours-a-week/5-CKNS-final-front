@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import SimpleHeader from '../../components/shared/simpleHeader.js';
@@ -9,48 +9,15 @@ const LoginPage = () => {
   const [nickname, setNickname] = useState('');
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
   const [nicknameError, setNicknameError] = useState('');
-  const navigate = useNavigate(); // useNavigate 훅을 사용하여 navigate 함수 가져오기
-
-  useEffect(() => {
-    const checkTokenAndFetchProfile = async () => {
-      const token = localStorage.getItem('accessToken');
-
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-
-      try {
-        const response = await fetch('https://kapi.kakao.com/v2/user/me', {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          const currentNickname = data.kakao_account.profile.nickname;
-          setNickname(currentNickname);
-        } else {
-          console.error('사용자 정보 요청 실패:', response.statusText);
-        }
-      } catch (error) {
-        console.error('사용자 정보 요청 중 오류 발생:', error);
-      }
-    };
-
-    checkTokenAndFetchProfile();
-  }, [navigate]);
+  const navigate = useNavigate();
 
   const handleNicknameChange = async (e) => {
-    const newNickname = e.target.value.trim();
-    setNickname(newNickname);
+    const nickname = e.target.value.trim();
+    setNickname(nickname);
 
-    if (newNickname) {
+    if (nickname) {
       try {
-        const response = await axios.get(`https://api.thetravelday.co.kr/api/nickname/check?nickname=${newNickname}`);
+        const response = await axios.get(`https://api.thetravelday.co.kr/api/user/nickname/check?nickname=${nickname}`);
         if (response.data.exists) {
           setNicknameError('이미 사용 중인 닉네임입니다.');
           setIsButtonEnabled(false);
@@ -72,9 +39,9 @@ const LoginPage = () => {
   const handleSubmit = async () => {
     const token = localStorage.getItem('accessToken');
 
-    if (!token) {
-      return;
-    }
+    // if (!token) {
+    //   return;
+    // }
 
     try {
       const response = await axios.put(
@@ -116,7 +83,6 @@ const LoginPage = () => {
             변경하기
           </Button>
         </Content>
-        
         <BottomNav />
       </Container>
     </PageContainer>
@@ -125,7 +91,6 @@ const LoginPage = () => {
 
 export default LoginPage;
 
-// Styled Components
 
 const PageContainer = styled.div`
   display: flex;

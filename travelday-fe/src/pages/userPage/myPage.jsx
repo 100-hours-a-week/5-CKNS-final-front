@@ -16,37 +16,35 @@ const MyPage = () => {
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
     
-    // if (!token) {
-    //   setErrorMessage('로그인이 필요합니다.');
-    //   navigate('/login');
-    //   return;
-    // }
+    if (!token) {
+      setErrorMessage('로그인이 필요합니다.');
+      navigate('/login');
+      return;
+    }
 
-    fetchKakaoUserProfile(token);
   }, [navigate]);
 
   const fetchKakaoUserProfile = async (token) => {
     try {
-      const response = await axios.get('https://kapi.kakao.com/v2/user/me', {
+      const response = await axios.get('https://www.thetravelday.co.kr/api/user', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         }
       });
-
+  
       if (response.status === 200) {
         const data = response.data;
-        const nickname = data.kakao_account.profile.nickname;
+        const nickname = data.nickname; 
         setNickname(nickname);
       } else {
         throw new Error('사용자 정보 요청 실패');
       }
     } catch (error) {
       setErrorMessage('사용자 정보를 불러오는 중 오류가 발생했습니다.');
-    
     }
   };
-
+  
   const handleLogout = async () => {
     try {
       const token = localStorage.getItem('accessToken');
@@ -119,7 +117,7 @@ const MyPage = () => {
       alert('링크가 복사되었습니다!');
     } catch (error) {
       console.error('링크 복사 실패:', error);
-      alert('링크 복사 중 오류가 발생했습니다.'); // 사용자에게 알림
+      alert('링크 복사 중 오류가 발생했습니다.'); 
     }
   };
 
