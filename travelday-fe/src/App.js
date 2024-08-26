@@ -12,6 +12,7 @@ import MyPage from './pages/userPage/myPage';
 import Nickname from './pages/userPage/nicknamePage';
 import MapPage from './pages/mapPage/mapPage'; 
 import SchedulePage from './pages/schedulePage/schedulePage';
+import FixSchedulePage from './pages/schedulePage/fixschedulePage';
 import AlarmPage from './pages/userPage/alarmPage';
 import IntroPage from './pages/introPage/introPage';
 import HotelDetailPage from './pages/resultPage/hotelDetailPage';
@@ -71,6 +72,7 @@ function MainRouter() {
       <Route path="/map" element={<MapPage />} />
       <Route path="/schedule" element={<SchedulePage />} />
       <Route path="/schedule/:travelRoomId" element={<ScheduleDetail />} />
+      <Route path="/edit/:travelRoomId" element={<FixSchedulePage />} />
       <Route path="/wishlist/:travelRoomId" element={<WishListPage />} /> 
       <Route path="/maplocation/:travelRoomId" element={<MapLocationPage />} /> 
       <Route path="/alarm" element={<AlarmPage />} />
