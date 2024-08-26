@@ -10,6 +10,7 @@ const CreateSchedulePage = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const navigate = useNavigate();
 
   const today = new Date().toISOString().split('T')[0];
@@ -52,8 +53,10 @@ const CreateSchedulePage = () => {
       );
 
       if (response.status === 201) { 
-        alert('일정이 성공적으로 생성되었습니다.');
-        navigate('/schedule');  // 일정 생성 후 schedule 페이지로 리다이렉트
+        setShowSuccessMessage(true); // 성공 메시지 표시
+        setTimeout(() => {
+          navigate('/schedule'); // 일정 생성 후 일정 페이지로 리다이렉트
+        }, 2000); // 2초 후 리다이렉트
       }
     } catch (error) {
       console.error('일정 생성 중 오류 발생:', error);
@@ -99,6 +102,7 @@ const CreateSchedulePage = () => {
         >
           일정 만들기
         </CreateButton>
+        {showSuccessMessage && <SuccessMessage>일정이 성공적으로 생성되었습니다!</SuccessMessage>}
       </ContentWrapper>
       <BottomNav />
     </Container>
@@ -108,6 +112,23 @@ const CreateSchedulePage = () => {
 export default CreateSchedulePage;
 
 // 스타일 컴포넌트 정의
+// 여기에 SuccessMessage 스타일 추가
+
+const SuccessMessage = styled.p`
+  margin-top: 20px;
+  font-size: 16px;
+  color: green;
+  animation: fadeIn 0.5s ease-in-out;
+`;
+
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+`;
 
 const Container = styled.div`
   display: flex;
