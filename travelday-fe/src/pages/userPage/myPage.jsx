@@ -16,13 +16,12 @@ const MyPage = () => {
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
     
-    // if (!token) {
-    //   setErrorMessage('로그인이 필요합니다.');
-    //   navigate('/login');
-    //   return;
-    // }
+    if (!token) {
+      setErrorMessage('로그인이 필요합니다.');
+      navigate('/login');
+      return;
+    }
 
-    fetchKakaoUserProfile(token);
   }, [navigate]);
 
   const fetchKakaoUserProfile = async (token) => {
@@ -36,7 +35,7 @@ const MyPage = () => {
   
       if (response.status === 200) {
         const data = response.data;
-        const nickname = data.nickname; // 데이터 구조에 맞게 수정
+        const nickname = data.nickname; 
         setNickname(nickname);
       } else {
         throw new Error('사용자 정보 요청 실패');
@@ -118,7 +117,7 @@ const MyPage = () => {
       alert('링크가 복사되었습니다!');
     } catch (error) {
       console.error('링크 복사 실패:', error);
-      alert('링크 복사 중 오류가 발생했습니다.'); // 사용자에게 알림
+      alert('링크 복사 중 오류가 발생했습니다.'); 
     }
   };
 
