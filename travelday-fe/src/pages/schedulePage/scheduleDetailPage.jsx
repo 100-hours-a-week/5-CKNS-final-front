@@ -29,15 +29,22 @@ const ScheduleDetail = () => {
           headers: { Authorization: `Bearer ${token}` },
           withCredentials: true
         });
-        setFetchedSchedule(response.data);
+        
+        // 데이터를 가져올 때 response.data.data로 접근합니다.
+        const roomData = response.data.data;
 
-        const { date } = response.data;
-        const [startDateStr, endDateStr] = date.split(' ~ ');
-        const startDate = new Date(startDateStr);
-        const endDate = new Date(endDateStr);
+        // startDate와 endDate를 결합하여 date를 생성합니다.
+        const startDateStr = roomData.startDate.replace(/-/g, '.');
+        const endDateStr = roomData.endDate.replace(/-/g, '.');
+
+        setFetchedSchedule({
+          ...roomData,
+          date: `${startDateStr} ~ ${endDateStr}`
+        });
 
         const tempDetails = [];
-        let currentDate = new Date(startDate);
+        let currentDate = new Date(roomData.startDate);
+        const endDate = new Date(roomData.endDate);
 
         while (currentDate <= endDate) {
           tempDetails.push({
@@ -151,7 +158,8 @@ const ScheduleDetail = () => {
 
 export default ScheduleDetail;
 
-// Styled components definitions can remain the same
+// Styled components definitions remain the same
+
 
 const Container = styled.div`
   display: flex;
