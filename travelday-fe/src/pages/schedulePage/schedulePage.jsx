@@ -33,7 +33,7 @@ const SchedulePage = () => {
 
         if (response.status === 200) {
           const formattedSchedules = response.data.map((schedule) => ({
-            id: schedule.id, // 여기서 id 필드를 사용
+            id: schedule.id, 
             title: schedule.name,
             date: `${schedule.startDate.replace(/-/g, '.')} ~ ${schedule.endDate.replace(/-/g, '.')}`,
           }));

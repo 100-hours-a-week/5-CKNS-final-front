@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import axios from 'axios';
 import TrashIcon from '../../images/trash.png';
 
-
 const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
   const [sortedSchedules, setSortedSchedules] = useState([]);
   const [sortOrder, setSortOrder] = useState('nearest');
@@ -44,7 +43,8 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
     if (selectedScheduleId) {
       try {
         await axios.delete(`https://api.thetravelday.co.kr/api/rooms/${selectedScheduleId}`);
-        onDeleteClick(selectedScheduleId); 
+        setSortedSchedules(sortedSchedules.filter(schedule => schedule.id !== selectedScheduleId));
+        onDeleteClick(selectedScheduleId);
         setIsModalOpen(false); 
       } catch (error) {
         console.error("일정 삭제 중 오류 발생:", error);
@@ -82,7 +82,7 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
 
           return (
             <ScheduleItem
-              key={index}
+              key={schedule.id}
               isPast={isPast}
             >
               <ScheduleContent onClick={() => onItemClick(schedule.id)}>
