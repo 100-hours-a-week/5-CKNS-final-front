@@ -45,7 +45,7 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
         await axios.delete(`https://api.thetravelday.co.kr/api/rooms/${selectedScheduleId}`);
         setSortedSchedules(sortedSchedules.filter(schedule => schedule.id !== selectedScheduleId));
         onDeleteClick(selectedScheduleId);
-        setIsModalOpen(false); 
+        setIsModalOpen(false);
       } catch (error) {
         console.error("일정 삭제 중 오류 발생:", error);
       }
@@ -82,7 +82,7 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
 
           return (
             <ScheduleItem
-              key={schedule.id}
+              key={schedule.id} // 수정된 부분: 고유한 key 속성 확인
               isPast={isPast}
             >
               <ScheduleContent onClick={() => onItemClick(schedule.id)}>
@@ -97,7 +97,6 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
         })}
       </ListContainer>
 
-      {/* 모달 */}
       {isModalOpen && (
         <ModalOverlay>
           <ModalContent>

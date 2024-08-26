@@ -33,7 +33,7 @@ const SchedulePage = () => {
 
         if (response.status === 200) {
           const formattedSchedules = response.data.map((schedule) => ({
-            id: schedule.id, 
+            id: schedule.id,
             title: schedule.name,
             date: `${schedule.startDate.replace(/-/g, '.')} ~ ${schedule.endDate.replace(/-/g, '.')}`,
           }));
