@@ -32,7 +32,7 @@ const SchedulePage = () => {
         console.log('API 응답:', response.data);
 
         if (response.status === 200) {
-          const formattedSchedules = response.data.map((schedule) => ({
+          const formattedSchedules = response.data.data.map((schedule) => ({
             id: schedule.id, 
             title: schedule.name,
             date: `${schedule.startDate.replace(/-/g, '.')} ~ ${schedule.endDate.replace(/-/g, '.')}`,
