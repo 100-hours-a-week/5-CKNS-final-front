@@ -13,14 +13,23 @@ const SchedulePage = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
+    if (!token) {
+      console.error('토큰이 없습니다. 로그인 페이지로 이동합니다.');
+      navigate('/login');
+      return;
+    }
+
     const fetchSchedules = async () => {
       try {
+        console.log('스케줄을 불러오는 중...');
         const response = await axios.get('https://api.thetravelday.co.kr/api/rooms', {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
+
+        console.log('API 응답:', response.data);
 
         if (response.status === 200) {
           const formattedSchedules = response.data.map((schedule) => ({
@@ -30,10 +39,10 @@ const SchedulePage = () => {
           }));
           setSchedules(formattedSchedules);
         } else {
-          console.error('Failed to load schedules:', response.statusText);
+          console.error('스케줄 로딩 실패:', response.statusText);
         }
       } catch (error) {
-        console.error('Error fetching schedules:', error);
+        console.error('스케줄 불러오기 중 오류 발생:', error);
       } finally {
         setIsLoading(false);
       }
