@@ -3,25 +3,66 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-
 import Header from '../../components/shared/header.js'; 
 import BottomNav from '../../components/shared/bottomNav.js';  
 import { images } from '../../data/mainPage.js'; 
-
 import TakeoffIcon from '../../images/filter/takeoff.png';
 import PriceIcon from '../../images/filter/price.png';
 import ScheduleIcon from '../../images/footer/schedule.png';
 import PplIcon from '../../images/main/detail/ppl.png';
 
 const airportNames = {
-  ICN: '인천국제공항',
-  JFK: '존 F. 케네디 국제공항',
-  DAD: '다낭 국제공항',
-};
+    PQC: '푸꾸옥 국제공항',
+    OIT: '오이타 공항',
+    CNX: '치앙마이 국제공항',
+    TPE: '타이완 타오위안 국제공항',
+    KIX: '간사이 국제공항',
+    HND: '하네다 공항',
+    DPS: '응우라라이 국제공항',
+    OKA: '나하 공항',
+    FUK: '후쿠오카 공항',
+    JFK: '존 F. 케네디 국제공항',
+    NGO: '츄부 센트레아 국제공항',
+    CDG: '샤를 드 골 국제공항',
+    SYD: '시드니 킹스포드 스미스 국제공항',
+    MAD: '마드리드 바라하스 국제공항',
+    LHR: '런던 히드로 공항',
+    VIE: '비엔나 국제공항',
+    FRA: '프랑크푸르트 공항',
+    FCO: '피우미치노 공항',
+    ICN: '인천국제공항',
+  };
+  
 
-const airlineNames = {
-  KE: '대한항공',
-};
+  const airlineNames = {
+    KE: '대한항공',
+    OZ: '아시아나항공',
+    JL: '일본항공',
+    NH: '전일본공수',
+    AA: '아메리칸 항공',
+    UA: '유나이티드 항공',
+    DL: '델타 항공',
+    SQ: '싱가포르 항공',
+    CX: '캐세이퍼시픽 항공',
+    QF: '콴타스 항공',
+    BA: '영국항공',
+    AF: '에어프랑스',
+    LH: '루프트한자',
+    EK: '에미레이트 항공',
+    QR: '카타르 항공',
+    TG: '타이 항공',
+    MH: '말레이시아 항공',
+    BR: '에바 항공',
+    CI: '중화항공',
+    CZ: '중국남방항공',
+    MU: '중국동방항공',
+    CA: '중국국제항공',
+    NZ: '에어 뉴질랜드',
+    TK: '터키항공',
+    SU: '아에로플로트',
+  };
+  
+  
 
 const getAirportName = (iataCode) => airportNames[iataCode] || iataCode;
 const getAirlineName = (carrierCode) => airlineNames[carrierCode] || carrierCode;
@@ -51,6 +92,7 @@ const MainDetailPage = () => {
         console.error('항공 데이터 가져오는데 오류가 있습니다', error);
       });
   }, [id]);
+  
 
   const image = images[id];
 
@@ -120,6 +162,10 @@ const MainDetailPage = () => {
         <PplImage src={PplIcon} alt="People" onClick={() => {
           window.location.href = "https://air.gmarket.co.kr/gm/init/lp/lpMain.do?cosemkid=ov17128974211865606&jaehuid=200012886&gad_source=1&gclid=CjwKCAjwiaa2BhAiEiwAQBgyHu1gIeblGLOlGjnggp0j71uxJcmXX_6QxLqVYw2HcDJDIzjeFOezCRoC2kgQAvD_BwE&gate_id=ED9298F9-E43D-4BD0-B2FE-A5F9DC062212";
         }} />
+         <SectionTitle>
+            {t('자주 묻는 질문')}
+            <Icon src={ScheduleIcon} alt="Schedule" />
+          </SectionTitle>
       </Content>
       
       <BottomNav />
