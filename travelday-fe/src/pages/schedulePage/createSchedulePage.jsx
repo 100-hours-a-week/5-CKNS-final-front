@@ -52,7 +52,7 @@ const CreateSchedulePage = () => {
         }
       );
 
-      if (response.status === 201) { 
+      if (response.status === 200) { 
         setShowSuccessMessage(true); // 성공 메시지 표시
         setTimeout(() => {
           navigate('/schedule'); // 일정 생성 후 일정 페이지로 리다이렉트

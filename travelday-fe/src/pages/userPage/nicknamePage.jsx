@@ -9,6 +9,7 @@ const LoginPage = () => {
   const [nickname, setNickname] = useState('');
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
   const [nicknameError, setNicknameError] = useState('');
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const navigate = useNavigate();
 
   const handleNicknameChange = async (e) => {
@@ -56,8 +57,10 @@ const LoginPage = () => {
       );
 
       if (response.status === 200) {
-        alert('닉네임이 성공적으로 변경되었습니다.');
-        navigate('/mypage');  // 닉네임 변경 후 마이페이지로 리다이렉트
+        setShowSuccessMessage(true);  // 성공 메시지 표시
+        setTimeout(() => {
+          navigate('/mypage');  // 일정 시간 후에 마이페이지로 리다이렉트
+        }, 2000);  // 2초 후에 리다이렉트
       } else {
         console.error('닉네임 변경 실패:', response.statusText);
       }
@@ -82,6 +85,7 @@ const LoginPage = () => {
           <Button onClick={handleSubmit} disabled={!isButtonEnabled}>
             변경하기
           </Button>
+          {showSuccessMessage && <SuccessMessage>닉네임이 성공적으로 변경되었습니다!</SuccessMessage>}
         </Content>
         <BottomNav />
       </Container>
@@ -91,6 +95,12 @@ const LoginPage = () => {
 
 export default LoginPage;
 
+// 스타일 컴포넌트 정의
+const SuccessMessage = styled.p`
+  color: green;
+  font-size: 16px;
+  margin-top: 20px;
+`;
 
 const PageContainer = styled.div`
   display: flex;
