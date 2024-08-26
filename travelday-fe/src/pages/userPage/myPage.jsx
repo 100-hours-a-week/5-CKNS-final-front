@@ -108,7 +108,7 @@ const MyPage = () => {
   };
 
   if (isLoading) {
-    return <div>로딩 중...</div>; // 로딩 상태일 때 표시할 내용
+    return <div>로딩 중...</div>; 
   }
 
   return (
