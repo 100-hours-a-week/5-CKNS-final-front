@@ -12,29 +12,28 @@ import ScheduleIcon from '../../images/footer/schedule.png';
 import PplIcon from '../../images/main/detail/ppl.png';
 
 const airportNames = {
-    PQC: '푸꾸옥 국제공항',
-    OIT: '오이타 공항',
-    CNX: '치앙마이 국제공항',
-    TPE: '타이완 타오위안 국제공항',
-    KIX: '간사이 국제공항',
-    HND: '하네다 공항',
-    DPS: '응우라라이 국제공항',
-    OKA: '나하 공항',
-    FUK: '후쿠오카 공항',
-    JFK: '존 F. 케네디 국제공항',
-    NGO: '츄부 센트레아 국제공항',
-    CDG: '샤를 드 골 국제공항',
-    SYD: '시드니 킹스포드 스미스 국제공항',
-    MAD: '마드리드 바라하스 국제공항',
-    LHR: '런던 히드로 공항',
-    VIE: '비엔나 국제공항',
-    FRA: '프랑크푸르트 공항',
-    FCO: '피우미치노 공항',
-    ICN: '인천국제공항',
-  };
-  
+  PQC: '푸꾸옥 국제공항',
+  OIT: '오이타 공항',
+  CNX: '치앙마이 국제공항',
+  TPE: '타이완 타오위안 국제공항',
+  KIX: '간사이 국제공항',
+  HND: '하네다 공항',
+  DPS: '응우라라이 국제공항',
+  OKA: '나하 공항',
+  FUK: '후쿠오카 공항',
+  JFK: '존 F. 케네디 국제공항',
+  NGO: '츄부 센트레아 국제공항',
+  CDG: '샤를 드 골 국제공항',
+  SYD: '시드니 킹스포드 스미스 국제공항',
+  MAD: '마드리드 바라하스 국제공항',
+  LHR: '런던 히드로 공항',
+  VIE: '비엔나 국제공항',
+  FRA: '프랑크푸르트 공항',
+  FCO: '피우미치노 공항',
+  ICN: '인천국제공항',
+};
 
-  const airlineNames = {
+const airlineNames = {
     KE: '대한항공',
     OZ: '아시아나항공',
     JL: '일본항공',
@@ -60,10 +59,10 @@ const airportNames = {
     NZ: '에어 뉴질랜드',
     TK: '터키항공',
     SU: '아에로플로트',
+    '7C': '제주항공', 
   };
   
   
-
 const getAirportName = (iataCode) => airportNames[iataCode] || iataCode;
 const getAirlineName = (carrierCode) => airlineNames[carrierCode] || carrierCode;
 
@@ -79,39 +78,34 @@ const formatDuration = (duration) => {
 };
 
 const MainDetailPage = () => {
-  const { id } = useParams();
+  const { id } = useParams(); 
   const { t } = useTranslation();
   const [flight, setFlight] = useState(null);
 
   useEffect(() => {
-    axios.get(`https://api.thetravelday.co.kr/api/flights/${id}`)
+    axios.get(`https://api.thetravelday.co.kr/api/flights/lowest-price/list`)
       .then(response => {
-        setFlight(response.data.data);
+        const filteredFlight = response.data.data.find(flight => {
+          const destinationCode = flight.itineraries[0]?.segments[flight.itineraries[0].segments.length - 1]?.arrival.iataCode;
+          return destinationCode === id;
+        });
+
+        setFlight(filteredFlight);
       })
       .catch(error => {
         console.error('항공 데이터 가져오는데 오류가 있습니다', error);
       });
   }, [id]);
-  
 
   const image = images[id];
-
-  const renderFlightDetails = (departure, arrival) => (
-    <FlightDetails>
-      <TimeBold>{formatDate(departure.at)}</TimeBold>
-      <Route>{getAirportName(departure.iataCode)} ({departure.iataCode}) → {getAirportName(arrival.iataCode)} ({arrival.iataCode})</Route>
-    </FlightDetails>
-  );
-
-  const renderFlightInfo = (duration, stops) => (
-    <FlightInfo>
-      <InfoItem>{formatDuration(duration)}, {stops > 0 ? `${t('stops', { count: stops })}` : t('nonStop')}</InfoItem>
-    </FlightInfo>
-  );
 
   if (!flight) {
     return <p>{t('loading')}</p>;
   }
+
+  const { itineraries, travelerPricings, price } = flight;
+
+  const includedBags = travelerPricings && travelerPricings[0].fareDetailsBySegment[0].includedCheckedBags.quantity;
 
   return (
     <PageContainer>
@@ -125,32 +119,35 @@ const MainDetailPage = () => {
           </SectionTitle>
 
           <RouteLabel>{t('가는편')}</RouteLabel>
-          <Airline>{getAirlineName(flight.itineraries[0].segments[0].carrierCode)}</Airline>
-          {flight.itineraries[0].segments.map((segment, segIndex) => (
+          <Airline>{getAirlineName(itineraries[0]?.segments[0]?.carrierCode)}</Airline>
+          {itineraries[0]?.segments.map((segment, segIndex) => (
             <FlightSegment key={segIndex}>
-              {renderFlightDetails(segment.departure, segment.arrival)}
-              {segIndex === flight.itineraries[0].segments.length - 1 && renderFlightInfo(segment.duration, segment.numberOfStops)}
+              <FlightDetails>
+                <TimeBold>{formatDate(segment.departure.at)}</TimeBold>
+                <Route>{getAirportName(segment.departure.iataCode)} ({segment.departure.iataCode}) → {getAirportName(segment.arrival.iataCode)} ({segment.arrival.iataCode})</Route>
+              </FlightDetails>
+              {segIndex === itineraries[0].segments.length - 1 && (
+                <FlightInfo>
+                  <InfoItem>{formatDuration(itineraries[0].duration)}, {segment.numberOfStops > 0 ? `${t('stops', { count: segment.numberOfStops })}` : t('nonStop')}</InfoItem>
+                </FlightInfo>
+              )}
             </FlightSegment>
           ))}
 
-          <HorizontalLine />
-
-          <RouteLabel>{t('오는편')}</RouteLabel>
-          <Airline>{getAirlineName(flight.itineraries[1].segments[0].carrierCode)}</Airline>
-          {flight.itineraries[1].segments.map((segment, segIndex) => (
-            <FlightSegment key={segIndex}>
-              {renderFlightDetails(segment.departure, segment.arrival)}
-              {segIndex === flight.itineraries[1].segments.length - 1 && renderFlightInfo(segment.duration, segment.numberOfStops)}
-            </FlightSegment>
-          ))}
           <HorizontalLine />
 
           <SectionTitle>
             {t('가격 정보')}
             <Icon src={PriceIcon} alt="Price" />
           </SectionTitle>
-          <Price>{t('price.perAdult')}: {flight.travelerPricings[0].price.total} {flight.price.currency} ({flight.travelerPricings[0].fareDetailsBySegment[0].cabin})</Price>
-          <Price>{t('includedCheckedBags')}: {flight.travelerPricings[0].fareDetailsBySegment[0].includedCheckedBags.quantity} {t('bags')}</Price>
+          {price ? (
+            <>
+              <Price>{t('price.perAdult')}: {price.grandTotal} {price.currency}</Price>
+              <Price>{t('includedCheckedBags')}: {includedBags} {t('bags')}</Price>
+            </>
+          ) : (
+            <p>{t('가격 정보가 없습니다')}</p>
+          )}
 
           <SectionTitle>
             {t('예약 정보')}
@@ -162,10 +159,6 @@ const MainDetailPage = () => {
         <PplImage src={PplIcon} alt="People" onClick={() => {
           window.location.href = "https://air.gmarket.co.kr/gm/init/lp/lpMain.do?cosemkid=ov17128974211865606&jaehuid=200012886&gad_source=1&gclid=CjwKCAjwiaa2BhAiEiwAQBgyHu1gIeblGLOlGjnggp0j71uxJcmXX_6QxLqVYw2HcDJDIzjeFOezCRoC2kgQAvD_BwE&gate_id=ED9298F9-E43D-4BD0-B2FE-A5F9DC062212";
         }} />
-         <SectionTitle>
-            {t('자주 묻는 질문')}
-            <Icon src={ScheduleIcon} alt="Schedule" />
-          </SectionTitle>
       </Content>
       
       <BottomNav />
@@ -196,6 +189,7 @@ const Content = styled.div`
   padding-bottom: 100px;  
   margin-bottom: 20px;
 `;
+
 const StyledImage = styled.img`
   width: 100%;
   height: auto;
@@ -327,3 +321,4 @@ const BookingInfo = styled.div`
   text-align: left;
   margin-top: 10px;
 `;
+

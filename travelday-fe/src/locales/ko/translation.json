@@ -6,6 +6,7 @@
     "stops": "{{count}}회 경유",
     "nonStop": "직항",
     "price": {
+      "grandTotal": "총요금",
       "total": "총 요금",
       "base": "기본 요금",
       "fees": "수수료",

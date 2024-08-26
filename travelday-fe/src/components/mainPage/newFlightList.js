@@ -47,8 +47,8 @@ const NewFlightList = () => {
             'PQC': Image1,
             'OIT': Image2,
             'DPS': Image3,
-            'HND': Image4,
-            'NRT': Image5,
+            'NRT': Image4,
+            'CNX': Image5,
             'TPE': Image6,
           };
 
