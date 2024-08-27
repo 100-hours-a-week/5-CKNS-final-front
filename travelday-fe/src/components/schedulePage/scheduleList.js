@@ -39,6 +39,7 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
     setIsModalOpen(true);
   };
 
+
   const confirmDelete = async () => {
     if (selectedScheduleId) {
       try {
@@ -58,9 +59,9 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
         setIsModalOpen(false);
         window.alert('삭제되었습니다!');
       } catch (error) {
-        // 에러 로그 추가
         setIsModalOpen(false);
         window.alert('삭제되었습니다!');
+        // 에러 로그 추가
         console.error("일정 삭제 중 오류 발생:", error);
         // 서버 응답에 대한 에러 로그 추가
         if (error.response) {
