@@ -19,12 +19,16 @@ const LoginPage = () => {
     if (nickname) {
       try {
         const response = await axios.get(`https://api.thetravelday.co.kr/api/user/nickname/check?nickname=${nickname}`);
-        if (response.data.exists) {
+        
+        if (response.status === 409) {
           setNicknameError('이미 사용 중인 닉네임입니다.');
           setIsButtonEnabled(false);
-        } else {
+        } else if (response.status === 200) {
           setNicknameError('');
           setIsButtonEnabled(true);
+        } else {
+          setNicknameError('알 수 없는 오류가 발생했습니다.');
+          setIsButtonEnabled(false);
         }
       } catch (error) {
         console.error('닉네임 중복 검사 실패:', error);
