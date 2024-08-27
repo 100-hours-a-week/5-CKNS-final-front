@@ -20,7 +20,7 @@ const LoginPage = () => {
       setIsButtonEnabled(false);
       return;
     } else {
-      setNicknameError(''); // 10글자 이하일 때는 에러 메시지 제거
+      setNicknameError(''); 
     }
   
     setNickname(nickname);
