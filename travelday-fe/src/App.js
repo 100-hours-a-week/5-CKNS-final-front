@@ -20,6 +20,8 @@ import ScheduleDetail from './pages/schedulePage/scheduleDetailPage';
 import WishListPage from './pages/schedulePage/wishListPage';
 import MapLocationPage from './pages/schedulePage/mapLocationPage';
 import CreateSchedulePage from './pages/schedulePage/createSchedulePage';  
+import TokenRefresher from './utils/useTokenRefresher'; 
+
 
 import './App.css';
 import './i18n'; 
@@ -38,6 +40,7 @@ function App() {
 
   return (
     <Router>
+      <TokenRefresher /> 
       <Routes>
         <Route path="/*" element={<MainRouter />} />
       </Routes>
