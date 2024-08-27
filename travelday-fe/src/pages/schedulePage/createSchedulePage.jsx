@@ -55,8 +55,8 @@ const CreateSchedulePage = () => {
       if (response.status === 200) { 
         setShowSuccessMessage(true); // 성공 메시지 표시
         setTimeout(() => {
-          navigate('/schedule'); // 일정 생성 후 일정 페이지로 리다이렉트
-        }, 2000); // 2초 후 리다이렉트
+          navigate('/schedule'); 
+        }, 500); // 2초 후 리다이렉트
       }
     } catch (error) {
       console.error('일정 생성 중 오류 발생:', error);
