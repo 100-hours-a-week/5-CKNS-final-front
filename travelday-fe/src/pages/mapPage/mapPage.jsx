@@ -5,6 +5,7 @@ import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import searchIcon from '../../images/search/search.png'; 
 import SearchResultsPopup from '../../components/mapPage/searchResultsPopup.js';
+import Footer from '../../components/shared/footer.js'
 
 const center = {
   lat: 37.5400456,
@@ -137,6 +138,7 @@ function MapPage() {
               </InfoWindow>
             )}
           </GoogleMap>
+          <Footer />
         </MapButtonContainer>
         <BottomPadding />
         <BottomNav />

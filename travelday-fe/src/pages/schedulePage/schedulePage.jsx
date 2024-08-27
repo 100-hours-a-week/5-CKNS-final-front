@@ -4,6 +4,7 @@ import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import ScheduleList from '../../components/schedulePage/scheduleList';
 import { useNavigate } from 'react-router-dom';
+import Footer from '../../components/shared/footer.js'
 import axios from 'axios';
 
 const SchedulePage = () => {
@@ -76,7 +77,9 @@ const SchedulePage = () => {
         ) : (
           <NoScheduleText>등록된 일정이 없습니다! 만들어 주세요.</NoScheduleText>
         )}
+        <Footer />
       </ContentWrapper>
+      <BottomPadding />
       <BottomNav />
     </Container>
   );
@@ -161,4 +164,8 @@ const NoScheduleText = styled.div`
   font-size: 16px;
   color: #999;
   margin-top: 20px;
+`;
+
+const BottomPadding = styled.div`
+  height: 110px; 
 `;
