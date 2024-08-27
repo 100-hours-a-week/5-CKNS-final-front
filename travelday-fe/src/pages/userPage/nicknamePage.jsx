@@ -19,43 +19,56 @@ const LoginPage = () => {
       setNicknameError('닉네임은 10글자를 넘을 수 없습니다!');
       setIsButtonEnabled(false);
       return;
-    } else {
-      setNicknameError(''); 
     }
-  
+
     setNickname(nickname);
-  
-    if (nickname.length > 0) {
-      try {
-        const response = await axios.get(`https://api.thetravelday.co.kr/api/user/nickname/check?nickname=${nickname}`);
-        
-        if (response.status === 200) {
-          if (response.data === 'OK') {
-            setNicknameError('');
-            setIsButtonEnabled(true);
-          } else if (response.data === 'DUPLICATE') {
-            setNicknameError('이미 사용 중인 닉네임입니다!');
-            setIsButtonEnabled(false);
-          }
-        } else {
-          setNicknameError('서버 응답 오류가 발생했습니다. 다시 시도해 주세요.');
+
+    if (nickname.length === 0) {
+      setIsButtonEnabled(false);
+      setNicknameError('');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('accessToken');
+
+      if (!token) {
+        setNicknameError('로그인 정보가 없습니다. 다시 로그인 해주세요.');
+        return;
+      }
+
+      const response = await axios.get(`https://api.thetravelday.co.kr/api/user/nickname/check?nickname=${nickname}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (response.status === 200) {
+        if (response.data === 'OK') {
+          setNicknameError('');
+          setIsButtonEnabled(true);
+        } else if (response.data === 'DUPLICATE') {
+          setNicknameError('이미 사용 중인 닉네임입니다!');
           setIsButtonEnabled(false);
         }
-      } catch (error) {
-        setNicknameError('닉네임 확인 중 오류가 발생했습니다.');
+      } else {
+        setNicknameError('서버 응답 오류가 발생했습니다. 다시 시도해 주세요.');
         setIsButtonEnabled(false);
-        console.error('닉네임 확인 오류:', error);
       }
-    } else {
+    } catch (error) {
+      setNicknameError('닉네임 확인 중 오류가 발생했습니다.');
       setIsButtonEnabled(false);
+      console.error('닉네임 확인 오류:', error);
     }
   };
-  
-  
+
   const handleSubmit = async () => {
     const token = localStorage.getItem('accessToken');
 
     if (!token) {
+      console.error('토큰이 없습니다. 로그인 페이지로 이동합니다.');
+      navigate('/login');
       return;
     }
 
@@ -73,9 +86,7 @@ const LoginPage = () => {
 
       if (response.status === 200) {
         setShowSuccessMessage(true); 
-        setTimeout(() => {
-          navigate('/mypage'); 
-        }); 
+        navigate('/mypage');
       } else {
         console.error('닉네임 변경 실패:', response.statusText);
       }
