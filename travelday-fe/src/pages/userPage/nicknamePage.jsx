@@ -22,14 +22,20 @@ const LoginPage = () => {
         const response = await axios.get(`https://api.thetravelday.co.kr/api/user/nickname/check?nickname=${nickname}`);
         console.log('API 응답:', response); // API 응답 전체 확인
   
-        if (response.status === 409) {
-          console.log('이미 사용 중인 닉네임'); // 중복된 닉네임 확인
-          setNicknameError('이미 사용 중인 닉네임입니다.');
-          setIsButtonEnabled(false);
-        } else if (response.status === 200) {
-          console.log('사용 가능한 닉네임'); // 사용 가능한 닉네임 확인
-          setNicknameError('');
-          setIsButtonEnabled(true);
+        if (response.status === 200) {
+          if (response.data === "DUPLICATE") {
+            console.log('이미 사용 중인 닉네임'); // 중복된 닉네임 확인
+            setNicknameError('이미 사용 중인 닉네임입니다.');
+            setIsButtonEnabled(false);
+          } else if (response.data === "OK") {
+            console.log('사용 가능한 닉네임'); // 사용 가능한 닉네임 확인
+            setNicknameError('');
+            setIsButtonEnabled(true);
+          } else {
+            console.log('알 수 없는 응답 데이터:', response.data); // 예상치 못한 데이터 확인
+            setNicknameError('알 수 없는 오류가 발생했습니다.');
+            setIsButtonEnabled(false);
+          }
         } else {
           console.log('알 수 없는 상태 코드:', response.status); // 예상치 못한 상태 코드 확인
           setNicknameError('알 수 없는 오류가 발생했습니다.');
