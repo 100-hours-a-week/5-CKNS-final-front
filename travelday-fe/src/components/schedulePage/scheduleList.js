@@ -38,7 +38,6 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
     setSelectedScheduleId(id);
     setIsModalOpen(true);
   };
-
   const confirmDelete = async () => {
     if (!selectedScheduleId) {
         console.error("selectedScheduleId가 설정되지 않았습니다.");
@@ -47,15 +46,20 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
 
     try {
         // 삭제 요청
-        await axios.delete(`https://api.thetravelday.co.kr/api/rooms/${selectedScheduleId}`);
+        const response = await axios.delete(`https://api.thetravelday.co.kr/api/rooms/${selectedScheduleId}`);
 
-        // 삭제 후 상태 업데이트
-        setSortedSchedules(prevSchedules => 
-            prevSchedules.filter(schedule => schedule.id !== selectedScheduleId)
-        );
-        onDeleteClick(selectedScheduleId);
-        setIsModalOpen(false);
-        window.alert('삭제되었습니다!');
+        // 삭제 요청이 성공적인지 확인
+        if (response.status === 200) {
+            // 삭제 후 상태 업데이트
+            setSortedSchedules(prevSchedules => 
+                prevSchedules.filter(schedule => schedule.id !== selectedScheduleId)
+            );
+            onDeleteClick(selectedScheduleId);
+            setIsModalOpen(false);
+            window.alert('삭제되었습니다!');
+        } else {
+            console.error('삭제 요청 실패:', response.status, response.statusText);
+        }
     } catch (error) {
         console.error("일정 삭제 중 오류 발생:", error);
 

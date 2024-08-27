@@ -11,6 +11,7 @@ const CreateSchedulePage = () => {
   const [endDate, setEndDate] = useState('');
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [countdown, setCountdown] = useState(3); 
   const navigate = useNavigate();
 
   const today = new Date().toISOString().split('T')[0];
@@ -53,10 +54,16 @@ const CreateSchedulePage = () => {
       );
 
       if (response.status === 200) { 
-        setShowSuccessPopup(true); // 성공 팝업 표시
-        setTimeout(() => {
-          navigate('/schedule'); 
-        }, 3000); // 3초 후 리다이렉트
+        setShowSuccessPopup(true);
+        const interval = setInterval(() => {
+          setCountdown(prev => {
+            if (prev === 1) {
+              clearInterval(interval);
+              navigate('/schedule');
+            }
+            return prev - 1;
+          });
+        }, 1000);
       }
     } catch (error) {
       console.error('일정 생성 중 오류 발생:', error);
@@ -107,6 +114,7 @@ const CreateSchedulePage = () => {
             <PopupContent>
               <p>일정이 성공적으로 생성되었습니다!</p>
               <CountdownBar />
+              <CountdownText>{countdown}초 후에 페이지가 이동합니다.</CountdownText>
             </PopupContent>
           </SuccessPopup>
         )}
@@ -167,6 +175,12 @@ const countdown = keyframes`
   to {
     width: 0;
   }
+`;
+
+const CountdownText = styled.p`
+  font-size: 14px;
+  color: #333;
+  margin-top: 10px;
 `;
 
 const Container = styled.div`
@@ -251,3 +265,4 @@ const CreateButton = styled.button`
     background-color: ${({ enabled }) => (enabled ? '#d11a45' : '#ccc')};
   }
 `;
+
