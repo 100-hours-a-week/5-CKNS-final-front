@@ -38,19 +38,20 @@ const useTokenRefresher = () => {
                 });
 
                 if (response.status === 200 && response.data.ok) {
+                    console.log(data);
                     const newAccessToken = response.data.access_token;
                     localStorage.setItem('access_token', newAccessToken);
                     return newAccessToken;
                 } else {
                     console.error('Failed to refresh token');
                     alert('토큰이 만료되어 로그아웃 되었습니다!');
-                    navigate('/login'); // navigate를 여기서 호출
+                    navigate('/login'); 
                     return null;
                 }
             } catch (error) {
                 console.error('Error while refreshing access token:', error);
                 alert('토큰이 만료되어 로그아웃 되었습니다!');
-                navigate('/login'); // navigate를 여기서 호출
+                navigate('/login');
                 return null;
             }
         };
