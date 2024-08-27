@@ -13,7 +13,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const handleNicknameChange = async (e) => {
-    const nickname = e.target.value.trim();
+    const nickname = e.target.value;  // 입력값을 그대로 사용, 공백을 제거하지 않음
   
     if (nickname.length > 10) {
       setNicknameError('닉네임은 10글자를 넘을 수 없습니다!');
