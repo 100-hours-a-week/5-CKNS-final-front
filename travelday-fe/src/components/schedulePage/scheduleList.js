@@ -40,38 +40,32 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
   };
 
   const confirmDelete = async () => {
-    if (selectedScheduleId) {
-      try {
-        // 삭제 요청 전에 로그 추가
-        console.log('삭제하려는 일정 ID:', selectedScheduleId);
-        
-        // 수정된 엔드포인트
-        const response = await axios.delete(`https://api.thetravelday.co.kr/api/rooms/${selectedScheduleId}`);
-        
-        
-        // 응답 확인을 위한 로그 추가
-        console.log('삭제 요청에 대한 서버 응답:', response);
+    if (!selectedScheduleId) {
+        console.error("selectedScheduleId가 설정되지 않았습니다.");
+        return;
+    }
+
+    try {
+        // 삭제 요청
+        await axios.delete(`https://api.thetravelday.co.kr/api/rooms/${selectedScheduleId}`);
 
         // 삭제 후 상태 업데이트
-        setSortedSchedules(sortedSchedules.filter(schedule => schedule.id !== selectedScheduleId));
+        setSortedSchedules(prevSchedules => 
+            prevSchedules.filter(schedule => schedule.id !== selectedScheduleId)
+        );
         onDeleteClick(selectedScheduleId);
         setIsModalOpen(false);
         window.alert('삭제되었습니다!');
-      } catch (error) {
-        // 에러 로그 추가
+    } catch (error) {
         console.error("일정 삭제 중 오류 발생:", error);
-        // 서버 응답에 대한 에러 로그 추가
+
         if (error.response) {
-          console.error("서버에서 반환된 에러 응답 데이터:", error.response.data);
-          console.error("서버에서 반환된 에러 상태 코드:", error.response.status);
+            console.error("서버에서 반환된 에러 응답 데이터:", error.response.data);
+            console.error("서버에서 반환된 에러 상태 코드:", error.response.status);
         }
-        
-      }
-    } else {
-      console.error("selectedScheduleId가 설정되지 않았습니다.");
     }
-    
-  };
+};
+
 
   const closeModal = () => {
     setIsModalOpen(false);
