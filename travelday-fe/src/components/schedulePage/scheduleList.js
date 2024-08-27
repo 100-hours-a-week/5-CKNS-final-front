@@ -38,38 +38,55 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
     setSelectedScheduleId(id);
     setIsModalOpen(true);
   };
+
   const confirmDelete = async () => {
     if (!selectedScheduleId) {
-        console.error("selectedScheduleId가 설정되지 않았습니다.");
-        return;
+      console.error("selectedScheduleId가 설정되지 않았습니다.");
+      return;
     }
-
+  
+    const token = localStorage.getItem('accessToken');
+  
+    if (!token) {
+      console.error("로그인 토큰이 없습니다.");
+      return;
+    }
+  
     try {
-        // 삭제 요청
-        const response = await axios.delete(`https://api.thetravelday.co.kr/api/rooms/${selectedScheduleId}`);
-
-        // 삭제 요청이 성공적인지 확인
-        if (response.status === 200) {
-            // 삭제 후 상태 업데이트
-            setSortedSchedules(prevSchedules => 
-                prevSchedules.filter(schedule => schedule.id !== selectedScheduleId)
-            );
-            onDeleteClick(selectedScheduleId);
-            setIsModalOpen(false);
-            window.alert('삭제되었습니다!');
-        } else {
-            console.error('삭제 요청 실패:', response.status, response.statusText);
-        }
+      // 삭제 요청 전에 로그 추가
+      console.log('삭제하려는 일정 ID:', selectedScheduleId);
+      
+      // 삭제 요청
+      const response = await axios.delete(`https://api.thetravelday.co.kr/api/rooms/${selectedScheduleId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      // 응답 확인을 위한 로그 추가
+      console.log('삭제 요청에 대한 서버 응답:', response);
+  
+      // 삭제 후 상태 업데이트
+      if (response.status === 200) {
+        setSortedSchedules(prevSchedules => 
+          prevSchedules.filter(schedule => schedule.id !== selectedScheduleId)
+        );
+        onDeleteClick(selectedScheduleId);
+        setIsModalOpen(false);
+        window.alert('삭제되었습니다!');
+      } else {
+        console.error('삭제 요청 실패:', response.status, response.statusText);
+      }
     } catch (error) {
-        console.error("일정 삭제 중 오류 발생:", error);
-
-        if (error.response) {
-            console.error("서버에서 반환된 에러 응답 데이터:", error.response.data);
-            console.error("서버에서 반환된 에러 상태 코드:", error.response.status);
-        }
+      console.error("일정 삭제 중 오류 발생:", error);
+      if (error.response) {
+        console.error("서버에서 반환된 에러 응답 데이터:", error.response.data);
+        console.error("서버에서 반환된 에러 상태 코드:", error.response.status);
+      }
     }
-};
-
+  };
+  
 
   const closeModal = () => {
     setIsModalOpen(false);
