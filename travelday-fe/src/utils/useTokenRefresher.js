@@ -7,14 +7,14 @@ export default function TokenRefresher() {
 
   useEffect(() => {
     const refreshAPI = axios.create({
-      baseURL: import.meta.env.REACT_APP_GENERATED_SERVER_URL,
+      baseURL: process.env.REACT_APP_GENERATED_SERVER_URL,
       headers: {"Content-Type": "application/json"} // header의 Content-Type을 JSON 형식의 데이터를 전송한다
     });
 
     const interceptor = axios.interceptors.response.use(
       // 성공적인 응답 처리
       response => {
-        // console.log('Starting Request', response)
+        console.log('Starting Request', response)
         return response;
       },
       async error => {
@@ -24,9 +24,9 @@ export default function TokenRefresher() {
         // access_token 재발급
         if (status === 401 ) {
           if(msg == "Expired Access Token. 토큰이 만료되었습니다") {
-            // console.log("토큰 재발급 요청");
+            console.log("토큰 재발급 요청");
             await axios.post(
-              `${import.meta.env.REACT_APP_GENERATED_SERVER_URL}/api/token/reissue`,{},
+              `${process.env.REACT_APP_GENERATED_SERVER_URL}/api/token/reissue`,{},
               {headers: {
                 Authorization: `${localStorage.getItem('Authorization')}`,
                 Refresh: `${localStorage.getItem('Refresh')}`,
@@ -42,7 +42,7 @@ export default function TokenRefresher() {
               originalConfig.headers["authorization"]="Bearer "+res.headers.authorization;
               originalConfig.headers["refresh"]= res.headers.refresh;
 
-              // console.log("New access token obtained.");
+               console.log("New access token obtained.");
               // 새로운 토큰으로 재요청
               return refreshAPI(originalConfig);
             })
@@ -55,7 +55,7 @@ export default function TokenRefresher() {
           else{
             localStorage.clear();
             navigate("/"); 
-            // window.alert("토큰이 만료되어 자동으로 로그아웃 되었습니다.")
+         window.alert("토큰이 만료되어 자동으로 로그아웃 되었습니다.")
           }
         }
         else if(status == 400 || status == 404 || status == 409) {
@@ -71,7 +71,7 @@ export default function TokenRefresher() {
       axios.interceptors.response.eject(interceptor);
     };
   }, []);
-  return (
+  return (s
     <div></div>
   )
 }

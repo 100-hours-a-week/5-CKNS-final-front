@@ -20,7 +20,7 @@ import ScheduleDetail from './pages/schedulePage/scheduleDetailPage';
 import WishListPage from './pages/schedulePage/wishListPage';
 import MapLocationPage from './pages/schedulePage/mapLocationPage';
 import CreateSchedulePage from './pages/schedulePage/createSchedulePage';  
-import TokenRefresher from './utils/useTokenRefresher'; // 상대 경로가 맞는지 확인하세요
+import TokenRefresher from './utils/useTokenRefresher'; 
 
 
 import './App.css';
@@ -40,7 +40,7 @@ function App() {
 
   return (
     <Router>
-      <TokenRefresher /> {/* TokenRefresher 컴포넌트를 Router 안에 추가 */}
+      <TokenRefresher /> 
       <Routes>
         <Route path="/*" element={<MainRouter />} />
       </Routes>
