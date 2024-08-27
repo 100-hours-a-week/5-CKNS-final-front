@@ -115,13 +115,13 @@ const MyPage = () => {
           <ModalContent>
             <ModalTitle>여행한DAY를 떠나시려 한다니 정말 아쉽네요.</ModalTitle>
             <ModalMessage>
-              그동안 저희와 함께해 주셔서 감사합니다.<br/>
               언제든지 다시 여행 계획이 필요할 때,<br/>
               여행한DAY가 기다리고 있을게요.<br/>
               즐거운 여행 가득하시길 바랍니다!<br/>
+              <br/>
               감사합니다.
             </ModalMessage>
-            <ModalButton onClick={() => setShowModal(false)}>닫기</ModalButton>
+            <ModalButton onClick={() => navigate('/intro')}>닫기</ModalButton>
           </ModalContent>
         </ModalOverlay>
       )}
@@ -258,7 +258,7 @@ const ModalContent = styled.div`
 
 const ModalTitle = styled.h2`
   margin-bottom: 20px;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: bold;
   color: #333;
 `;
@@ -290,3 +290,4 @@ const ErrorMessage = styled.p`
   margin-top: 10px;
   font-size: 14px;
 `;
+
