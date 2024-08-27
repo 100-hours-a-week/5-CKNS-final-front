@@ -121,7 +121,7 @@ const MyPage = () => {
               <br/>
               감사합니다.
             </ModalMessage>
-            <ModalButton onClick={() => setShowModal(false)}>닫기</ModalButton>
+            <ModalButton onClick={() => navigate('/intro')}>닫기</ModalButton>
           </ModalContent>
         </ModalOverlay>
       )}
@@ -290,3 +290,4 @@ const ErrorMessage = styled.p`
   margin-top: 10px;
   font-size: 14px;
 `;
+
