@@ -78,10 +78,7 @@ const FlightResultList = () => {
 
 export default FlightResultList;
 
-// Styled components definitions remain the same as previously given.
 
-
-// styled-components 그대로 유지
 
 const ListContainer = styled.div`
   display: flex;

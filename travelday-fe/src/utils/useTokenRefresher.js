@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const useTokenRefresher = () => {
-    const navigate = useNavigate(); // useNavigate를 커스텀 훅의 최상위에서 호출
+    const navigate = useNavigate(); 
 
     useEffect(() => {
         const api = axios.create({
@@ -38,7 +38,7 @@ const useTokenRefresher = () => {
                 });
 
                 if (response.status === 200 && response.data.ok) {
-                    console.log(response.data); // 수정된 부분
+                    console.log(response.data);
                     const newAccessToken = response.data.access_token;
                     localStorage.setItem('access_token', newAccessToken);
                     return newAccessToken;
