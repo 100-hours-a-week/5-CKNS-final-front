@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import axios from 'axios';
 import TrashIcon from '../../images/trash.png';
 
-const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
+const ScheduleList = ({ schedules, onItemClick }) => {
   const [sortedSchedules, setSortedSchedules] = useState([]);
   const [sortOrder, setSortOrder] = useState('nearest');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,35 +34,29 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
     setSortedSchedules([...sortedUpcoming, { type: 'pastLabel' }, ...pastSchedules]);
   }, [schedules, sortOrder]);
 
-  const handleDeleteClick = (id) => {
-    setSelectedScheduleId(id);
+  const handleDeleteClick = (scheduleId) => {
+    setSelectedScheduleId(scheduleId);
     setIsModalOpen(true);
   };
 
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedScheduleId(null);
+  };
 
   const confirmDelete = async () => {
-    if (!selectedScheduleId) {
-      console.error("selectedScheduleId가 설정되지 않았습니다.");
-      return;
-    }
-  
+    if (selectedScheduleId) {
     const accessToken = localStorage.getItem('accessToken');
-    if (!accessToken) {
-      console.error("액세스 토큰을 찾을 수 없습니다.");
-      return;
-    }
-  
+
     try {
       const response = await axios.delete(`https://api.thetravelday.co.kr/api/rooms/${selectedScheduleId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-  
+
       if (response.status === 200) {
-        setSortedSchedules(prevSchedules =>
-          prevSchedules.filter(schedule => schedule.id !== selectedScheduleId)
-        );
+        setSortedSchedules(prevSchedules => prevSchedules.filter(schedule => schedule.id !== selectedScheduleId));
         window.alert('삭제되었습니다!');
         setIsModalOpen(false);
       } else {
@@ -70,13 +64,7 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
       }
     } catch (error) {
       console.error('Error deleting schedule:', error);
-      window.alert('스케줄 삭제에 실패했습니다. 다시 시도해 주세요.');
     }
-  };
-  
-
-  const closeModal = () => {
-    setIsModalOpen(false);
   };
 
   return (
@@ -126,7 +114,7 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
           <ModalContent>
             <ModalMessage>정말 일정을 삭제하시겠습니까?</ModalMessage>
             <ModalButtons>
-              <ModalButton onClick={confirmDelete}>예</ModalButton>
+              <ModalButton onClick={handleConfirmDelete}>예</ModalButton>
               <ModalButton onClick={closeModal}>아니오</ModalButton>
             </ModalButtons>
           </ModalContent>
