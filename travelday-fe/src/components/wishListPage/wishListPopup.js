@@ -112,7 +112,7 @@ const WishlistPopup = ({ isOpen, onClose, selectedPlace }) => {
 
 export default WishlistPopup;
 
-// Styled Components
+
 const PopupOverlay = styled.div`
   position: fixed;
   top: 0;
