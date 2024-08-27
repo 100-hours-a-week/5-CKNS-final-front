@@ -1,77 +1,116 @@
-import axios from 'axios';
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router'
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-export default function TokenRefresher() {
-  const navigate = useNavigate();
+const useTokenRefresher = () => {
+    const navigate = useNavigate(); // useNavigate를 커스텀 훅의 최상위에서 호출
 
-  useEffect(() => {
-    const refreshAPI = axios.create({
-      baseURL: process.env.REACT_APP_GENERATED_SERVER_URL,
-      headers: {"Content-Type": "application/json"} // header의 Content-Type을 JSON 형식의 데이터를 전송한다
-    });
+    useEffect(() => {
+        const api = axios.create({
+            baseURL: 'http://api.thetravelday.co.kr',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
 
-    const interceptor = axios.interceptors.response.use(
-      // 성공적인 응답 처리
-      response => {
-        console.log('Starting Request', response)
-        return response;
-      },
-      async error => {
-        const originalConfig = error.config; // 기존에 수행하려고 했던 작업
-        const msg = error.response.data.msg; // error msg from backend
-        const status = error.response.status; // 현재 발생한 에러 코드
-        // access_token 재발급
-        if (status === 401 ) {
-          if(msg == "Expired Access Token. 토큰이 만료되었습니다") {
-            console.log("토큰 재발급 요청");
-            await axios.post(
-              `${process.env.REACT_APP_GENERATED_SERVER_URL}/api/token/reissue`,{},
-              {headers: {
-                Authorization: `${localStorage.getItem('Authorization')}`,
-                Refresh: `${localStorage.getItem('Refresh')}`,
-              }},
-            )
-            .then((res) => {
-              // console.log("res : ", res);
-              // 새 토큰 저장
-              localStorage.setItem("Authorization", res.headers.authorization);
-              localStorage.setItem("Refresh", res.headers.refresh);
+        let isRefreshing = false;
+        let failedQueue = [];
 
-              // 새로 응답받은 데이터로 토큰 만료로 실패한 요청에 대한 인증 시도 (header에 토큰 담아 보낼 때 사용)
-              originalConfig.headers["authorization"]="Bearer "+res.headers.authorization;
-              originalConfig.headers["refresh"]= res.headers.refresh;
-
-               console.log("New access token obtained.");
-              // 새로운 토큰으로 재요청
-              return refreshAPI(originalConfig);
-            })
-            .catch(() => {
-              console.error('An error occurred while refreshing the token:', error);
+        const processQueue = (error, token = null) => {
+            failedQueue.forEach(prom => {
+                if (error) {
+                    prom.reject(error);
+                } else {
+                    prom.resolve(token);
+                }
             });
-          }
-          // refresh_token 재발급과 예외 처리
-          // else if(msg == "만료된 리프레시 토큰입니다") {
-          else{
-            localStorage.clear();
-            navigate("/"); 
-         window.alert("토큰이 만료되어 자동으로 로그아웃 되었습니다.")
-          }
-        }
-        else if(status == 400 || status == 404 || status == 409) {
-          // window.alert(msg); 
-          // console.log(msg)
-        }
-        // console.error('Error response:', error);
-        // 다른 모든 오류를 거부하고 처리
-        return Promise.reject(error);
-      },
-    );
-    return () => {
-      axios.interceptors.response.eject(interceptor);
-    };
-  }, []);
-  return (s
-    <div></div>
-  )
-}
+            failedQueue = [];
+        };
+
+        const refreshAccessToken = async () => {
+            const expiredToken = localStorage.getItem('access_token');
+            try {
+                const response = await api.post('/api/user/refresh', null, {
+                    headers: {
+                        'Authorization': `Bearer ${expiredToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (response.status === 200 && response.data.ok) {
+                    const newAccessToken = response.data.access_token;
+                    localStorage.setItem('access_token', newAccessToken);
+                    return newAccessToken;
+                } else {
+                    console.error('Failed to refresh token');
+                    alert('토큰이 만료되어 로그아웃 되었습니다!');
+                    navigate('/login'); // navigate를 여기서 호출
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error while refreshing access token:', error);
+                alert('토큰이 만료되어 로그아웃 되었습니다!');
+                navigate('/login'); // navigate를 여기서 호출
+                return null;
+            }
+        };
+
+        const requestInterceptor = api.interceptors.request.use(
+            config => {
+                const token = localStorage.getItem('access_token');
+                if (token) {
+                    config.headers['Authorization'] = `Bearer ${token}`;
+                }
+                return config;
+            },
+            error => Promise.reject(error)
+        );
+
+        const responseInterceptor = api.interceptors.response.use(
+            response => response,
+            async error => {
+                const originalRequest = error.config;
+
+                if (error.response && error.response.status === 401 && !originalRequest._retry) {
+                    if (isRefreshing) {
+                        return new Promise(function(resolve, reject) {
+                            failedQueue.push({ resolve, reject });
+                        })
+                            .then(token => {
+                                originalRequest.headers['Authorization'] = 'Bearer ' + token;
+                                return api(originalRequest);
+                            })
+                            .catch(err => {
+                                return Promise.reject(err);
+                            });
+                    }
+
+                    originalRequest._retry = true;
+                    isRefreshing = true;
+
+                    return new Promise(async (resolve, reject) => {
+                        const newToken = await refreshAccessToken();
+                        if (newToken) {
+                            originalRequest.headers['Authorization'] = 'Bearer ' + newToken;
+                            processQueue(null, newToken);
+                            resolve(api(originalRequest));
+                        } else {
+                            processQueue(error, null);
+                            reject(error);
+                        }
+                        isRefreshing = false;
+                    });
+                }
+
+                return Promise.reject(error);
+            }
+        );
+
+        return () => {
+            api.interceptors.request.eject(requestInterceptor);
+            api.interceptors.response.eject(responseInterceptor);
+        };
+    }, [navigate]); // navigate를 useEffect의 의존성 배열에 추가
+};
+
+export default useTokenRefresher;
