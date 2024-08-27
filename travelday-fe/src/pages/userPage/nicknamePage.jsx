@@ -25,32 +25,29 @@ const LoginPage = () => {
   
     setNickname(nickname);
   
-    if (nickname) {
+    if (nickname.length > 0) {
       try {
         const response = await axios.get(`https://api.thetravelday.co.kr/api/user/nickname/check?nickname=${nickname}`);
-  
+        
         if (response.status === 200) {
-          if (response.data === "DUPLICATE") {
-            setNicknameError('이미 사용 중인 닉네임입니다.');
-            setIsButtonEnabled(false);
-          } else if (response.data === "OK") {
+          if (response.data === 'OK') {
             setNicknameError('');
             setIsButtonEnabled(true);
-          } else {
-            setNicknameError('알 수 없는 오류가 발생했습니다.');
+          } else if (response.data === 'DUPLICATE') {
+            setNicknameError('이미 사용 중인 닉네임입니다!');
             setIsButtonEnabled(false);
           }
         } else {
-          setNicknameError('알 수 없는 오류가 발생했습니다.');
+          setNicknameError('서버 응답 오류가 발생했습니다. 다시 시도해 주세요.');
           setIsButtonEnabled(false);
         }
       } catch (error) {
-        setNicknameError('서버와의 통신 중 오류가 발생했습니다.');
+        setNicknameError('닉네임 확인 중 오류가 발생했습니다.');
         setIsButtonEnabled(false);
+        console.error('닉네임 확인 오류:', error);
       }
     } else {
       setIsButtonEnabled(false);
-      setNicknameError('');
     }
   };
   
