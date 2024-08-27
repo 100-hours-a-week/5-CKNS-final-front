@@ -32,8 +32,7 @@ const WishListPage = () => {
             'Content-Type': 'application/json',
           },
         });
-
-        // 응답에 대한 디버깅 로그 추가
+        
         console.log('위시리스트 가져오기 응답:', response);
 
         if (response.status === 200) {

@@ -30,7 +30,8 @@ const WishListModal = ({ onClose, selectedPlace, travelRoomId }) => {
       setTimeout(() => {
         setSuccessMessage('');
         onClose();
-      }, 2000); // 2초 후에 팝업창 닫기
+      }, 1000); 
+
     } catch (error) {
       console.error('일정에 추가 실패:', error);
     }
@@ -60,7 +61,7 @@ const WishListModal = ({ onClose, selectedPlace, travelRoomId }) => {
       setTimeout(() => {
         setSuccessMessage('');
         onClose();
-      }, 2000); // 2초 후에 팝업창 닫기
+      }, 1000);
     } catch (error) {
       console.error('위시리스트에 추가 실패:', error);
     }
@@ -182,3 +183,4 @@ const SuccessMessage = styled.p`
   text-align: center;
   margin: 20px 0;
 `;
+

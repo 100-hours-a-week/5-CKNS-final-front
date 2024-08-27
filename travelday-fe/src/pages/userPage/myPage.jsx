@@ -127,6 +127,7 @@ const MyPage = () => {
       )}
 
       {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
+      <BottomPadding />
     </PageContainer>
   );
 };
@@ -291,3 +292,6 @@ const ErrorMessage = styled.p`
   font-size: 14px;
 `;
 
+const BottomPadding = styled.div`
+  height: 110px; 
+`;

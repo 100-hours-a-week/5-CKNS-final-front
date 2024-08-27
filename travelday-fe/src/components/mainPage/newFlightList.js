@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-// 이미지 임포트
+
 import Image1 from '../../images/main/list1/PQC.png';
 import Image2 from '../../images/main/list1/OIT.png';
 import Image3 from '../../images/main/list1/DPS.png';
