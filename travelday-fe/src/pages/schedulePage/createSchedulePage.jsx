@@ -10,7 +10,7 @@ const CreateSchedulePage = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const navigate = useNavigate();
 
   const today = new Date().toISOString().split('T')[0];
@@ -53,10 +53,10 @@ const CreateSchedulePage = () => {
       );
 
       if (response.status === 200) { 
-        setShowSuccessMessage(true); // 성공 메시지 표시
+        setShowSuccessPopup(true); // 성공 팝업 표시
         setTimeout(() => {
           navigate('/schedule'); 
-        }, 500); // 2초 후 리다이렉트
+        }, 3000); // 3초 후 리다이렉트
       }
     } catch (error) {
       console.error('일정 생성 중 오류 발생:', error);
@@ -83,7 +83,7 @@ const CreateSchedulePage = () => {
             type="date" 
             value={startDate} 
             onChange={(e) => setStartDate(e.target.value)} 
-            min={today} // 시작 날짜의 최소값을 오늘로 설정
+            min={today} 
           />
         </InputField>
         <InputField>
@@ -92,7 +92,7 @@ const CreateSchedulePage = () => {
             type="date" 
             value={endDate} 
             onChange={(e) => setEndDate(e.target.value)} 
-            min={startDate || today} // 종료 날짜의 최소값을 시작 날짜로 설정
+            min={startDate || today} 
           />
         </InputField>
         <CreateButton 
@@ -102,7 +102,14 @@ const CreateSchedulePage = () => {
         >
           일정 만들기
         </CreateButton>
-        {showSuccessMessage && <SuccessMessage>일정이 성공적으로 생성되었습니다!</SuccessMessage>}
+        {showSuccessPopup && (
+          <SuccessPopup>
+            <PopupContent>
+              <p>일정이 성공적으로 생성되었습니다!</p>
+              <CountdownBar />
+            </PopupContent>
+          </SuccessPopup>
+        )}
       </ContentWrapper>
       <BottomNav />
     </Container>
@@ -112,14 +119,6 @@ const CreateSchedulePage = () => {
 export default CreateSchedulePage;
 
 // 스타일 컴포넌트 정의
-// 여기에 SuccessMessage 스타일 추가
-
-const SuccessMessage = styled.p`
-  margin-top: 20px;
-  font-size: 16px;
-  color: green;
-  animation: fadeIn 0.5s ease-in-out;
-`;
 
 const fadeIn = keyframes`
   from {
@@ -127,6 +126,46 @@ const fadeIn = keyframes`
   }
   to {
     opacity: 1;
+  }
+`;
+
+const SuccessPopup = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: ${fadeIn} 0.5s ease-in-out;
+  z-index: 9999;
+`;
+
+const PopupContent = styled.div`
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+`;
+
+const CountdownBar = styled.div`
+  width: 100%;
+  height: 5px;
+  background-color: #f12e5e;
+  margin-top: 15px;
+  border-radius: 5px;
+  animation: countdown 3s linear forwards;
+`;
+
+const countdown = keyframes`
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0;
   }
 `;
 
