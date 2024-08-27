@@ -41,7 +41,6 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
 
   const confirmDelete = async () => {
     if (selectedScheduleId) {
-      const token = localStorage.getItem('accessToken');
       try {
         // 삭제 요청 전에 로그 추가
         console.log('삭제하려는 일정 ID:', selectedScheduleId);
@@ -56,13 +55,11 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
             },
           }
         );
-        
-        // 응답 확인을 위한 로그 추가
-        console.log('삭제 요청에 대한 서버 응답:', response);
-  
+
         // 삭제 후 상태 업데이트
         setSortedSchedules(sortedSchedules.filter(schedule => schedule.id !== selectedScheduleId));
         onDeleteClick(selectedScheduleId);
+
         setIsModalOpen(false);
         window.alert('삭제되었습니다!');
       } catch (error) {
@@ -78,7 +75,7 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
       console.error("selectedScheduleId가 설정되지 않았습니다.");
     }
   };
-  
+
 
   const closeModal = () => {
     setIsModalOpen(false);
