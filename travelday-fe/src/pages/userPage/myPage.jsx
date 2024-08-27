@@ -37,11 +37,9 @@ const MyPage = () => {
       });
   
       if (response.status === 200) {
-        console.log("API Response:", response.data);
         const nickname = response.data.data.nickname; 
         setNickname(nickname);
         setIsLoading(false); 
-        console.log("Fetched Nickname:", nickname); 
       } else {
         throw new Error('사용자 정보 요청 실패');
       }
@@ -50,7 +48,6 @@ const MyPage = () => {
       setIsLoading(false); 
     }
   };
-  
   
   const handleLogout = async () => {
     try {
@@ -67,30 +64,6 @@ const MyPage = () => {
     } catch (error) {
       console.error('로그아웃 중 오류 발생:', error);
       alert('로그아웃 중 오류가 발생했습니다.'); 
-    }
-  };
-  
-  const handleDeleteAccount = async () => {
-    try {
-      const token = localStorage.getItem('accessToken');
-      const response = await axios.delete('https://api.thetravelday.co.kr/api/user', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        withCredentials: true
-      });
-
-      if (response.status === 200) {
-        console.log('회원 탈퇴 성공');
-        localStorage.removeItem('accessToken');
-        navigate('/intro');
-      } else {
-        throw new Error('회원 탈퇴 실패');
-      }
-    } catch (error) {
-      setErrorMessage('회원 탈퇴 중 오류가 발생했습니다.');
-      alert('회원 탈퇴 중 오류가 발생했습니다.'); // 사용자에게 알림
     }
   };
 
@@ -140,11 +113,15 @@ const MyPage = () => {
       {showModal && (
         <ModalOverlay>
           <ModalContent>
-            <ModalTitle>정말 탈퇴하시겠습니까?</ModalTitle>
-            <ModalButtons>
-              <ModalButton onClick={handleDeleteAccount}>예</ModalButton>
-              <ModalButton onClick={() => setShowModal(false)}>아니오</ModalButton>
-            </ModalButtons>
+            <ModalTitle>여행한DAY를 떠나시려 한다니 정말 아쉽네요.</ModalTitle>
+            <ModalMessage>
+              그동안 저희와 함께해 주셔서 감사합니다.<br/>
+              언제든지 다시 여행 계획이 필요할 때,<br/>
+              여행한DAY가 기다리고 있을게요.<br/>
+              즐거운 여행 가득하시길 바랍니다!<br/>
+              감사합니다.
+            </ModalMessage>
+            <ModalButton onClick={() => setShowModal(false)}>닫기</ModalButton>
           </ModalContent>
         </ModalOverlay>
       )}
@@ -157,7 +134,7 @@ const MyPage = () => {
 export default MyPage;
 
 
-
+// 스타일 컴포넌트 정의
 
 const PageContainer = styled.div`
   display: flex;
@@ -171,14 +148,14 @@ const PageContainer = styled.div`
 const Content = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* 왼쪽 정렬 */
+  align-items: flex-start;
   width: 390px;
   height: 100%;
   background-color: #fff;
 `;
 
 const LogoWrapper = styled.div`
-  margin-top: 20px; 
+  margin-top: 20px;
   margin-bottom: 30px; 
   display: flex;
   justify-content: center;
@@ -230,8 +207,8 @@ const Button = styled.button`
   font-size: 16px;
   background-color: #fff;
   color: #000;
-  font-weight: bold;  
-  border: none; 
+  font-weight: bold;
+  border: none;
   cursor: pointer;
   margin: 10px 0;
   width: 390px;  
@@ -251,7 +228,7 @@ const Button = styled.button`
 const DeleteButton = styled(Button)`
   color: #808080; 
   &:hover {
-    border-bottom: 2px solid #808080;  /* hover 시 아래쪽 테두리만 회색으로 나타남 */
+    border-bottom: 2px solid #808080;  
     color: #666666;
   }
 `;
@@ -286,9 +263,11 @@ const ModalTitle = styled.h2`
   color: #333;
 `;
 
-const ModalButtons = styled.div`
-  display: flex;
-  justify-content: space-between;
+const ModalMessage = styled.p`
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 20px;
+  line-height: 1.5;
 `;
 
 const ModalButton = styled.button`
@@ -298,21 +277,11 @@ const ModalButton = styled.button`
   border-radius: 4px;
   cursor: pointer;
   color: #fff;
+  background-color: #007bff;  
   transition: background-color 0.3s;
-  width: 45%;  
-
-  &:nth-child(1) {  
-    background-color: #808080; 
-    &:hover {
-      background-color: #666666;
-    }
-  }
-
-  &:nth-child(2) {  
-    background-color: #007bff;  
-    &:hover {
-      background-color: #0056b3;
-    }
+  
+  &:hover {
+    background-color: #0056b3;
   }
 `;
 
@@ -321,4 +290,3 @@ const ErrorMessage = styled.p`
   margin-top: 10px;
   font-size: 14px;
 `;
-

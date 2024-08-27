@@ -38,7 +38,7 @@ const useTokenRefresher = () => {
                 });
 
                 if (response.status === 200 && response.data.ok) {
-                    console.log(data);
+                    console.log(response.data); // 수정된 부분
                     const newAccessToken = response.data.access_token;
                     localStorage.setItem('access_token', newAccessToken);
                     return newAccessToken;
