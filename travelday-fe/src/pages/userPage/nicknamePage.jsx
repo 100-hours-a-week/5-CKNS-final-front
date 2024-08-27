@@ -14,38 +14,46 @@ const LoginPage = () => {
 
   const handleNicknameChange = async (e) => {
     const nickname = e.target.value.trim();
-    console.log('입력된 닉네임:', nickname); // 입력된 닉네임 확인
+  
+    if (nickname.length > 10) {
+      setNicknameError('닉네임은 10글자를 넘을 수 없습니다!');
+      setIsButtonEnabled(false);
+      return;
+    } else {
+      setNicknameError(''); 
+    }
+  
     setNickname(nickname);
   
     if (nickname) {
       try {
         const response = await axios.get(`https://api.thetravelday.co.kr/api/user/nickname/check?nickname=${nickname}`);
-        console.log('API 응답:', response); // API 응답 전체 확인
   
-        if (response.status === 409) {
-          console.log('이미 사용 중인 닉네임'); // 중복된 닉네임 확인
-          setNicknameError('이미 사용 중인 닉네임입니다.');
-          setIsButtonEnabled(false);
-        } else if (response.status === 200) {
-          console.log('사용 가능한 닉네임'); // 사용 가능한 닉네임 확인
-          setNicknameError('');
-          setIsButtonEnabled(true);
+        if (response.status === 200) {
+          if (response.data === "DUPLICATE") {
+            setNicknameError('이미 사용 중인 닉네임입니다.');
+            setIsButtonEnabled(false);
+          } else if (response.data === "OK") {
+            setNicknameError('');
+            setIsButtonEnabled(true);
+          } else {
+            setNicknameError('알 수 없는 오류가 발생했습니다.');
+            setIsButtonEnabled(false);
+          }
         } else {
-          console.log('알 수 없는 상태 코드:', response.status); // 예상치 못한 상태 코드 확인
           setNicknameError('알 수 없는 오류가 발생했습니다.');
           setIsButtonEnabled(false);
         }
       } catch (error) {
-        console.error('닉네임 중복 검사 실패:', error); // 에러 객체 확인
         setNicknameError('서버와의 통신 중 오류가 발생했습니다.');
         setIsButtonEnabled(false);
       }
     } else {
-      console.log('닉네임이 비어있습니다.'); // 입력이 없을 때 확인
       setIsButtonEnabled(false);
       setNicknameError('');
     }
   };
+  
   
   const handleSubmit = async () => {
     const token = localStorage.getItem('accessToken');

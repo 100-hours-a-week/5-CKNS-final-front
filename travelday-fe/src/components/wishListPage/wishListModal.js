@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import backIcon from '../../images/header/back.png';  
 import axios from 'axios';  
 
 const WishListModal = ({ onClose, selectedPlace, travelRoomId }) => {
+  const [successMessage, setSuccessMessage] = useState('');
+
   const handleAddToSchedule = async () => {
     const token = localStorage.getItem('accessToken'); // 토큰 가져오기
 
@@ -24,7 +26,11 @@ const WishListModal = ({ onClose, selectedPlace, travelRoomId }) => {
         }
       );
       console.log('일정에 추가 성공:', response.data);
-      onClose();
+      setSuccessMessage('일정에 추가되었습니다!');
+      setTimeout(() => {
+        setSuccessMessage('');
+        onClose();
+      }, 2000); // 2초 후에 팝업창 닫기
     } catch (error) {
       console.error('일정에 추가 실패:', error);
     }
@@ -50,7 +56,11 @@ const WishListModal = ({ onClose, selectedPlace, travelRoomId }) => {
         }
       );
       console.log('위시리스트에 추가 성공:', response.data);
-      onClose();
+      setSuccessMessage('위시리스트에 추가되었습니다!');
+      setTimeout(() => {
+        setSuccessMessage('');
+        onClose();
+      }, 2000); // 2초 후에 팝업창 닫기
     } catch (error) {
       console.error('위시리스트에 추가 실패:', error);
     }
@@ -66,14 +76,17 @@ const WishListModal = ({ onClose, selectedPlace, travelRoomId }) => {
           <ModalTitle>어디에 추가하시겠습니까?</ModalTitle>
         </ModalHeader>
         <Divider />
-        <ButtonList>
-          <ButtonItem onClick={handleAddToSchedule}>
-            일정에 추가
-          </ButtonItem>
-          <ButtonItem onClick={handleAddToWishlist}>
-            위시리스트에 추가
-          </ButtonItem>
-        </ButtonList>
+        {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
+        {!successMessage && (
+          <ButtonList>
+            <ButtonItem onClick={handleAddToSchedule}>
+              일정에 추가
+            </ButtonItem>
+            <ButtonItem onClick={handleAddToWishlist}>
+              위시리스트에 추가
+            </ButtonItem>
+          </ButtonList>
+        )}
       </ModalContent>
     </ModalOverlay>
   );
@@ -161,4 +174,11 @@ const ButtonItem = styled.div`
   &:active {
     transform: scale(0.98);
   }
+`;
+
+const SuccessMessage = styled.p`
+  color: green;
+  font-size: 18px;
+  text-align: center;
+  margin: 20px 0;
 `;
