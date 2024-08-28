@@ -141,6 +141,7 @@ export default ScheduleList;
 const Container = styled.div`
   width: 100%;
   max-width: 340px;
+  min-height: 600px;
   display: flex;
   flex-direction: column;
   align-items: center;
