@@ -83,7 +83,7 @@ function Footer() {
         </div>
 
         <p style={styles.address}>주소: 제주 제주시 도남로 168-12</p>
-        <p style={styles.copyright}>© 2024 여행한 DAY. All rights reserved.</p>
+        <p style={styles.copyright}>© 2024 CKNS. All rights reserved.</p>
       </div>
 
       {showModal && (
