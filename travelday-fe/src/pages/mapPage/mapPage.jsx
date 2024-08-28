@@ -12,6 +12,8 @@ const center = {
   lng: 126.9921017
 };
 
+
+
 function MapPage() {
   const [map, setMap] = useState(null);
   const [searchInput, setSearchInput] = useState('');

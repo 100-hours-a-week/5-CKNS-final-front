@@ -113,7 +113,7 @@ const CreateSchedulePage = () => {
           <SuccessPopup>
             <PopupContent>
               <p>일정이 성공적으로 생성되었습니다!</p>
-              <CountdownBar />
+              <CountdownBar countdown={countdown} />
               <CountdownText>{countdown}초 후에 페이지가 이동합니다.</CountdownText>
             </PopupContent>
           </SuccessPopup>
@@ -134,6 +134,15 @@ const fadeIn = keyframes`
   }
   to {
     opacity: 1;
+  }
+`;
+
+const countdownAnimation = keyframes`
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0;
   }
 `;
 
@@ -165,16 +174,7 @@ const CountdownBar = styled.div`
   background-color: #f12e5e;
   margin-top: 15px;
   border-radius: 5px;
-  animation: countdown 3s linear forwards;
-`;
-
-const countdown = keyframes`
-  from {
-    width: 100%;
-  }
-  to {
-    width: 0;
-  }
+  animation: ${countdownAnimation} ${props => props.countdown}s linear forwards;
 `;
 
 const CountdownText = styled.p`
@@ -265,4 +265,3 @@ const CreateButton = styled.button`
     background-color: ${({ enabled }) => (enabled ? '#d11a45' : '#ccc')};
   }
 `;
-
