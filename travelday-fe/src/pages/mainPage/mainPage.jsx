@@ -5,7 +5,7 @@ import BottomNav from '../../components/shared/bottomNav.js';
 import ImageSlider from '../../components/mainPage/imageSlider.js';
 import NewFlightList from '../../components/mainPage/newFlightList.js'; 
 import JapanSaleList from '../../components/mainPage/japanSaleList.js';  
-import Footer from '../../components/shared/footer.js'
+import Footer from '../../components/footer/footer.js'
 
 const MainPage = () => {
   return (
@@ -62,7 +62,7 @@ const SectionTitle = styled.h2`
   width: 370px;
   margin-left: 10px;
   font-weight: bold;
-  margin-top: 30px;
+  margin-top: 40px;
   margin-bottom: 0px;
 `;
 
@@ -71,11 +71,11 @@ const SectionSubTitle = styled.h2`
   text-align: left;
   width: 370px;
   margin-left: 10px;
-  margin-top: 15px;
+  margin-top: 7px;
   margin-bottom: 15px;
   color: #c2c2c2;
 `;
 
 const BottomPadding = styled.div`
-  height: 110px; 
+  height: 80px; 
 `;

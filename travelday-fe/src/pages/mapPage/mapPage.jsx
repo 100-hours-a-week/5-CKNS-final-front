@@ -6,7 +6,7 @@ import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import searchIcon from '../../images/search/search.png'; 
 import SearchResultsPopup from '../../components/mapPage/searchResultsPopup.js';
-import Footer from '../../components/shared/footer.js';
+import Footer from '../../components/footer/footer.js';
 
 const center = {
   lat: 37.5400456,
@@ -235,7 +235,7 @@ const SearchIcon = styled.img`
 `;
 
 const BottomPadding = styled.div`
-  height: 110px; 
+  height: 80px; 
 `;
 
 const InfoWindowContent = styled.div`

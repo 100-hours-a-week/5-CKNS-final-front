@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
 
 import Image1 from '../../images/main/list1/PQC.png';
 import Image2 from '../../images/main/list1/OIT.png';
@@ -36,12 +35,12 @@ const IATACodeToCity = {
 const NewFlightList = () => {
   const navigate = useNavigate();
   const [flights, setFlights] = useState([]);
+  const listContainerRef = useRef(null);
 
   useEffect(() => {
     const fetchFlights = async () => {
       try {
         const response = await axios.get('https://api.thetravelday.co.kr/api/flights/lowest-price/list');
-        console.log(response.data); 
         if (response.status === 200) {
           const imageMap = {
             'PQC': Image1,
@@ -64,10 +63,10 @@ const NewFlightList = () => {
                 date: flight.lastTicketingDate,
                 price: `${flight.price.grandTotal} ${flight.price.currency}`,
                 image: imageMap[destinationCode] || null,
-                iataCode: destinationCode, 
+                iataCode: destinationCode,
               };
             })
-            .filter(flight => flight.image); // 이미지가 없는 항목은 필터링
+            .filter(flight => flight.image);
 
           setFlights(formattedFlights);
         }
@@ -83,9 +82,24 @@ const NewFlightList = () => {
     navigate(`/maindetail/${flight.iataCode}`, { state: { flight } });
   };
 
+  const handleScroll = (direction) => {
+    const container = listContainerRef.current;
+    if (container) {
+      const scrollAmount = direction === 'left' ? -200 : 200;
+      container.scrollBy({
+        left: scrollAmount,
+        behavior: 'smooth',
+      });
+    }
+  };
+
   return (
     <Wrapper>
-      <ListContainer>
+      <ScrollButtonContainer>
+        <ScrollButton onClick={() => handleScroll('left')}>&lt;</ScrollButton>
+        <ScrollButton onClick={() => handleScroll('right')}>&gt;</ScrollButton>
+      </ScrollButtonContainer>
+      <ListContainer ref={listContainerRef}>
         {flights.map((flight) => (
           <ListItem key={flight.id} onClick={() => handleItemClick(flight)}>
             {flight.image && <FlightImage src={flight.image} alt={`${flight.destination} 이미지`} />}
@@ -106,11 +120,22 @@ export default NewFlightList;
 const Wrapper = styled.div`
   width: 100%;
   overflow-x: auto;
-  padding-bottom: 10px; 
+  padding-bottom: 10px;
+  position: relative;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; 
+  
   &::-webkit-scrollbar {
     display: none;
+  }
+
+
+  -ms-overflow-style: none;  
+  scrollbar-width: none;
+
+  &:hover {
+    & > div:first-child {
+      opacity: 1;
+    }
   }
 `;
 
@@ -119,6 +144,16 @@ const ListContainer = styled.div`
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+
+  -ms-overflow-style: none; 
+  scrollbar-width: none; 
 `;
 
 const ListItem = styled.div`
@@ -157,4 +192,37 @@ const FlightPrice = styled.div`
   font-weight: bold;
   color: #007bff;
   margin-top: 10px;
+`;
+
+const ScrollButtonContainer = styled.div`
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  ${Wrapper}:hover & {
+    opacity: 1;
+  }
+`;
+
+const ScrollButton = styled.div`
+  pointer-events: all;
+  width: 40px;
+  height: 40px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  cursor: pointer;
+  user-select: none;
+  margin: 0 10px;
+  font-size: 18px;
 `;

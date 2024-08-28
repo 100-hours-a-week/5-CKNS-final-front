@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import Footer from '../../components/footer/introfooter.js';
 
 const Intro = () => {
   const navigate = useNavigate(); 
@@ -10,33 +11,47 @@ const Intro = () => {
   };
 
   return (
-    <VideoContainer>
-      <BackgroundVideo autoPlay loop muted>
-        <source src={require('../../images/intro/intro.mp4')} type="video/mp4" />
-        Your browser does not support the video tag.
-      </BackgroundVideo>
-      <OverlayButton onClick={handleButtonClick}>
-        여행한DAY 바로가기
-      </OverlayButton>
-    </VideoContainer>
+    <PageContainer>
+      <VideoContainer>
+        <BackgroundVideo autoPlay loop muted>
+          <source src={require('../../images/intro/intro.mp4')} type="video/mp4" />
+          Your browser does not support the video tag.
+        </BackgroundVideo>
+        <OverlayButton onClick={handleButtonClick}>
+          여행한DAY 바로가기
+        </OverlayButton>
+      </VideoContainer>
+      <FooterContainer>
+        <Footer />
+      </FooterContainer>
+    </PageContainer>
   );
 };
 
 export default Intro;
 
-const VideoContainer = styled.div`
+const PageContainer = styled.div`
   width: 100%;
   height: auto;
-  overflow: auto;
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const VideoContainer = styled.div`
+  width: 100%;
+  max-width: 500px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
   justify-content: center;
   position: relative;
 `;
 
 const BackgroundVideo = styled.video`
-  width: 500px;
-  height: 2100px;
+  width: 100%;
+  height: auto;
+  max-width: 500px;
 `;
 
 const OverlayButton = styled.button`
@@ -54,7 +69,7 @@ const OverlayButton = styled.button`
   overflow: hidden;
   transition: color 0.3s ease;
   z-index: 1;
-  border: none; /* 테두리를 보이지 않도록 설정 */
+  border: none;
 
   &:hover {
     color: #333;
@@ -76,4 +91,12 @@ const OverlayButton = styled.button`
   &:hover:after {
     transform: translateY(0);
   }
+`;
+
+const FooterContainer = styled.div`
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
