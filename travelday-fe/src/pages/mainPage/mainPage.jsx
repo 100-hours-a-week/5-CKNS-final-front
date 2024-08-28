@@ -62,7 +62,7 @@ const SectionTitle = styled.h2`
   width: 370px;
   margin-left: 10px;
   font-weight: bold;
-  margin-top: 30px;
+  margin-top: 40px;
   margin-bottom: 0px;
 `;
 
