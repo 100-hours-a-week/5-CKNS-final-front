@@ -5,8 +5,8 @@ function Footer() {
   const [showTerms, setShowTerms] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [email, setEmail] = useState('');
-  const [isEmailValid, setIsEmailValid] = useState(false); // 이메일 유효성 상태
-  const [showModal, setShowModal] = useState(false); // 모달 표시 여부를 관리하는 state
+  const [isEmailValid, setIsEmailValid] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const toggleTerms = () => {
     setShowTerms(!showTerms);
@@ -19,11 +19,10 @@ function Footer() {
   const handleEmailChange = (e) => {
     const newEmail = e.target.value;
     setEmail(newEmail);
-    setIsEmailValid(validateEmail(newEmail)); // 이메일 유효성 검사 결과 업데이트
+    setIsEmailValid(validateEmail(newEmail));
   };
 
   const validateEmail = (email) => {
-    // 간단한 이메일 유효성 검사 정규식
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
@@ -31,13 +30,13 @@ function Footer() {
   const handleSubscribe = () => {
     if (isEmailValid) {
       console.log(`Subscribed with email: ${email}`);
-      setEmail(''); // 구독 후 이메일 입력란을 초기화
-      setShowModal(true); // 모달을 표시
+      setEmail('');
+      setShowModal(true);
     }
   };
 
   const closeModal = () => {
-    setShowModal(false); // 모달을 닫음
+    setShowModal(false);
   };
 
   return (
@@ -69,11 +68,11 @@ function Footer() {
           <button
             style={{
               ...styles.subscribeButton,
-              backgroundColor: isEmailValid ? '#007bff' : '#e0e0e0', // 유효성에 따라 색상 변경
-              cursor: isEmailValid ? 'pointer' : 'not-allowed', // 유효성에 따라 커서 변경
+              backgroundColor: isEmailValid ? '#007bff' : '#e0e0e0',
+              cursor: isEmailValid ? 'pointer' : 'not-allowed',
             }}
             onClick={handleSubscribe}
-            disabled={!isEmailValid} // 유효하지 않으면 버튼 비활성화
+            disabled={!isEmailValid}
           >
             구독
           </button>
@@ -86,7 +85,6 @@ function Footer() {
         <p style={styles.copyright}>© 2024 여행한 DAY. All rights reserved.</p>
       </div>
 
-      {/* 모달 컴포넌트 */}
       {showModal && (
         <ModalOverlay onClick={closeModal}>
           <ModalContent onClick={(e) => e.stopPropagation()}>
@@ -108,107 +106,97 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: '20px',
+    padding: '10px',
     boxSizing: 'border-box',
     borderTop: '1px solid #e0e0e0',
     flexDirection: 'column',
   },
   container: {
     textAlign: 'center',
-    maxWidth: '500px',
+    maxWidth: '400px',
     width: '100%',
   },
   title: {
-    fontSize: '18px',
+    fontSize: '16px',
     fontWeight: 'bold',
-    margin: '10px 0',
+    margin: '5px 0',
     color: '#555',
   },
   description: {
-    fontSize: '14px',
-    margin: '0 0 20px 0',
-    lineHeight: '1.6',
+    fontSize: '12px',
+    margin: '0 0 10px 0',
+    lineHeight: '1.4',
     color: '#666',
   },
   toggleContainer: {
-    marginBottom: '15px',
+    marginBottom: '10px',
   },
   toggleButton: {
-    margin: '0 5px',
+    margin: '0 3px',
     backgroundColor: '#e0e0e0',
     color: '#555',
-    padding: '8px 15px',
-    fontSize: '12px',
+    padding: '6px 10px',
+    fontSize: '10px',
     border: 'none',
-    borderRadius: '5px',
+    borderRadius: '3px',
     cursor: 'pointer',
     transition: 'background-color 0.3s ease',
   },
   terms: {
-    fontSize: '12px',
+    fontSize: '10px',
     color: '#666',
-    margin: '10px 0',
+    margin: '5px 0',
   },
   privacy: {
-    fontSize: '12px',
+    fontSize: '10px',
     color: '#666',
-    margin: '10px 0',
+    margin: '5px 0',
   },
   contact: {
-    fontSize: '12px',
+    fontSize: '10px',
     color: '#888',
-    marginBottom: '20px',
+    marginBottom: '10px',
   },
   newsletter: {
-    marginBottom: '20px',
+    marginBottom: '10px',
   },
   newsletterText: {
-    fontSize: '14px',
-    marginBottom: '10px',
+    fontSize: '12px',
+    marginBottom: '5px',
     color: '#555',
   },
   emailInput: {
-    padding: '8px',
-    fontSize: '14px',
+    padding: '5px',
+    fontSize: '12px',
     border: '1px solid #ddd',
-    borderRadius: '5px',
-    width: '70%',
-    marginRight: '10px',
+    borderRadius: '3px',
+    width: '65%',
+    marginRight: '5px',
   },
   helperText: {
-    fontSize: '12px',
+    fontSize: '10px',
     color: '#c8c8c8',
-    marginTop: '5px',
+    marginTop: '3px',
   },
   subscribeButton: {
-    padding: '8px 15px',
-    fontSize: '14px',
+    padding: '6px 10px',
+    fontSize: '12px',
     border: 'none',
-    borderRadius: '5px',
+    borderRadius: '3px',
     color: '#fff',
     backgroundColor: '#e0e0e0',
     cursor: 'pointer',
     transition: 'background-color 0.3s ease',
   },
   address: {
-    fontSize: '12px',
+    fontSize: '10px',
     color: '#888',
-    marginTop: '20px',
+    marginTop: '10px',
   },
   copyright: {
-    fontSize: '12px',
+    fontSize: '10px',
     color: '#aaa',
-    marginTop: '10px',
-  },
-  modalButton: {
-    padding: '8px 15px',
-    fontSize: '14px',
-    border: 'none',
-    borderRadius: '5px',
-    backgroundColor: '#007bff',
-    color: '#fff',
-    cursor: 'pointer',
-    marginTop: '10px',
+    marginTop: '5px',
   },
 };
 
@@ -227,32 +215,32 @@ const ModalOverlay = styled.div`
 
 const ModalContent = styled.div`
   background: #fff;
-  padding: 30px;
-  border-radius: 15px;
+  padding: 20px;
+  border-radius: 10px;
   text-align: center;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  max-width: 90%;
-  width: 330px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  max-width: 80%;
+  width: 280px;
   position: relative;
   animation: slide-down 0.3s ease-out;
 `;
 
 const ModalHeader = styled.h3`
   margin-top: 0;
-  font-size: 20px;
+  font-size: 18px;
   color: #007bff;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 `;
 
 const ModalBody = styled.p`
-  font-size: 16px;
+  font-size: 14px;
   color: #333;
-  margin: 0 0 20px 0;
+  margin: 0 0 15px 0;
 `;
 
 const ModalButton = styled.button`
-  padding: 10px 20px;
-  font-size: 14px;
+  padding: 8px 15px;
+  font-size: 12px;
   color: #fff;
   background-color: #007bff;
   border: none;

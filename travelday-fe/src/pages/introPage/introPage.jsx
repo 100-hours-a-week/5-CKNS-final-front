@@ -21,7 +21,9 @@ const Intro = () => {
           여행한DAY 바로가기
         </OverlayButton>
       </VideoContainer>
-      <Footer /> {/* Footer가 VideoContainer 아래에 위치하도록 이동 */}
+      <FooterContainer>
+        <Footer />
+      </FooterContainer>
     </PageContainer>
   );
 };
@@ -38,6 +40,7 @@ const PageContainer = styled.div`
 
 const VideoContainer = styled.div`
   width: 100%;
+  max-width: 500px;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -46,8 +49,9 @@ const VideoContainer = styled.div`
 `;
 
 const BackgroundVideo = styled.video`
-  width: 500px;
-  height: 2100px;
+  width: 100%;
+  height: auto;
+  max-width: 500px;
 `;
 
 const OverlayButton = styled.button`
@@ -87,4 +91,12 @@ const OverlayButton = styled.button`
   &:hover:after {
     transform: translateY(0);
   }
+`;
+
+const FooterContainer = styled.div`
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
