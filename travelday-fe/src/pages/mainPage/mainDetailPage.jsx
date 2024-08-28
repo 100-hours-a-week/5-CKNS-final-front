@@ -61,7 +61,9 @@ const airlineNames = {
     SU: '아에로플로트',
     '7C': '제주항공', 
     'H1': '한에어항공',
-    YP: '에어프레미아'
+    YP: '에어프레미아',
+    OD: '말린도항공',
+    TW: '티웨이항공'
   };
 
 
@@ -93,7 +95,9 @@ const airlineUrls = {
     SU: 'https://www.aeroflot.ru', // 아에로플로트
     '7C': 'https://www.jejuair.net', // 제주항공
     'H1': 'https://www.hahnair.com', // 한에어항공
-    YP: 'https://www.airpremia.com' // 에어프레미아
+    YP: 'https://www.airpremia.com' ,// 에어프레미아
+    OD: 'https://www.malindoair.com/kr/ko/',
+    TW: 'https://www.twayair.com/app/main'
   };
   
   

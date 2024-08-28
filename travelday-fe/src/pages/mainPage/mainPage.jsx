@@ -15,7 +15,7 @@ const MainPage = () => {
         <ImageSlider />
       </SliderContainer>
       <Content>
-        <SectionTitle>신규 노선은 뭐가 있을까?👀</SectionTitle>
+        <SectionTitle>신규 노선은 뭐가 있을까? 👀</SectionTitle>
         <SectionSubTitle>#바로 떠나는 새로운 노선만 모아 뒀어요!</SectionSubTitle>
         <NewFlightList />
         <SectionTitle>바로 떠나는 일본 ✈️</SectionTitle>
