@@ -4,8 +4,9 @@ import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import ScheduleList from '../../components/schedulePage/scheduleList';
 import { useNavigate } from 'react-router-dom';
-import Footer from '../../components/footer/footer.js'
+import Footer from '../../components/footer/footer.js';
 import axios from 'axios';
+import backgroundVideo from '../../images/schedule/null.mp4'; // 비디오 파일의 경로를 import로 수정
 
 const SchedulePage = () => {
   const [schedules, setSchedules] = useState([]);
@@ -14,6 +15,8 @@ const SchedulePage = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
+    
+   
     if (!token) {
       console.error('토큰이 없습니다. 로그인 페이지로 이동합니다.');
       navigate('/login');
@@ -75,7 +78,15 @@ const SchedulePage = () => {
         ) : schedules.length > 0 ? (
           <ScheduleList schedules={schedules} onItemClick={handleItemClick} />
         ) : (
-          <NoScheduleText>등록된 일정이 없습니다! 만들어 주세요.</NoScheduleText>
+          <>
+            <VideoContainer>
+              <BackgroundVideo autoPlay loop muted>
+                <source src={backgroundVideo} type="video/mp4" />
+                Your browser does not support the video tag.
+              </BackgroundVideo>
+            </VideoContainer>
+            <NoScheduleText>등록된 일정이 없습니다! 만들어 주세요.</NoScheduleText>
+          </>
         )}
         <Footer />
       </ContentWrapper>
@@ -164,9 +175,25 @@ const NoScheduleText = styled.div`
   font-size: 16px;
   color: #999;
   margin-top: 20px;
-  margin-bottom: 500px;
+  margin-bottom: 200px; 
 `;
 
 const BottomPadding = styled.div`
   height: 80px; 
+`;
+
+const VideoContainer = styled.div`
+  width: 100%;
+  max-width: 500px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+`;
+
+const BackgroundVideo = styled.video`
+  width: 100%;
+  height: auto;
+  max-width: 150px;
 `;
