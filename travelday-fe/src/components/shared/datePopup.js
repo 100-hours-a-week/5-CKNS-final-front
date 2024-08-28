@@ -70,7 +70,6 @@ const DateRangePopup = ({ isOpen, onClose, onDateRangeChange, onSearchClick }) =
 
     return <CalendarGrid>{calendars}</CalendarGrid>;
   };
-
   const renderMonthCalendar = (currentMonth) => {
     const startDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay();
     const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
@@ -94,11 +93,14 @@ const DateRangePopup = ({ isOpen, onClose, onDateRangeChange, onSearchClick }) =
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
       const isDisabled = startDate && !endDate && date < startDate;
-      const isSelected = date >= startDate && date <= (endDate || startDate);
+      const isSelected = date.getTime() === startDate?.getTime() || date.getTime() === endDate?.getTime();
+      const isBetween = startDate && endDate && date > startDate && date < endDate;
+  
       days.push(
         <Day 
           key={day} 
           isSelected={isSelected} 
+          isBetween={isBetween} 
           isDisabled={isDisabled} 
           onClick={() => !isDisabled && handleDayClick(date)} 
         >
@@ -122,6 +124,7 @@ const DateRangePopup = ({ isOpen, onClose, onDateRangeChange, onSearchClick }) =
   
     return <>{weeks}</>;
   };
+  
 
   const handlePreviousMonth = () => {
     if (currentMonthIndex > 0) {
@@ -158,13 +161,12 @@ const DateRangePopup = ({ isOpen, onClose, onDateRangeChange, onSearchClick }) =
           {renderCalendar(12)}
         </CalendarContainer>
         <ButtonContainer>
-          <SearchBtn text="검색" onClick={onSearchClick} />
+          <SearchBtn text="적용하기" onClick={onSearchClick} />
         </ButtonContainer>
       </PopupContent>
     </PopupOverlay>
   );
 };
-
 
 const PopupOverlay = styled.div`
   position: fixed;
@@ -268,6 +270,7 @@ const MonthLabel = styled.div`
   font-weight: bold;
   margin-bottom: 10px;
   text-align: center;
+  color: #f12e5e; /* 선택된 색상으로 변경 */
 `;
 
 const Week = styled.div`
@@ -282,6 +285,8 @@ const Weekday = styled.div`
   align-items: center;
   font-weight: bold;
   color: #555;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 `;
 
 const Day = styled.div`
@@ -291,13 +296,25 @@ const Day = styled.div`
   justify-content: center;
   align-items: center;
   cursor: ${({ isDisabled }) => (isDisabled ? 'not-allowed' : 'pointer')};
-  background-color: ${({ isSelected }) => (isSelected ? '#3d91ff' : 'transparent')};
-  color: ${({ isSelected, isDisabled }) => (isDisabled ? '#ccc' : isSelected ? '#fff' : '#000')};
-
+  border: ${({ isSelected }) => (isSelected ? '2px solid #f12e5e' : '2px solid transparent')}; /* 선택된 경우에만 테두리 추가 */
+  background: ${({ isSelected, isBetween }) =>
+    isSelected
+      ? '#f75d63'
+      : isBetween
+      ? 'rgba(241, 46, 94, 0.2)'
+      : 'transparent'};
+  color: ${({ isSelected, isBetween, isDisabled }) =>
+    isDisabled ? '#ccc' : isSelected ? '#fff' : isBetween ? '#f12e5e' : '#000'};
+  transition: background 0.3s ease, border-color 0.3s ease;
+  border-radius: 4px; /* 네모 상자로 설정 */
+  
   &:hover {
-    background-color: ${({ isSelected, isDisabled }) => (isSelected ? '#3d91ff' : isDisabled ? 'transparent' : '#eaeaea')};
+    border-color: ${({ isDisabled, isSelected, isBetween }) =>
+      isDisabled ? 'transparent' : isSelected ? '#f12e5e' : isBetween ? '#f12e5e' : '#eaeaea'};
   }
 `;
+
+
 
 const ButtonContainer = styled.div`
   display: flex;

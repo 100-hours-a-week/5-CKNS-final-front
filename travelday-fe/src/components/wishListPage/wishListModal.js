@@ -178,7 +178,7 @@ const ButtonItem = styled.div`
 `;
 
 const SuccessMessage = styled.p`
-  color: green;
+  color: #f12e5e;
   font-size: 18px;
   text-align: center;
   margin: 20px 0;
