@@ -23,7 +23,7 @@ function Footer() {
     <footer style={styles.footer}>
       <div style={styles.container}>
         <h2 style={styles.title}>여행한 DAY</h2>
-        <p style={styles.description}>여행을 동행인과 함께 상의하고 관리할 수 있습니다.</p>
+        <p style={styles.description}>함께 만드는 여행 이야기, 그 순간을 담아주세요.</p>
 
         <div style={styles.toggleContainer}>
           <button style={styles.toggleButton} onClick={toggleTerms}>이용약관</button>
