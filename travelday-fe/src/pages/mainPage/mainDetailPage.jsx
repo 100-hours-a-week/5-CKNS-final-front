@@ -63,10 +63,43 @@ const airlineNames = {
     'H1': '한에어항공',
     YP: '에어프레미아'
   };
+
+
+const airlineUrls = {
+    KE: 'https://www.koreanair.com', // 대한항공
+    OZ: 'https://flyasiana.com', // 아시아나항공
+    JL: 'https://www.jal.com', // 일본항공
+    NH: 'https://www.ana.co.jp', // 전일본공수
+    AA: 'https://www.aa.com', // 아메리칸 항공
+    UA: 'https://www.united.com', // 유나이티드 항공
+    DL: 'https://www.delta.com', // 델타 항공
+    SQ: 'https://www.singaporeair.com', // 싱가포르 항공
+    CX: 'https://www.cathaypacific.com', // 캐세이퍼시픽 항공
+    QF: 'https://www.qantas.com/kr/en.html', // 콴타스 항공
+    BA: 'https://www.britishairways.com', // 영국항공
+    AF: 'https://www.airfrance.com', // 에어프랑스
+    LH: 'https://www.lufthansa.com', // 루프트한자
+    EK: 'https://www.lufthansa.com', // 에미레이트 항공
+    QR: 'https://www.qatarairways.com', // 카타르 항공
+    TG: 'https://www.thaiairways.com', // 타이 항공
+    MH: 'https://www.malaysiaairlines.com', // 말레이시아 항공
+    BR: 'https://www.evaair.com', // 에바 항공
+    CI: 'https://www.china-airlines.com', // 중화항공
+    CZ: 'https://www.csair.com', // 중국남방항공
+    MU: 'https://www.ceair.com', // 중국동방항공
+    CA: 'https://www.airchina.kr/KR/KO/Home', // 중국국제항공
+    NZ: 'https://www.airnewzealand.com', // 에어 뉴질랜드
+    TK: 'https://www.turkishairlines.com', // 터키항공
+    SU: 'https://www.aeroflot.ru', // 아에로플로트
+    '7C': 'https://www.jejuair.net', // 제주항공
+    'H1': 'https://www.hahnair.com', // 한에어항공
+    YP: 'https://www.airpremia.com' // 에어프레미아
+  };
   
   
 const getAirportName = (iataCode) => airportNames[iataCode] || iataCode;
 const getAirlineName = (carrierCode) => airlineNames[carrierCode] || carrierCode;
+const getAirlineUrl = (carrierCode) => airlineUrls[carrierCode] || '#';
 
 const formatDate = (dateTime) => {
   const date = new Date(dateTime);
@@ -108,6 +141,8 @@ const MainDetailPage = () => {
   const { itineraries, travelerPricings, price } = flight;
 
   const includedBags = travelerPricings && travelerPricings[0].fareDetailsBySegment[0].includedCheckedBags.quantity;
+  const airlineUrl = getAirlineUrl(itineraries[0]?.segments[0]?.carrierCode);
+
 
   return (
     <PageContainer>
@@ -156,8 +191,11 @@ const MainDetailPage = () => {
             <Icon src={ScheduleIcon} alt="Schedule" />
           </SectionTitle>
           <BookingInfo>{t('bookingInfo.availableSeats')}: {flight.numberOfBookableSeats}</BookingInfo>
-          <BookingInfo>{t('bookingInfo.lastTicketingDate')}: {flight.lastTicketingDate}</BookingInfo>
         </FlightItem>
+        <BookingInfo>{t('bookingInfo.lastTicketingDate')}: {flight.lastTicketingDate}</BookingInfo>
+          <ReservationButton href={airlineUrl} target="_blank" rel="noopener noreferrer">
+            {t('예약하러가기')}
+          </ReservationButton>
         <PplImage src={PplIcon} alt="People" onClick={() => {
           window.location.href = "https://air.gmarket.co.kr/gm/init/lp/lpMain.do?cosemkid=ov17128974211865606&jaehuid=200012886&gad_source=1&gclid=CjwKCAjwiaa2BhAiEiwAQBgyHu1gIeblGLOlGjnggp0j71uxJcmXX_6QxLqVYw2HcDJDIzjeFOezCRoC2kgQAvD_BwE&gate_id=ED9298F9-E43D-4BD0-B2FE-A5F9DC062212";
         }} />
@@ -238,7 +276,7 @@ const PplImage = styled.img`
   width: 390px;
   height: 110px;
   margin-bottom: 30px;
-  margin-top: 40px;
+  margin-top: 50px;
   cursor: pointer;
 `;
 
@@ -323,4 +361,33 @@ const BookingInfo = styled.div`
   text-align: left;
   margin-top: 10px;
 `;
+
+const ReservationButton = styled.a`
+  display: inline-block;
+  width: 270px;
+  padding: 12px 24px;
+  margin-top: 50px;
+  background: linear-gradient(90deg, #007bff, #00aaff);
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.75);
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: linear-gradient(90deg, #0056b3, #007bff);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.85);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    background: linear-gradient(90deg, #004080, #0056b3);
+    box-shadow: 0 3px 10px rgba(0, 123, 255, 0.75);
+    transform: translateY(1px);
+  }
+`;
+
 
