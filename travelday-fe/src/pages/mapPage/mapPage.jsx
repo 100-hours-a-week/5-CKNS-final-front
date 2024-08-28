@@ -1,18 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { GoogleMap, Marker, InfoWindow } from '@react-google-maps/api';
+import { useNavigate } from 'react-router-dom'; // 추가
 import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import searchIcon from '../../images/search/search.png'; 
 import SearchResultsPopup from '../../components/mapPage/searchResultsPopup.js';
-import Footer from '../../components/shared/footer.js'
+import Footer from '../../components/shared/footer.js';
 
 const center = {
   lat: 37.5400456,
   lng: 126.9921017
 };
-
-
 
 function MapPage() {
   const [map, setMap] = useState(null);
@@ -22,6 +21,16 @@ function MapPage() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [isSearchComplete, setIsSearchComplete] = useState(false);
+  const navigate = useNavigate(); // 추가
+
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      console.error('토큰이 없습니다. 로그인 페이지로 이동합니다.');
+      navigate('/login'); // 로그인 페이지로 리다이렉트
+      return;
+    }
+  }, [navigate]);
 
   const handleSearch = () => {
     if (map && searchInput) {
@@ -172,7 +181,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 390px;ㄴㄴ
+  width: 390px;
   height: 100vh;
   background-color: #fff; 
 `;
