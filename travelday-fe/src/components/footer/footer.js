@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom'; // useNavigate 추가
 
 function Footer() {
   const [showTerms, setShowTerms] = useState(false);
-  const [showPrivacy, setShowPrivacy] = useState(false);
   const [email, setEmail] = useState('');
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
+  const navigate = useNavigate(); // navigate 함수 초기화
+
   const toggleTerms = () => {
     setShowTerms(!showTerms);
-  };
-
-  const togglePrivacy = () => {
-    setShowPrivacy(!showPrivacy);
   };
 
   const handleEmailChange = (e) => {
@@ -39,6 +37,10 @@ function Footer() {
     setShowModal(false);
   };
 
+  const navigateToPrivacy = () => {
+    navigate('/privacy'); // /privacy 페이지로 이동
+  };
+
   return (
     <footer style={styles.footer}>
       <div style={styles.container}>
@@ -47,11 +49,10 @@ function Footer() {
 
         <div style={styles.toggleContainer}>
           <button style={styles.toggleButton} onClick={toggleTerms}>이용약관</button>
-          <button style={styles.toggleButton} onClick={togglePrivacy}>개인정보 처리방침</button>
+          <button style={styles.toggleButton} onClick={navigateToPrivacy}>개인정보 처리방침</button>
         </div>
 
         {showTerms && <p style={styles.terms}>[이용약관 추가 예정]</p>}
-        {showPrivacy && <p style={styles.privacy}>[개인정보 처리방침 추가 예정]</p>}
 
         <p style={styles.contact}>문의: support@travelday.com | 전화: 123-456-7890</p>
 
@@ -97,6 +98,8 @@ function Footer() {
     </footer>
   );
 }
+
+
 
 const styles = {
   footer: {

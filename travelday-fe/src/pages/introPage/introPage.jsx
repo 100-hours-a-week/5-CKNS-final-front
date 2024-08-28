@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import Footer from '../../components/shared/introfooterl.js';
+import Footer from '../../components/footer/introfooter.js';
 
 const Intro = () => {
   const navigate = useNavigate(); 

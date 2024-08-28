@@ -5,7 +5,7 @@ import BottomNav from '../../components/shared/bottomNav.js';
 import ImageSlider from '../../components/mainPage/imageSlider.js';
 import NewFlightList from '../../components/mainPage/newFlightList.js'; 
 import JapanSaleList from '../../components/mainPage/japanSaleList.js';  
-import Footer from '../../components/shared/footer.js'
+import Footer from '../../components/footer/footer.js'
 
 const MainPage = () => {
   return (
