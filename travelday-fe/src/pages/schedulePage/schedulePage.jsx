@@ -168,5 +168,5 @@ const NoScheduleText = styled.div`
 `;
 
 const BottomPadding = styled.div`
-  height: 110px; 
+  height: 80px; 
 `;

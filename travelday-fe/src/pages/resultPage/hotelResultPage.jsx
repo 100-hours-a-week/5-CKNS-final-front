@@ -149,5 +149,5 @@ const Icon = styled.img`
 `;
 
 const BottomPadding = styled.div`
-  height: 110px;  /* 하단 네비게이션 바의 높이만큼 여유 공간 추가 */
+  height: 80px;  /* 하단 네비게이션 바의 높이만큼 여유 공간 추가 */
 `;
