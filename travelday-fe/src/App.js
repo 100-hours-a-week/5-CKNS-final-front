@@ -22,6 +22,8 @@ import MapLocationPage from './pages/schedulePage/mapLocationPage';
 import CreateSchedulePage from './pages/schedulePage/createSchedulePage';
 import TokenRefresher from './utils/useTokenRefresher';
 import PrivacyPage from './pages/mainPage/privacyPage';
+import ChatPage from './pages/chatPage/chatPage';
+import ChatListPage from './pages/chatPage/chatListPage';
 
 import './App.css';
 import './i18n';
@@ -82,6 +84,8 @@ function MainRouter() {
       <Route path="/createschedule" element={<CreateSchedulePage />} />
       <Route path="/fixschedule/:travelRoomId" element={<FixSchedulePage />} />
       <Route path="/privacy" element={<PrivacyPage />} />
+      <Route path="/chat" element={<ChatPage />} />
+      <Route path="/chatList" element={<ChatListPage />}/>
     </Routes>
   );
 }
