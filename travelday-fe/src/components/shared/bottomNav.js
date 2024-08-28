@@ -10,23 +10,26 @@ const BottomNav = () => {
   const location = useLocation(); // 현재 경로를 가져옴
 
   return (
-    <NavContainer>
-      <NavItem href="/search" isActive={location.pathname === '/search'}>
-        <NavIcon src={airplaneIcon} alt="검색" />
-        <NavText isActive={location.pathname === '/search'}>검색</NavText>
-      </NavItem>
-      <NavItem href="/" isActive={location.pathname === '/'}>
-        <NavIcon src={homeIcon} alt="메인" />
-        <NavText isActive={location.pathname === '/'}>메인</NavText>
-      </NavItem>
-      <NavItem href="/map" isActive={location.pathname === '/map'}>
-        <NavIcon src={mapIcon} alt="지도" />
-        <NavText isActive={location.pathname === '/map'}>지도</NavText>
-      </NavItem>
-      <NavItem href="/schedule" isActive={location.pathname === '/schedule'}>
-        <NavIcon src={scheduleIcon} alt="일정" />
-        <NavText isActive={location.pathname === '/schedule'}>일정</NavText>
-      </NavItem>
+      <NavContainer>
+          <NavItem href="/" isActive={location.pathname === '/'}>
+              <NavIcon src={homeIcon} alt="메인" />
+              <NavText isActive={location.pathname === '/'}>메인</NavText>
+          </NavItem>
+
+          <NavItem href="/search" isActive={location.pathname === '/search'}>
+            <NavIcon src={airplaneIcon} alt="검색" />
+            <NavText isActive={location.pathname === '/search'}>검색</NavText>
+          </NavItem>
+
+          <NavItem href="/map" isActive={location.pathname === '/map'}>
+            <NavIcon src={mapIcon} alt="지도" />
+            <NavText isActive={location.pathname === '/map'}>지도</NavText>
+          </NavItem>
+
+          <NavItem href="/schedule" isActive={location.pathname === '/schedule'}>
+            <NavIcon src={scheduleIcon} alt="일정" />
+            <NavText isActive={location.pathname === '/schedule'}>일정</NavText>
+          </NavItem>
     </NavContainer>
   );
 };

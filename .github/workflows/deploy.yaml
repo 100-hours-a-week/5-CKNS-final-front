@@ -1,0 +1,63 @@
+name: CI/CD React Build with npm caching, deploy to AWS S3
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v3
+
+      - name: npm 캐시 설정
+        uses: actions/cache@v4.0.2
+        id: npm-cache
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('travelday-fe/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: npm 캐시 확인
+        if: steps.npm-cache.outputs.cache-hit == 'true'
+        run: echo 'npm cache hit!'
+        working-directory: travelday-fe
+
+      - name: npm 캐시 미스
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: echo 'npm cache missed!'
+        working-directory: travelday-fe
+
+      - name: 의존성 설치 및 빌드
+        run: |
+          npm ci
+          CI=false npm run build
+        working-directory: travelday-fe
+        env:
+          REACT_APP_GOOGLE_MAP_KEY: ${{ secrets.REACT_APP_GOOGLE_MAP_KEY }}
+
+      - name: AWS IAM 사용자 설정
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: 빌드한 파일 S3에 업로드
+        run: aws s3 sync build/ s3://${{ secrets.S3_BUCKET_NAME }} --acl public-read
+        working-directory: travelday-fe
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: CloudFront 캐시 무력화 설정
+        uses: chetan/invalidate-cloudfront-action@v2
+        env:
+          DISTRIBUTION: ${{ secrets.AWS_CLOUDFRONT_ID }}
+          PATHS: "/index.html"
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
