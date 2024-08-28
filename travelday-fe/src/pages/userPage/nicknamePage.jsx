@@ -1,92 +1,102 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
+import React, { useState, useEffect } from 'react';
+import styled, { keyframes } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import SimpleHeader from '../../components/shared/simpleHeader.js';
 import BottomNav from '../../components/shared/bottomNav.js';
-import axios from 'axios';
 
 const LoginPage = () => {
   const [nickname, setNickname] = useState('');
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
   const [nicknameError, setNicknameError] = useState('');
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [countdown, setCountdown] = useState(3);
   const navigate = useNavigate();
 
-  const handleNicknameChange = async (e) => {
-    const nickname = e.target.value;  // 입력값을 그대로 사용, 공백을 제거하지 않음
-  
-    if (nickname.length > 10) {
-      setNicknameError('닉네임은 10글자를 넘을 수 없습니다!');
-      setIsButtonEnabled(false);
-      return;
+  const accessToken = localStorage.getItem('accessToken');  
+
+
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      navigate('/login');
     }
+  }, [navigate]);
 
-    setNickname(nickname);
-
-    if (nickname.length === 0) {
-      setIsButtonEnabled(false);
-      setNicknameError('');
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem('accessToken');
-
-      if (!token) {
-        setNicknameError('로그인 정보가 없습니다. 다시 로그인 해주세요.');
+  useEffect(() => {
+    const validateNickname = async () => {
+      // 닉네임 길이 검사
+      if (nickname.length > 10) {
+        setNicknameError('닉네임은 10글자 이내여야 합니다.');
+        setIsButtonEnabled(false);
         return;
       }
 
-      const response = await axios.get(`https://api.thetravelday.co.kr/api/user/nickname/check?nickname=${nickname}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (response.status === 200) {
-        if (response.data === 'OK') {
+      // 중복 닉네임 검사
+      try {
+        const response = await axios.get(
+          `https://api.thetravelday.co.kr/api/user/nickname/check?nickname=${nickname}`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        console.log('Response data:', response.data);
+
+        if (response.data.data === 'DUPLICATE') {
+          setNicknameError('이미 사용 중인 닉네임입니다.');
+          setIsButtonEnabled(false);
+        } else if (response.data.data === 'OK') {
           setNicknameError('');
           setIsButtonEnabled(true);
-        } else if (response.data === 'DUPLICATE') {
-          setNicknameError('이미 사용 중인 닉네임입니다!');
+        } else {
+          console.log('Unexpected response:', response.data);
+          setNicknameError('알 수 없는 응답입니다.');
           setIsButtonEnabled(false);
         }
-      } else {
-        setNicknameError('서버 응답 오류가 발생했습니다. 다시 시도해 주세요.');
+      } catch (error) {
+        console.error('중복 검사 중 오류 발생:', error);
+        setNicknameError('중복 검사 중 오류가 발생했습니다.');
         setIsButtonEnabled(false);
       }
-    } catch (error) {
-      setNicknameError('닉네임 확인 중 오류가 발생했습니다.');
+    };
+
+    if (nickname) {
+      validateNickname();
+    } else {
       setIsButtonEnabled(false);
-      console.error('닉네임 확인 오류:', error);
+      setNicknameError('');
     }
-  };
+  }, [nickname, accessToken]);
 
   const handleSubmit = async () => {
-    const token = localStorage.getItem('accessToken');
-
-    if (!token) {
-      console.error('토큰이 없습니다. 로그인 페이지로 이동합니다.');
-      navigate('/login');
-      return;
-    }
-
     try {
+      console.log('닉네임 제출:', nickname);
       const response = await axios.put(
         'https://api.thetravelday.co.kr/api/user/nickname',
-        { nickname }, 
+        { nickname },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
           },
         }
       );
 
-      if (response.status === 200) {
-        setShowSuccessMessage(true); 
-        navigate('/mypage');
+      if (response.data.data === '닉네임 수정 성공') {
+        setShowSuccessPopup(true);
+        const interval = setInterval(() => {
+          setCountdown(prev => {
+            if (prev === 1) {
+              clearInterval(interval);
+              navigate('/mypage');
+            }
+            return prev - 1;
+          }, 1000);
+        });
       } else {
         console.error('닉네임 변경 실패:', response.statusText);
       }
@@ -104,17 +114,26 @@ const LoginPage = () => {
           <Input
             type="text"
             value={nickname}
-            onChange={handleNicknameChange}
+            onChange={(e) => setNickname(e.target.value)}
             placeholder="새로운 닉네임을 입력하세요"
           />
           <ErrorText>{nicknameError || '\u00A0'}</ErrorText>
           <Button onClick={handleSubmit} disabled={!isButtonEnabled}>
             변경하기
           </Button>
-          {showSuccessMessage && <SuccessMessage>닉네임이 성공적으로 변경되었습니다!</SuccessMessage>}
         </Content>
         <BottomNav />
       </Container>
+
+      {showSuccessPopup && (
+        <SuccessPopup>
+          <PopupContent>
+            <p>닉네임이 성공적으로 변경되었습니다!</p>
+            <CountdownBar />
+            <CountdownText>{countdown}초 후에 페이지가 이동합니다.</CountdownText>
+          </PopupContent>
+        </SuccessPopup>
+      )}
     </PageContainer>
   );
 };
@@ -122,10 +141,60 @@ const LoginPage = () => {
 export default LoginPage;
 
 // 스타일 컴포넌트 정의
-const SuccessMessage = styled.p`
-  color: green;
-  font-size: 16px;
-  margin-top: 20px;
+
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+`;
+
+const countdown = keyframes`
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0;
+  }
+`;
+
+const SuccessPopup = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: ${fadeIn} 0.5s ease-in-out;
+  z-index: 9999;
+`;
+
+const PopupContent = styled.div`
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+`;
+
+const CountdownBar = styled.div`
+  width: 100%;
+  height: 5px;
+  background-color: #f12e5e;
+  margin-top: 15px;
+  border-radius: 5px;
+  animation: ${countdown} 3s linear forwards;
+`;
+
+const CountdownText = styled.p`
+  font-size: 14px;
+  color: #333;
+  margin-top: 10px;
 `;
 
 const PageContainer = styled.div`
@@ -172,13 +241,13 @@ const Input = styled.input`
   border-radius: 4px;
 
   &:focus {
-    border-color: #007bff; 
-    border-width: 2px; 
-    outline: none; 
+    border-color: #007bff;
+    border-width: 2px;
+    outline: none;
   }
 
   &:disabled {
-    background-color: #f0f0f0; 
+    background-color: #f0f0f0;
   }
 `;
 
