@@ -71,7 +71,7 @@ const SectionSubTitle = styled.h2`
   text-align: left;
   width: 370px;
   margin-left: 10px;
-  margin-top: 15px;
+  margin-top: 7px;
   margin-bottom: 15px;
   color: #c2c2c2;
 `;

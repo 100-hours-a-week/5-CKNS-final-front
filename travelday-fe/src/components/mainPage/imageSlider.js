@@ -25,6 +25,10 @@ const ImageSlider = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const handleIndicatorClick = (index) => {
+    setActiveIndex(index);
+  };
+
   return (
     <Slider>
       <SliderContent activeIndex={activeIndex}>
@@ -39,6 +43,7 @@ const ImageSlider = () => {
           <Indicator
             key={index}
             isActive={index === activeIndex}
+            onClick={() => handleIndicatorClick(index)} // 사용자가 Indicator를 클릭했을 때 슬라이드 변경
           />
         ))}
       </Indicators>
@@ -90,7 +95,8 @@ const Indicators = styled.div`
 
 const Indicator = styled.div`
   width: 10px;
-  height: 10px;
-  background-color: ${({ isActive }) => (isActive ? '#333' : '#ccc')};
-  border-radius: 50%;
+  height: 5px;
+  background-color: ${({ isActive }) => (isActive ? '#a7b1e9' : '#e9efff')};
+  border-radius: 15px;
+  cursor: pointer;
 `;

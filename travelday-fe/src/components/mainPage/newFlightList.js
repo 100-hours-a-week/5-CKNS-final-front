@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
 
 import Image1 from '../../images/main/list1/PQC.png';
 import Image2 from '../../images/main/list1/OIT.png';
@@ -36,12 +35,12 @@ const IATACodeToCity = {
 const NewFlightList = () => {
   const navigate = useNavigate();
   const [flights, setFlights] = useState([]);
+  const listContainerRef = useRef(null);
 
   useEffect(() => {
     const fetchFlights = async () => {
       try {
         const response = await axios.get('https://api.thetravelday.co.kr/api/flights/lowest-price/list');
-        console.log(response.data); 
         if (response.status === 200) {
           const imageMap = {
             'PQC': Image1,
@@ -67,7 +66,7 @@ const NewFlightList = () => {
                 iataCode: destinationCode, 
               };
             })
-            .filter(flight => flight.image); // 이미지가 없는 항목은 필터링
+            .filter(flight => flight.image);
 
           setFlights(formattedFlights);
         }
@@ -85,7 +84,7 @@ const NewFlightList = () => {
 
   return (
     <Wrapper>
-      <ListContainer>
+      <ListContainer ref={listContainerRef}>
         {flights.map((flight) => (
           <ListItem key={flight.id} onClick={() => handleItemClick(flight)}>
             {flight.image && <FlightImage src={flight.image} alt={`${flight.destination} 이미지`} />}
@@ -105,12 +104,22 @@ export default NewFlightList;
 
 const Wrapper = styled.div`
   width: 100%;
-  overflow-x: auto;
-  padding-bottom: 10px; 
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; 
+  overflow-x: auto; /* 가로 스크롤 활성화 */
+  padding-bottom: 10px;
+  -webkit-overflow-scrolling: touch; /* 부드러운 스크롤링 */
+  scrollbar-width: thin; /* Firefox에서 스크롤바 얇게 표시 */
+
   &::-webkit-scrollbar {
-    display: none;
+    height: 8px; /* 스크롤바 높이 */
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #007bff; /* 스크롤바 색상 */
+    border-radius: 10px; /* 스크롤바 모서리 */
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f0f0f0; /* 스크롤바 트랙(배경) 색상 */
   }
 `;
 
@@ -119,7 +128,24 @@ const ListContainer = styled.div`
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   width: 100%;
+  overflow-x: auto; /* 가로 스크롤 가능하게 설정 */
+
+  /* 스크롤바 스타일 통일 */
+  scrollbar-width: thin; /* Firefox에서 스크롤바 얇게 표시 */
+  &::-webkit-scrollbar {
+    height: 8px; /* 스크롤바 높이 */
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #007bff; /* 스크롤바 색상 */
+    border-radius: 10px; /* 스크롤바 모서리 */
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f0f0f0; /* 스크롤바 트랙(배경) 색상 */
+  }
 `;
+
 
 const ListItem = styled.div`
   display: flex;

@@ -164,7 +164,7 @@ const NoScheduleText = styled.div`
   font-size: 16px;
   color: #999;
   margin-top: 20px;
-  margin-bottom: 210px;
+  margin-bottom: 500px;
 `;
 
 const BottomPadding = styled.div`
