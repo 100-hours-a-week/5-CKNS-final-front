@@ -2,8 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import BottomNav from '../../components/shared/bottomNav.js'; 
 import { useNavigate } from 'react-router-dom';
+import { IoSearch, IoMenuOutline } from "react-icons/io5";
+import Sidebar from '../../components/chatPage/sideBar.js';  
 
-// URL 감지 및 하이퍼링크 변환 함수
+
 const linkify = (text) => {
   const urlPattern = /https?:\/\/[^\s]+/g;
   return text.split(urlPattern).map((part, index) => {
@@ -29,9 +31,12 @@ const ChatPage = () => {
     { sender: '나', content: '안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요', timestamp: new Date() }, 
   ]);
   const [newMessage, setNewMessage] = useState('');
+  const [isSearchVisible, setIsSearchVisible] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const navigate = useNavigate();
-
   const messageEndRef = useRef(null);
+  const messageListRef = useRef(null);
 
   const handleSendMessage = (e) => {
     e.preventDefault();
@@ -46,6 +51,12 @@ const ChatPage = () => {
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       handleSendMessage(e);
+    }
+  };
+
+  const handleSearchKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
     }
   };
 
@@ -87,6 +98,34 @@ const ChatPage = () => {
     navigate(-1); 
   };
 
+  const toggleSearch = () => {
+    setIsSearchVisible(!isSearchVisible);
+  };
+
+  const toggleSidebar = () => {
+    setIsSidebarVisible(!isSidebarVisible);
+  };
+
+  const handleSearch = () => {
+    if (searchTerm.trim() === '') return;
+
+    const index = messages.findIndex(message => 
+      message.content.includes(searchTerm)
+    );
+
+    if (index !== -1 && messageListRef.current) {
+      const messageElements = messageListRef.current.children;
+      if (messageElements[index]) {
+        messageElements[index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  };
+
+  const handleCancelSearch = () => {
+    setIsSearchVisible(false);
+    setSearchTerm('');
+  };
+
   useEffect(() => {
     if (messageEndRef.current) {
       messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -99,9 +138,25 @@ const ChatPage = () => {
         <Navbar>
           <BackButton onClick={handleBackButtonClick}>뒤로</BackButton>
           <RoomTitle>챗팅방 이름</RoomTitle>
+          <IconsContainer>
+            <IoSearch size={22} onClick={toggleSearch} />  
+            <IoMenuOutline size={22} onClick={toggleSidebar} /> 
+          </IconsContainer>
         </Navbar>
 
-        <MessageList>
+        {isSearchVisible && (
+          <SearchContainer>
+            <SearchInput 
+              placeholder="검색어를 입력하세요..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyPress={handleSearchKeyPress}
+            />
+            <CancelButton onClick={handleCancelSearch}>취소</CancelButton>
+          </SearchContainer>
+        )}
+
+        <MessageList ref={messageListRef}>
           {messages.map((message, index) => {
             const previousMessage = messages[index - 1];
             const nextMessage = messages[index + 1];
@@ -147,12 +202,15 @@ const ChatPage = () => {
         </MessageInputContainer>
       </ChatContainer>
 
+      <Sidebar isSidebarVisible={isSidebarVisible} toggleSidebar={toggleSidebar} />
+
       <BottomNav /> 
     </Container>
   );
 };
 
 export default ChatPage;
+
 
 const Container = styled.div`
   display: flex;
@@ -163,6 +221,10 @@ const Container = styled.div`
   background-color: #fafafa;
   position: relative;
   overflow-y: auto;
+
+   &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const ChatContainer = styled.div`
@@ -170,17 +232,15 @@ const ChatContainer = styled.div`
   flex-direction: column;
   width: 100%;
   max-width: 390px;
-  min-height: 100%;
+  height: calc(100vh - 80px);
   padding-bottom: 70px;
 `;
 
 const MessageList = styled.div`
   flex: 1;
-  padding: 100px 20px 80px 20px;
+  padding: 100px 20px 10px 20px;
   background-color: #fff;
   border-top: 1px solid #e0e0e0;
-  min-height: 600px;
-  height: 100vh;
   overflow-y: auto;
 `;
 
@@ -196,9 +256,8 @@ const StyledLink = styled.a`
 const Navbar = styled.header`
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   height: 68px;
-  padding: 0;
   border-bottom: 1px solid #e0e0e0;
   background-color: #007bff;
   color: #fff;
@@ -209,9 +268,34 @@ const Navbar = styled.header`
   z-index: 10;
 `;
 
-const BackButton = styled.button`
+const RoomTitle = styled.h2`
+  flex-grow: 1; 
+  font-size: 15px;
+  margin: 0;
+  text-align: center; 
   position: absolute;
-  left: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+`;
+
+const IconsContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-right: 10px;
+
+  svg {
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.3s ease;
+  }
+
+  svg:hover {
+    color: #0056b3;
+    transform: scale(1.1);
+  }
+`;
+
+const BackButton = styled.button`
   padding: 6px 12px;
   background-color: transparent;
   color: #fff;
@@ -226,11 +310,6 @@ const BackButton = styled.button`
   }
 `;
 
-const RoomTitle = styled.h2`
-  font-size: 15px;
-  margin: 0; 
-`;
-
 const MessageItem = styled.div`
   display: flex;
   flex-direction: column;
@@ -243,6 +322,7 @@ const MessageWrapper = styled.div`
   align-items: end;
   flex-direction: ${(props) => (props.isOwnMessage ? 'row-reverse' : 'row')};
   position: relative;
+  width: 100%;
 `;
 
 const MessageSender = styled.div`
@@ -332,4 +412,41 @@ const DateSeparator = styled.div`
   text-align: center;
   font-size: 12px;
   color: #999;
+`;
+
+const SearchContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px  0px ;
+  background-color: #e8f0fe;
+  position: fixed;
+  top: 68px;
+  width: 100%;
+  max-width: 390px;
+  z-index: 100;
+`;
+
+const SearchInput = styled.input`
+  width: 70%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+`;
+
+const CancelButton = styled.button`
+  padding: 10px;
+  margin-left: 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: #0069d9;
+  }
 `;
