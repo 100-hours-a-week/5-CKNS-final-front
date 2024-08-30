@@ -16,8 +16,8 @@ const Sidebar = ({ isSidebarVisible, toggleSidebar }) => {
           <SectionTitle>대화상대</SectionTitle>
           <InviteButton>대화상대 초대</InviteButton>
         </Section>
-    
       </SidebarContent>
+      <ExitButton onClick={toggleSidebar}>나가기</ExitButton>
     </SidebarContainer>
   );
 };
@@ -46,18 +46,21 @@ const SidebarContainer = styled.div`
   position: fixed;
   right: 0;
   top: 0;
-  height: 100vh;
-  width: 300px; /* 너비를 조금 더 넓게 조정 */
-  background-color: #f9f9f9; /* 부드러운 배경색 */
+  height: calc(100vh - 40px);
+  width: 300px; 
+  background-color: #ffffff; /* Changed to pure white for a clean look */
   padding: 20px;
-  box-shadow: -2px 0 10px rgba(0,0,0,0.1); /* 그림자 강조 */
-  z-index: 1000;
+  box-shadow: -2px 0 15px rgba(0,0,0,0.15); /* Slightly deeper shadow */
+  z-index: 1100; 
   transform: translateX(${props => (props.isSidebarVisible ? '0' : '100%')});
   animation: ${props => (props.isSidebarVisible ? slideIn : slideOut)} 0.3s forwards;
-  transition: box-shadow 0.3s ease;
-
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  
   &:hover {
-    box-shadow: -4px 0 15px rgba(0,0,0,0.2); /* 호버 시 그림자 확대 */
+    box-shadow: -4px 0 20px rgba(0,0,0,0.25); /* Enhanced shadow on hover */
   }
 `;
 
@@ -65,15 +68,15 @@ const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #e0e0e0; /* 헤더 하단에 선 추가 */
+  border-bottom: 1px solid #e0e0e0;
   padding-bottom: 10px;
   margin-bottom: 20px;
 `;
 
 const SidebarTitle = styled.h2`
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
+  font-size: 20px; /* Slightly increased font size */
+  font-weight: 700; /* Made font bolder */
+  color: #2c3e50; /* Darker shade for a modern look */
   margin: 0;
 `;
 
@@ -81,19 +84,20 @@ const CloseButton = styled.button`
   background: transparent;
   border: none;
   cursor: pointer;
-  color: #333;
+  color: #2c3e50;
   font-size: 1.5rem;
   padding: 0;
   margin: 0;
   transition: color 0.3s ease;
 
   &:hover {
-    color: #ff4b4b; /* 빨간색으로 변경하여 경고 느낌 추가 */
+    color: #e74c3c; /* More vibrant red on hover */
   }
 `;
 
 const SidebarContent = styled.div`
   margin-top: 20px;
+  flex-grow: 1;
 `;
 
 const Section = styled.div`
@@ -102,28 +106,53 @@ const Section = styled.div`
 
 const SectionTitle = styled.h3`
   font-size: 16px;
-  font-weight: 500;
-  color: #555;
+  font-weight: 600; /* Increased font weight */
+  color: #34495e; /* Darker color for titles */
   margin-bottom: 10px;
 `;
 
 const InviteButton = styled.button`
   width: 100%;
   padding: 12px;
-  background-color: #007bff;
+  background-color: #007bff; /* Original blue color */
   color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 50px;
   cursor: pointer;
   font-weight: bold;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
 
   &:hover {
-    background-color: #0056b3; /* 더 짙은 파란색으로 변경 */
-    transform: translateY(-2px); /* 약간 위로 이동하여 입체감 추가 */
+    background-color: #0056b3; 
+    transform: translateY(-2px);
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.1); 
   }
 
   &:active {
-    transform: translateY(0); /* 클릭 시 원래 위치로 돌아오도록 */
+    transform: translateY(0);
+  }
+`;
+
+const ExitButton = styled.button`
+  width: 100%;
+  padding: 12px;
+  background-color: transparent;
+  color: #e74c3c;
+  border: 2px solid #e74c3c; 
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-bottom: 70px;
+  transition: color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+
+  &:hover {
+    color: #e74c3c; 
+    border-color: #c0392b; 
+    transform: translateY(-2px);
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 `;

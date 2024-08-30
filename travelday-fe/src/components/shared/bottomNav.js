@@ -46,8 +46,9 @@ const NavContainer = styled.div`
   align-items: center;
   background-color: #fff;
   border-top: 1px solid #ddd;
-  z-index: 1000;
+  z-index: 1000; /* Lower z-index than Sidebar */
 `;
+
 
 const NavItem = styled.a`
   display: flex;

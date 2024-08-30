@@ -242,6 +242,10 @@ const MessageList = styled.div`
   background-color: #fff;
   border-top: 1px solid #e0e0e0;
   overflow-y: auto;
+  
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const StyledLink = styled.a`
