@@ -1,43 +1,88 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import Header from '../../components/shared/header.js'; 
 import BottomNav from '../../components/shared/bottomNav.js'; 
+import { useNavigate } from 'react-router-dom';
 
 const ChatPage = () => {
   const [messages, setMessages] = useState([
-    { sender: '나', content: '안녕하세요!' },
-    { sender: '다른 사용자', content: '안녕하세요! 반갑습니다.' }
+    { sender: '나', content: '안녕하세요!', timestamp: new Date() },
+    { sender: '다른 사용자', content: '안녕하세요! 반갑습니다.', timestamp: new Date() },
+    { sender: '나', content: '안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요', timestamp: new Date() }, 
   ]);
   const [newMessage, setNewMessage] = useState('');
+  const navigate = useNavigate();
 
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (newMessage.trim() !== '') {
-      const updatedMessages = [...messages, { sender: '나', content: newMessage }];
+      const newTimestamp = new Date();
+      const updatedMessages = [...messages, { sender: '나', content: newMessage, timestamp: newTimestamp }];
       setMessages(updatedMessages);
       setNewMessage('');
     }
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSendMessage(e);
+    }
+  };
+
+  const formatTime = (date) => {
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? '오후' : '오전';
+    const formattedHours = hours % 12 || 12; 
+    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+    return `${ampm} ${formattedHours}시 ${formattedMinutes}분`;
+  };
+
+  const isSameSenderAndTime = (currentMessage, previousMessage) => {
+    if (!previousMessage) return false;
+
+    return (
+      currentMessage.sender === previousMessage.sender &&
+      formatTime(currentMessage.timestamp) === formatTime(previousMessage.timestamp)
+    );
+  };
+
+  const handleBackButtonClick = () => { 
+    navigate(-1); 
+  };
+
   return (
     <Container>
-      <Header /> 
-
       <ChatContainer>
         <Navbar>
-          <BackButton>뒤로</BackButton>
+          <BackButton onClick={handleBackButtonClick}>뒤로</BackButton>
           <RoomTitle>챗팅방 이름</RoomTitle>
         </Navbar>
 
         <MessageList>
-          {messages.map((message, index) => (
-            <MessageItem key={index}>
-              <MessageSender>{message.sender}</MessageSender>
-              <MessageContent isOwnMessage={message.sender === '나'}>
-                {message.content}
-              </MessageContent>
-            </MessageItem>
-          ))}
+          {messages.map((message, index) => {
+            const previousMessage = messages[index - 1];
+            const nextMessage = messages[index + 1];
+            const showSender = !isSameSenderAndTime(message, previousMessage);
+            const showTimestamp = !isSameSenderAndTime(message, nextMessage);
+
+            return (
+              <MessageItem key={index} isOwnMessage={message.sender === '나'}>
+                {showSender && (
+                  <MessageSender>{message.sender}</MessageSender>
+                )}
+                <MessageWrapper isOwnMessage={message.sender === '나'}>
+                  <MessageContent isOwnMessage={message.sender === '나'}>
+                    {message.content}
+                  </MessageContent>
+                  {showTimestamp && (
+                    <MessageTimestamp isOwnMessage={message.sender === '나'}>
+                      {formatTime(message.timestamp)}
+                    </MessageTimestamp>
+                  )}
+                </MessageWrapper>
+              </MessageItem>
+            );
+          })}
         </MessageList>
 
         <MessageInputContainer>
@@ -46,6 +91,7 @@ const ChatPage = () => {
             placeholder="메시지를 입력하세요..." 
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
+            onKeyPress={handleKeyPress} 
           />
           <SendButton onClick={handleSendMessage}>전송</SendButton>
         </MessageInputContainer>
@@ -65,7 +111,7 @@ const Container = styled.div`
   width: 100%;
   height: 100vh;
   margin: 0 auto;
-  background-color: #fafafa; /* 부드러운 밝은 색상 배경 */
+  background-color: #fafafa;
   position: relative;
 `;
 
@@ -81,9 +127,11 @@ const ChatContainer = styled.div`
 const Navbar = styled.header`
   display: flex;
   align-items: center;
-  padding: 12px 18px;
+  justify-content: center;
+  height: 68px;
+  padding: ;
   border-bottom: 1px solid #e0e0e0;
-  background-color: #2d87f0;
+  background-color: #007bff;
   color: #fff;
   position: sticky;
   top: 0;
@@ -91,6 +139,8 @@ const Navbar = styled.header`
 `;
 
 const BackButton = styled.button`
+  position: absolute;
+  left: 12px;
   padding: 6px 12px;
   background-color: transparent;
   color: #fff;
@@ -106,9 +156,8 @@ const BackButton = styled.button`
 `;
 
 const RoomTitle = styled.h2`
-  margin-left: 24px;
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 15px;
+  margin: 0; 
 `;
 
 const MessageList = styled.div`
@@ -120,49 +169,58 @@ const MessageList = styled.div`
 `;
 
 const MessageItem = styled.div`
-  margin-bottom: 15px;
   display: flex;
   flex-direction: column;
+  align-items: ${(props) => (props.isOwnMessage ? 'flex-end' : 'flex-start')};
+  margin-bottom: 15px;
 `;
 
-const MessageSender = styled.span`
-  font-weight: 600;
+const MessageWrapper = styled.div`
+  display: flex;
+  align-items: end;
+  flex-direction: ${(props) => (props.isOwnMessage ? 'row-reverse' : 'row')};
+  position: relative;
+`;
+
+const MessageSender = styled.div`
   margin-bottom: 5px;
   color: #333;
 `;
 
 const MessageContent = styled.div`
-position: relative;
-padding: 10px 16px;
-background-color: ${(props) => (props.isOwnMessage ? '#2d87f0' : '#e8f0fe')};
-color: ${(props) => (props.isOwnMessage ? '#fff' : '#333')};
-border-radius: 16px;
-max-width: 75%;
-align-self: ${(props) => (props.isOwnMessage ? 'flex-end' : 'flex-start')};
-margin: 8px 0;
-box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
-transition: background-color 0.3s ease;
+  position: relative;
+  padding: 10px 16px;
+  background-color: ${(props) => (props.isOwnMessage ? '#007bff' : '#e8f0fe')};
+  color: ${(props) => (props.isOwnMessage ? '#fff' : '#333')};
+  border-radius: 16px;
+  max-width: 70%;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
 
-&:after {
-  content: '';
-  position: absolute;
-  border-style: solid;
-  border-width: ${(props) => (props.isOwnMessage ? '8px 0 8px 12px' : '8px 12px 8px 0')};
-  border-color: ${(props) =>
-    props.isOwnMessage ? 'transparent transparent transparent #2d87f0' : 'transparent #e8f0fe transparent transparent'};
-  display: block;
-  width: 0;
-  z-index: 1;
-  margin-top: -8px;
-  left: ${(props) => (props.isOwnMessage ? 'auto' : '-12px')};
-  right: ${(props) => (props.isOwnMessage ? '-12px' : 'auto')};
-  top: 50%; /* 다시 가운데로 위치시킵니다 */
-  transform: translateY(-50%) translateY(8px); /* 삼각형을 아래로 조금 내립니다 */
-}
+  &:after {
+    content: '';
+    position: absolute;
+    border-style: solid;
+    border-width: ${(props) => (props.isOwnMessage ? '8px 0 8px 12px' : '8px 12px 8px 0')};
+    border-color: ${(props) =>
+      props.isOwnMessage ? 'transparent transparent transparent #007bff' : 'transparent #e8f0fe transparent transparent'};
+    display: block;
+    width: 0;
+    z-index: 1;
+    bottom: 8px; 
+    left: ${(props) => (props.isOwnMessage ? 'auto' : '-12px')};
+    right: ${(props) => (props.isOwnMessage ? '-10px' : 'auto')};
+    transform: translateY(0);
+  }
 `;
 
-
-
+const MessageTimestamp = styled.span`
+  font-size: 10px;
+  color: #999;
+  margin: ${(props) => (props.isOwnMessage ? '0 8px 0 0' : '0 0 0 8px')};
+                                                     
+`;
+ 
 const MessageInputContainer = styled.div`
   display: flex;
   padding: 10px;
@@ -188,14 +246,14 @@ const MessageInput = styled.input`
   outline: none;
 
   &:focus {
-    border-color: #2d87f0;
-    box-shadow: 0 0 3px rgba(45, 135, 240, 0.3);
+    border-color: #007bff;
+    box-shadow: 0 0 3px rgba(0, 123, 255, 0.3);
   }
 `;
 
 const SendButton = styled.button`
   padding: 12px 15px;
-  background-color: #2d87f0;
+  background-color: #007bff;
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -204,6 +262,6 @@ const SendButton = styled.button`
   transition: all 0.3s ease;
 
   &:hover {
-    background-color: #1a6bc9;
+    background-color: #0069d9;
   }
 `;
