@@ -1,7 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import BottomNav from '../../components/shared/bottomNav.js'; 
 import { useNavigate } from 'react-router-dom';
+
+// URL 감지 및 하이퍼링크 변환 함수
+const linkify = (text) => {
+  const urlPattern = /https?:\/\/[^\s]+/g;
+  return text.split(urlPattern).map((part, index) => {
+    const match = text.match(urlPattern);
+    if (match && match[index]) {
+      return (
+        <React.Fragment key={index}>
+          {part}
+          <StyledLink href={match[index]} target="_blank" rel="noopener noreferrer">
+            {match[index]}
+          </StyledLink>
+        </React.Fragment>
+      );
+    }
+    return part;
+  });
+};
 
 const ChatPage = () => {
   const [messages, setMessages] = useState([
@@ -11,6 +30,8 @@ const ChatPage = () => {
   ]);
   const [newMessage, setNewMessage] = useState('');
   const navigate = useNavigate();
+
+  const messageEndRef = useRef(null);
 
   const handleSendMessage = (e) => {
     e.preventDefault();
@@ -37,6 +58,13 @@ const ChatPage = () => {
     return `${ampm} ${formattedHours}시 ${formattedMinutes}분`;
   };
 
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return `${year}년 ${month}월 ${day}일`;
+  };
+
   const isSameSenderAndTime = (currentMessage, previousMessage) => {
     if (!previousMessage) return false;
 
@@ -46,9 +74,24 @@ const ChatPage = () => {
     );
   };
 
+  const isSameDay = (currentMessage, previousMessage) => {
+    if (!previousMessage) return false;
+
+    const currentDate = formatDate(currentMessage.timestamp);
+    const previousDate = formatDate(previousMessage.timestamp);
+
+    return currentDate === previousDate;
+  };
+
   const handleBackButtonClick = () => { 
     navigate(-1); 
   };
+
+  useEffect(() => {
+    if (messageEndRef.current) {
+      messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
 
   return (
     <Container>
@@ -64,25 +107,32 @@ const ChatPage = () => {
             const nextMessage = messages[index + 1];
             const showSender = !isSameSenderAndTime(message, previousMessage);
             const showTimestamp = !isSameSenderAndTime(message, nextMessage);
+            const showDate = !isSameDay(message, previousMessage) || index === 0;
 
             return (
-              <MessageItem key={index} isOwnMessage={message.sender === '나'}>
-                {showSender && (
-                  <MessageSender>{message.sender}</MessageSender>
+              <React.Fragment key={index}>
+                {showDate && (
+                  <DateSeparator>{formatDate(message.timestamp)}</DateSeparator>
                 )}
-                <MessageWrapper isOwnMessage={message.sender === '나'}>
-                  <MessageContent isOwnMessage={message.sender === '나'}>
-                    {message.content}
-                  </MessageContent>
-                  {showTimestamp && (
-                    <MessageTimestamp isOwnMessage={message.sender === '나'}>
-                      {formatTime(message.timestamp)}
-                    </MessageTimestamp>
+                <MessageItem isOwnMessage={message.sender === '나'}>
+                  {showSender && (
+                    <MessageSender>{message.sender}</MessageSender>
                   )}
-                </MessageWrapper>
-              </MessageItem>
+                  <MessageWrapper isOwnMessage={message.sender === '나'}>
+                    <MessageContent isOwnMessage={message.sender === '나'}>
+                      {linkify(message.content)}
+                    </MessageContent>
+                    {showTimestamp && (
+                      <MessageTimestamp isOwnMessage={message.sender === '나'}>
+                        {formatTime(message.timestamp)}
+                      </MessageTimestamp>
+                    )}
+                  </MessageWrapper>
+                </MessageItem>
+              </React.Fragment>
             );
           })}
+          <div ref={messageEndRef} />
         </MessageList>
 
         <MessageInputContainer>
@@ -109,10 +159,10 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
-  height: 100vh;
   margin: 0 auto;
   background-color: #fafafa;
   position: relative;
+  overflow-y: auto;
 `;
 
 const ChatContainer = styled.div`
@@ -120,8 +170,27 @@ const ChatContainer = styled.div`
   flex-direction: column;
   width: 100%;
   max-width: 390px;
-  height: 100%;
+  min-height: 100%;
   padding-bottom: 70px;
+`;
+
+const MessageList = styled.div`
+  flex: 1;
+  padding: 100px 20px 80px 20px;
+  background-color: #fff;
+  border-top: 1px solid #e0e0e0;
+  min-height: 600px;
+  height: 100vh;
+  overflow-y: auto;
+`;
+
+const StyledLink = styled.a`
+  color: #fff;
+  text-decoration: underline;
+
+  &:hover {
+    text-decoration: none;
+  }
 `;
 
 const Navbar = styled.header`
@@ -129,12 +198,14 @@ const Navbar = styled.header`
   align-items: center;
   justify-content: center;
   height: 68px;
-  padding: ;
+  padding: 0;
   border-bottom: 1px solid #e0e0e0;
   background-color: #007bff;
   color: #fff;
-  position: sticky;
+  position: fixed;
   top: 0;
+  width: 100%;
+  max-width: 390px;
   z-index: 10;
 `;
 
@@ -158,14 +229,6 @@ const BackButton = styled.button`
 const RoomTitle = styled.h2`
   font-size: 15px;
   margin: 0; 
-`;
-
-const MessageList = styled.div`
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
-  background-color: #fff;
-  border-top: 1px solid #e0e0e0;
 `;
 
 const MessageItem = styled.div`
@@ -218,9 +281,8 @@ const MessageTimestamp = styled.span`
   font-size: 10px;
   color: #999;
   margin: ${(props) => (props.isOwnMessage ? '0 8px 0 0' : '0 0 0 8px')};
-                                                     
 `;
- 
+
 const MessageInputContainer = styled.div`
   display: flex;
   padding: 10px;
@@ -264,4 +326,10 @@ const SendButton = styled.button`
   &:hover {
     background-color: #0069d9;
   }
+`;
+
+const DateSeparator = styled.div`
+  text-align: center;
+  font-size: 12px;
+  color: #999;
 `;
