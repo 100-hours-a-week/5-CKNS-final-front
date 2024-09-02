@@ -93,7 +93,6 @@ const ChatListContainer = styled.div`
 const Navbar = styled.div`
   display: flex;
   justify-content: center;
-  padding: 10px 20px;
   background-color: #fff;
   color: #000;
 `;

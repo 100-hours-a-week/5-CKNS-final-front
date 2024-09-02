@@ -7,31 +7,39 @@ import Sidebar from '../../components/chatPage/sideBar.js';
 
 const linkify = (text) => {
   const urlPattern = /https?:\/\/[^\s]+/g;
-  return text.split(urlPattern).map((part, index) => {
-    const match = text.match(urlPattern);
-    if (match && match[index]) {
-      return (
-        <React.Fragment key={index}>
-          {part}
-          <StyledLink href={match[index]} target="_blank" rel="noopener noreferrer">
-            {match[index]}
-          </StyledLink>
-        </React.Fragment>
+  const parts = text.split(urlPattern);
+  const matches = text.match(urlPattern);
+
+  if (!matches) {
+    return text;
+  }
+
+  return parts.reduce((acc, part, index) => {
+    if (matches[index]) {
+      acc.push(part);
+      acc.push(
+        <StyledLink key={index} href={matches[index]} target="_blank" rel="noopener noreferrer">
+          {matches[index]}
+        </StyledLink>
       );
+    } else {
+      acc.push(part);
     }
-    return part;
-  });
+    return acc;
+  }, []);
 };
 
 const ChatPage = () => {
   const [messages, setMessages] = useState([
     { sender: '나', content: '안녕하세요!', timestamp: new Date() },
     { sender: '다른 사용자', content: '안녕하세요! 반갑습니다.', timestamp: new Date() },
-    { sender: '나', content: '안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요', timestamp: new Date() }, 
+    { sender: '나', content: '이 링크를 확인해 보세요 https://www.naver.com/ ', timestamp: new Date() }, 
   ]);
   const [newMessage, setNewMessage] = useState('');
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [currentSearchIndex, setCurrentSearchIndex] = useState(0);
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const navigate = useNavigate();
   const messageEndRef = useRef(null);
@@ -99,6 +107,10 @@ const ChatPage = () => {
 
   const toggleSearch = () => {
     setIsSearchVisible(!isSearchVisible);
+    if (!isSearchVisible) {
+      setSearchResults([]);
+      setCurrentSearchIndex(0);
+    }
   };
 
   const toggleSidebar = () => {
@@ -108,14 +120,48 @@ const ChatPage = () => {
   const handleSearch = () => {
     if (searchTerm.trim() === '') return;
 
-    const index = messages.findIndex(message => 
-      message.content.includes(searchTerm)
-    );
+    const results = messages.reduce((acc, message, index) => {
+      if (message.content.includes(searchTerm)) {
+        acc.push(index);
+      }
+      return acc;
+    }, []);
 
-    if (index !== -1 && messageListRef.current) {
+    setSearchResults(results);
+    setCurrentSearchIndex(0);
+
+    if (results.length > 0 && messageListRef.current) {
       const messageElements = messageListRef.current.children;
-      if (messageElements[index]) {
-        messageElements[index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (messageElements[results[0]]) {
+        messageElements[results[0]].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  };
+
+  const handleNextSearchResult = () => {
+    if (searchResults.length === 0) return;
+
+    const nextIndex = (currentSearchIndex + 1) % searchResults.length;
+    setCurrentSearchIndex(nextIndex);
+
+    if (messageListRef.current) {
+      const messageElements = messageListRef.current.children;
+      if (messageElements[searchResults[nextIndex]]) {
+        messageElements[searchResults[nextIndex]].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  };
+
+  const handlePreviousSearchResult = () => {
+    if (searchResults.length === 0) return;
+
+    const prevIndex = (currentSearchIndex - 1 + searchResults.length) % searchResults.length;
+    setCurrentSearchIndex(prevIndex);
+
+    if (messageListRef.current) {
+      const messageElements = messageListRef.current.children;
+      if (messageElements[searchResults[prevIndex]]) {
+        messageElements[searchResults[prevIndex]].scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }
   };
@@ -123,6 +169,8 @@ const ChatPage = () => {
   const handleCancelSearch = () => {
     setIsSearchVisible(false);
     setSearchTerm('');
+    setSearchResults([]);
+    setCurrentSearchIndex(0);
   };
 
   useEffect(() => {
@@ -151,6 +199,10 @@ const ChatPage = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyPress={handleSearchKeyPress}
             />
+            <SearchControls>
+              <SearchButton onClick={handlePreviousSearchResult}>이전</SearchButton>
+              <SearchButton onClick={handleNextSearchResult}>다음</SearchButton>
+            </SearchControls>
             <CancelButton onClick={handleCancelSearch}>취소</CancelButton>
           </SearchContainer>
         )}
@@ -163,12 +215,15 @@ const ChatPage = () => {
             const showTimestamp = !isSameSenderAndTime(message, nextMessage);
             const showDate = !isSameDay(message, previousMessage) || index === 0;
 
+            const isHighlighted = searchResults.includes(index);
+            const isActiveResult = isHighlighted && index === searchResults[currentSearchIndex];
+
             return (
               <React.Fragment key={index}>
                 {showDate && (
                   <DateSeparator>{formatDate(message.timestamp)}</DateSeparator>
                 )}
-                <MessageItem isOwnMessage={message.sender === '나'}>
+                <MessageItem isOwnMessage={message.sender === '나'} isActiveResult={isActiveResult}>
                   {showSender && (
                     <MessageSender>{message.sender}</MessageSender>
                   )}
@@ -209,7 +264,6 @@ const ChatPage = () => {
 };
 
 export default ChatPage;
-
 
 const Container = styled.div`
   display: flex;
@@ -318,6 +372,8 @@ const MessageItem = styled.div`
   flex-direction: column;
   align-items: ${(props) => (props.isOwnMessage ? 'flex-end' : 'flex-start')};
   margin-bottom: 15px;
+  border-radius: 8px;
+  background-color: ${(props) => (props.isActiveResult ? '#eee' : 'transparent')};
 `;
 
 const MessageWrapper = styled.div`
@@ -354,10 +410,15 @@ const MessageContent = styled.div`
     width: 0;
     z-index: 1;
     bottom: 8px; 
-    left: ${(props) => (props.isOwnMessage ? 'auto' : '-12px')};
+    left: ${(props) => (props.isOwnMessage ? 'auto' : '-10px')};
     right: ${(props) => (props.isOwnMessage ? '-10px' : 'auto')};
     transform: translateY(0);
   }
+`;
+
+const HighlightedText = styled.span`
+  background-color: #E0E0E0; 
+  font-weight: bold;
 `;
 
 const MessageTimestamp = styled.span`
@@ -419,23 +480,41 @@ const DateSeparator = styled.div`
 
 const SearchContainer = styled.div`
   display: flex;
-  justify-content: center;
   align-items: center;
-  padding: 10px  0px ;
+  justify-content: space-between;
+  padding: 10px;
   background-color: #e8f0fe;
   position: fixed;
   top: 68px;
   width: 100%;
-  max-width: 390px;
+  max-width: 370px;
   z-index: 100;
 `;
 
 const SearchInput = styled.input`
-  width: 70%;
+  flex: 1;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 1rem;
+  margin-right: 10px;
+`;
+
+const SearchControls = styled.div`
+  display: flex;
+`;
+
+const SearchButton = styled.button`
+  background-color: #e8f0fe;
+  color: #007bff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+
+  &:hover {
+     color: #fff;
+  }
 `;
 
 const CancelButton = styled.button`
