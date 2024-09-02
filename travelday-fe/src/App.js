@@ -23,6 +23,7 @@ import CreateSchedulePage from './pages/schedulePage/createSchedulePage';
 import TokenRefresher from './utils/useTokenRefresher';
 import PrivacyPage from './pages/mainPage/privacyPage';
 import ChatPage from './pages/chatPage/chatPage';
+import ChatTest from './pages/chatPage/chatTest';
 import ChatListPage from './pages/chatPage/chatListPage';
 
 import './App.css';
@@ -85,6 +86,7 @@ function MainRouter() {
       <Route path="/fixschedule/:travelRoomId" element={<FixSchedulePage />} />
       <Route path="/privacy" element={<PrivacyPage />} />
       <Route path="/chat" element={<ChatPage />} />
+      <Route path="/chat/test" element={<ChatTest />} />
       <Route path="/chatList" element={<ChatListPage />}/>
     </Routes>
   );
