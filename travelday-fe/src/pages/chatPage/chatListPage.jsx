@@ -6,9 +6,9 @@ import { useNavigate } from 'react-router-dom';
 
 const ChatListPage = () => {
   const [chatRooms, setChatRooms] = useState([
-    { id: 1, name: '채팅방 1', lastMessage: '마지막 메시지입니다#1', timestamp: new Date() },
-    { id: 2, name: '채팅방 2', lastMessage: '마지막 메시지입니다#2', timestamp: new Date() },
-    { id: 3, name: '채팅방 3', lastMessage: '마지막 메세지입니다#3', timestamp: new Date() },
+    { id: 1, name: '곤듀들의 일본여행', lastMessage: '마지막 메시지입니다#1', timestamp: new Date(), participants: 5 },
+    { id: 2, name: '제주도 덩어리즈', lastMessage: '마지막 메시지입니다#2', timestamp: new Date(Date.now() - 86400000), participants: 3 },
+    { id: 3, name: '스껄', lastMessage: '마지막 메세지입니다#3', timestamp: new Date(Date.now() - 2 * 86400000), participants: 8 },
   ]);
   
   const [searchTerm, setSearchTerm] = useState(''); 
@@ -19,12 +19,22 @@ const ChatListPage = () => {
   };
 
   const formatTime = (date) => {
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-    const ampm = hours >= 12 ? '오후' : '오전';
-    const formattedHours = hours % 12 || 12; 
-    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
-    return `${ampm} ${formattedHours}시 ${formattedMinutes}분`;
+    const now = new Date();
+    const diffInMs = now - date;
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+
+    if (diffInDays === 0) {
+      const hours = date.getHours();
+      const minutes = date.getMinutes();
+      const ampm = hours >= 12 ? '오후' : '오전';
+      const formattedHours = hours % 12 || 12; 
+      const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+      return `${ampm} ${formattedHours}시 ${formattedMinutes}분`;
+    } else if (diffInDays === 1) {
+      return '어제';
+    } else {
+      return `${date.getMonth() + 1}월 ${date.getDate()}일`;
+    }
   };
 
   const filteredChatRooms = chatRooms.filter((room) =>
@@ -49,13 +59,22 @@ const ChatListPage = () => {
         </SearchContainer>
 
         <ChatList>
-          {filteredChatRooms.map((room) => (
-            <ChatRoomItem key={room.id} onClick={() => handleChatRoomClick(room.id)}>
-              <RoomName>{room.name}</RoomName>
-              <LastMessage>{room.lastMessage}</LastMessage>
-              <Timestamp>{formatTime(new Date(room.timestamp))}</Timestamp>
-            </ChatRoomItem>
-          ))}
+          {filteredChatRooms.length > 0 ? (
+            filteredChatRooms.map((room) => (
+              <ChatRoomItem key={room.id} onClick={() => handleChatRoomClick(room.id)}>
+                <RoomHeader>
+                  <RoomName>{room.name}</RoomName>
+                  <Participants>{room.participants}</Participants>
+                </RoomHeader>
+                <MessageContainer>
+                  <LastMessage>{room.lastMessage}</LastMessage>
+                  <Timestamp>{formatTime(new Date(room.timestamp))}</Timestamp>
+                </MessageContainer>
+              </ChatRoomItem>
+            ))
+          ) : (
+            <NoChatRooms>채팅방이 없습니다.</NoChatRooms>
+          )}
         </ChatList>
       </ChatListContainer>
 
@@ -143,7 +162,7 @@ const ChatList = styled.div`
 const ChatRoomItem = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 15px 10px;
+  padding: 18px 10px;
   margin-bottom: 10px; 
   border-radius: 12px; 
   background-color: #ffffff;
@@ -152,12 +171,17 @@ const ChatRoomItem = styled.div`
   transition: background-color 0.3s ease, transform 0.3s ease, color 0.3s ease;
 
   &:hover {
-    background-color: #eaf6ff; 
+    background-color: #dff1ff; 
+    border: 2px solid #89c5ff;
     color: #4a90e2; 
     transform: translateY(-3px); 
   }
 `;
 
+const RoomHeader = styled.div`
+  display: flex;
+  align-items: center;
+`;
 
 const RoomName = styled.span`
   font-size: 18px;
@@ -165,15 +189,35 @@ const RoomName = styled.span`
   color: #333;
 `;
 
+const Participants = styled.span`
+  font-size: 14px;
+  margin-left: 10px;
+  color: #999;
+`;
+
+const MessageContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+`;
+
 const LastMessage = styled.span`
   font-size: 14px;
   color: #666;
-  margin-top: 5px;
 `;
 
 const Timestamp = styled.span`
   font-size: 12px;
   color: #999;
-  margin-top: 3px;
   align-self: flex-end;
+`;
+
+const NoChatRooms = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  color: #999;
+  font-size: 16px;
 `;

@@ -1,8 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import Header from '../../components/shared/header.js';  
 import BottomNav from '../../components/shared/bottomNav.js'; 
+
 const PrivacyPage = () => {
+
+  // 페이지 접근 시 스크롤을 최상단으로 이동시키기 위한 useEffect 훅
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <Container>
       <Header />
