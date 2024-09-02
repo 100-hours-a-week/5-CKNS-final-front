@@ -266,12 +266,11 @@ const ModalButtons = styled.div`
   display: flex;
   justify-content: space-between;
 `;
-
 const ModalButton = styled.button`
-  background: linear-gradient(135deg, #ff7e79, #ff9a8b); 
+  background: linear-gradient(135deg, #f12e5e, #ff9a8b); 
   color: white;
   border: none;
-  width:82px;
+  width: 82px;
   padding: 10px 20px;
   border-radius: 50px; 
   cursor: pointer;
@@ -281,7 +280,7 @@ const ModalButton = styled.button`
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
 
   &:hover {
-    background: linear-gradient(135deg, #ff9a8b, #ff7e79);  
+    background: linear-gradient(135deg, #ff9a8b, #f12e5e);  
     transform: translateY(-2px);  
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); 
   }

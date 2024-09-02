@@ -10,19 +10,16 @@ const AlarmSidebar = ({ isOpen, onClose, alarms }) => {
 
   const handleAlarmClick = (roomId, roomName) => {
     setSelectedRoom({ roomId, roomName });
-    setIsModalOpen(true); // 모달 열기
-    // 이곳에서 알람이 확인된 것으로 표시하는 로직 추가 가능
+    setIsModalOpen(true);
   };
 
   const handleAccept = () => {
-    // 초대 수락 처리 로직 추가 예정
     setIsModalOpen(false);
     onClose();
     navigate(`/rooms/${selectedRoom.roomId}`);
   };
 
   const handleDecline = () => {
-    // 초대 거절 처리 로직 추가 예정
     setIsModalOpen(false);
     setSelectedRoom(null);
   };
@@ -31,12 +28,12 @@ const AlarmSidebar = ({ isOpen, onClose, alarms }) => {
     const now = new Date();
     const alarmTime = new Date(time);
     const differenceInMinutes = Math.floor((now - alarmTime) / 1000 / 60);
-  
+
     if (differenceInMinutes < 1) {
       return "방금 전";
     } else if (differenceInMinutes < 60) {
       return `${differenceInMinutes}분 전`;
-    } else if (differenceInMinutes < 1440) { // 1440분 = 24시간
+    } else if (differenceInMinutes < 1440) {
       const differenceInHours = Math.floor(differenceInMinutes / 60);
       return `${differenceInHours}시간 전`;
     } else {
@@ -44,7 +41,7 @@ const AlarmSidebar = ({ isOpen, onClose, alarms }) => {
       return `${differenceInDays}일 전`;
     }
   };
-  
+
   return (
     <>
       <SidebarContainer isOpen={isOpen}>
@@ -123,7 +120,7 @@ const CloseButton = styled.button`
   transition: color 0.3s ease;
 
   &:hover {
-    color: #e74c3c; 
+    color: #e74c3c;
   }
 `;
 
@@ -141,25 +138,25 @@ const AlarmItem = styled.div`
   height: 90px;
   cursor: pointer;
   border-radius: 8px;
-  background-color: #f8f9fa; /* 배경색 조정 */
+  background-color: #f8f9fa;
   margin-bottom: 10px;
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
 
   &:hover {
-    background-color: #e9ecef; /* hover 시 강조 */
+    background-color: #e9ecef;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 `;
 
 const AlarmMessage = styled.div`
   font-size: 16px;
-  color: #000; /* 텍스트 색상 */
+  color: #000;
   white-space: pre-wrap;
-  line-height: 1.5; /* 줄 간격을 조절하는 속성 */
+  line-height: 1.5;
 `;
 
 const HighlightedText = styled.span`
-  color: #007bff; /* 초대한 사람과 방 이름만 파란색으로 표시 */
+  color: #007bff;
   font-weight: 500;
 `;
 
@@ -169,6 +166,7 @@ const InviteTime = styled.div`
   margin-top: 5px;
 `;
 
+// 모달 관련 스타일
 const ModalOverlay = styled.div`
   position: fixed;
   top: 0;
@@ -179,30 +177,15 @@ const ModalOverlay = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 2000;
+  z-index: 1000;
 `;
 
 const ModalContainer = styled.div`
-  background-color: #fff;
+  background-color: white;
   padding: 20px;
-  border-radius: 15px;
-  width: 330px;
-  height: 120px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   text-align: center;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  position: relative;
-  animation: fadeIn 0.3s ease-out;
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: scale(0.9);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
 `;
 
 const CloseModalButton = styled.button`
@@ -220,32 +203,39 @@ const CloseModalButton = styled.button`
 `;
 
 const ModalTitle = styled.h2`
-  font-size: 15px;
-  margin-top: 25px;
-  margin-bottom: 25px;
+  font-size: 16px;
+  margin-top: 10px;
+  margin-bottom: 20px;
   color: #333;
 `;
 
 const ModalButtons = styled.div`
-  display: flex;
-  justify-content: space-between;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 `;
 
 const ModalButton = styled.button`
-  padding: 10px 20px;
-  font-size: 16px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  background-color: #b0b0b0;  /* 기본 회색 */
+  background: linear-gradient(135deg, #007bff, #00a2ff); 
   color: white;
-  width: 45%;
+  border: none;
+  width: 82px;
+  padding: 10px 20px;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 0 10px;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 
   &:hover {
-    background-color: ${props => props.decline ? '#007bff' : '#007bff'}; 
-    transform: translateY(-2px); /* 버튼이 약간 올라가는 효과 */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* hover 시 그림자 강화 */
+    background: linear-gradient(135deg, #00a2ff, #007bff);  
+    transform: translateY(-2px);  
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); 
+  }
+
+  &:active {
+    transform: translateY(0); 
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1); 
   }
 `;
