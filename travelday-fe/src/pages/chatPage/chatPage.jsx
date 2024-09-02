@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
+import axios from 'axios';
 import BottomNav from '../../components/shared/bottomNav.js'; 
 import { useNavigate } from 'react-router-dom';
 import { IoSearch, IoMenuOutline } from "react-icons/io5";
 import Sidebar from '../../components/chatPage/sideBar.js';  
-
 
 const linkify = (text) => {
   const urlPattern = /https?:\/\/[^\s]+/g;
@@ -24,39 +24,139 @@ const linkify = (text) => {
   });
 };
 
-const ChatPage = () => {
-  const [messages, setMessages] = useState([
-    { sender: '나', content: '안녕하세요!', timestamp: new Date() },
-    { sender: '다른 사용자', content: '안녕하세요! 반갑습니다.', timestamp: new Date() },
-    { sender: '나', content: '안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요', timestamp: new Date() }, 
-  ]);
+const ChatPage = ({ travelroom_id, nickname }) => {  
+  const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
+  const [isConnected, setIsConnected] = useState(true); // WebSocket 연결 상태를 관리하는 상태 변수
+  const [isSending, setIsSending] = useState(false); // 메시지 전송 중 상태를 관리하는 상태 변수
   const navigate = useNavigate();
   const messageEndRef = useRef(null);
   const messageListRef = useRef(null);
+  const socketRef = useRef(null); // WebSocket 인스턴스를 저장할 Ref
 
-  const handleSendMessage = (e) => {
+  const token = localStorage.getItem('accessToken');
+  const MAX_RETRY_COUNT = 5; // 최대 재연결 시도 횟수
+  const RETRY_DELAY = 2000; // 재연결 시도 간격
+
+  useEffect(() => {
+    let retryCount = 0; // 재연결 시도 횟수를 추적
+
+    const connectWebSocket = () => {
+      // WebSocket 인스턴스를 생성하여 연결
+      socketRef.current = new WebSocket(`wss://api.thetravelday.co.kr/api/rooms/${travelroom_id}/chat/ws`);
+
+      // WebSocket이 성공적으로 연결되었을 때 호출되는 함수
+      socketRef.current.onopen = () => {
+        console.log('WebSocket 연결 성공');
+        setIsConnected(true); // 연결 상태를 true로 설정
+        retryCount = 0; // 연결에 성공하면 재시도 횟수를 초기화
+      };
+
+      // WebSocket을 통해 메시지를 수신할 때 호출되는 함수
+      socketRef.current.onmessage = (event) => {
+        const message = JSON.parse(event.data); // 수신된 메시지를 JSON으로 파싱
+        setMessages((prevMessages) => [...prevMessages, message]); // 수신된 메시지를 상태에 추가
+      };
+
+      // WebSocket에서 오류가 발생했을 때 호출되는 함수
+      socketRef.current.onerror = (error) => {
+        console.error('WebSocket 에러:', error);
+    
+      };
+
+      // WebSocket 연결이 닫혔을 때 호출되는 함수
+      socketRef.current.onclose = (event) => {
+        console.warn('WebSocket 연결 종료:', event);
+        setIsConnected(false); // 연결 상태를 false로 설정
+
+        // 비정상적인 종료 시 재연결 시도
+        if (retryCount < MAX_RETRY_COUNT) {
+          setTimeout(() => {
+            retryCount++; // 재연결 시도 횟수 증가
+            connectWebSocket(); // 재연결 시도
+          }, RETRY_DELAY * retryCount); // 점진적 딜레이를 적용하여 재연결 시도
+        } else {
+          console.error('WebSocket 재연결 실패: 최대 재시도 횟수 초과');
+        }
+      };
+    };
+
+    connectWebSocket(); // WebSocket 연결 시도
+
+    // 컴포넌트가 언마운트될 때 WebSocket 연결을 해제하는 함수
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.close(); // WebSocket 연결 해제
+      }
+    };
+  }, [travelroom_id]); // travelroom_id가 변경될 때마다 WebSocket 연결을 재설정
+
+  useEffect(() => {
+    // 초기 채팅 내역을 불러오는 함수
+    const fetchChatHistory = async () => {
+      try {
+        const response = await axios.get(`https://api.thetravelday.co.kr/api/rooms/${travelroom_id}/chat`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        });
+        setMessages(response.data); // 불러온 채팅 내역을 상태에 저장
+      } catch (error) {
+        console.error('채팅 내역을 불러오지 못했습니다:', error);
+      }
+    };
+
+    fetchChatHistory(); // 컴포넌트 마운트 시 채팅 내역을 불러옴
+  }, [travelroom_id, token]); // travelroom_id 또는 token이 변경될 때마다 채팅 내역을 다시 불러옴
+
+  const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (newMessage.trim() !== '') {
-      const newTimestamp = new Date();
-      const updatedMessages = [...messages, { sender: '나', content: newMessage, timestamp: newTimestamp }];
-      setMessages(updatedMessages);
-      setNewMessage('');
+    if (newMessage.trim() !== '' && !isSending) {
+      setIsSending(true); // 메시지 전송 상태를 true로 설정
+      const messageData = {
+        sender: nickname, // sender를 nickname으로 설정
+        content: newMessage,
+        timestamp: new Date().toISOString(),
+      };
+
+      try {
+        // 메시지 전송 API 호출
+        await axios.post(`https://api.thetravelday.co.kr/api/rooms/${travelroom_id}/chat`, messageData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },//헤더에 토큰 필요한지 확인
+          withCredentials: true,
+        });
+
+        // WebSocket을 통해 메시지 전송
+        if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+          socketRef.current.send(JSON.stringify(messageData));
+        }
+
+        setNewMessage(''); // 메시지 입력 필드를 초기화
+      } catch (error) {
+        console.error('메시지 전송 실패:', error);
+      } finally {
+        setIsSending(false); // 메시지 전송 완료 후 상태를 false로 설정
+      }
     }
   };
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
-      handleSendMessage(e);
+      handleSendMessage(e); // 엔터 키를 누르면 메시지 전송
     }
   };
 
   const handleSearchKeyPress = (e) => {
     if (e.key === 'Enter') {
-      handleSearch();
+      handleSearch(); // 엔터 키를 누르면 검색 수행
     }
   };
 
@@ -81,29 +181,29 @@ const ChatPage = () => {
 
     return (
       currentMessage.sender === previousMessage.sender &&
-      formatTime(currentMessage.timestamp) === formatTime(previousMessage.timestamp)
+      formatTime(new Date(currentMessage.timestamp)) === formatTime(new Date(previousMessage.timestamp))
     );
   };
 
   const isSameDay = (currentMessage, previousMessage) => {
     if (!previousMessage) return false;
 
-    const currentDate = formatDate(currentMessage.timestamp);
-    const previousDate = formatDate(previousMessage.timestamp);
+    const currentDate = formatDate(new Date(currentMessage.timestamp));
+    const previousDate = formatDate(new Date(previousMessage.timestamp));
 
     return currentDate === previousDate;
   };
 
   const handleBackButtonClick = () => { 
-    navigate(-1); 
+    navigate(-1); // 뒤로 가기 버튼 클릭 시 이전 페이지로 이동
   };
 
   const toggleSearch = () => {
-    setIsSearchVisible(!isSearchVisible);
+    setIsSearchVisible(!isSearchVisible); // 검색 창 토글
   };
 
   const toggleSidebar = () => {
-    setIsSidebarVisible(!isSidebarVisible);
+    setIsSidebarVisible(!isSidebarVisible); // 사이드바 토글
   };
 
   const handleSearch = () => {
@@ -116,19 +216,19 @@ const ChatPage = () => {
     if (index !== -1 && messageListRef.current) {
       const messageElements = messageListRef.current.children;
       if (messageElements[index]) {
-        messageElements[index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        messageElements[index].scrollIntoView({ behavior: 'smooth', block: 'center' }); // 검색 결과로 스크롤 이동
       }
     }
   };
 
   const handleCancelSearch = () => {
-    setIsSearchVisible(false);
-    setSearchTerm('');
+    setIsSearchVisible(false); // 검색 창 닫기
+    setSearchTerm(''); // 검색어 초기화
   };
 
   useEffect(() => {
     if (messageEndRef.current) {
-      messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      messageEndRef.current.scrollIntoView({ behavior: 'smooth' }); // 새 메시지가 수신되면 스크롤을 맨 아래로 이동
     }
   }, [messages]);
 
@@ -143,6 +243,8 @@ const ChatPage = () => {
             <IoMenuOutline size={22} onClick={toggleSidebar} /> 
           </IconsContainer>
         </Navbar>
+
+        {!isConnected && <ConnectionStatus>연결이 끊겼습니다. 재연결 시도 중...</ConnectionStatus>}
 
         {isSearchVisible && (
           <SearchContainer>
@@ -167,19 +269,19 @@ const ChatPage = () => {
             return (
               <React.Fragment key={index}>
                 {showDate && (
-                  <DateSeparator>{formatDate(message.timestamp)}</DateSeparator>
+                  <DateSeparator>{formatDate(new Date(message.timestamp))}</DateSeparator>
                 )}
-                <MessageItem isOwnMessage={message.sender === '나'}>
+                <MessageItem isOwnMessage={message.sender === nickname}>
                   {showSender && (
                     <MessageSender>{message.sender}</MessageSender>
                   )}
-                  <MessageWrapper isOwnMessage={message.sender === '나'}>
-                    <MessageContent isOwnMessage={message.sender === '나'}>
+                  <MessageWrapper isOwnMessage={message.sender === nickname}>
+                    <MessageContent isOwnMessage={message.sender === nickname}>
                       {linkify(message.content)}
                     </MessageContent>
                     {showTimestamp && (
-                      <MessageTimestamp isOwnMessage={message.sender === '나'}>
-                        {formatTime(message.timestamp)}
+                      <MessageTimestamp isOwnMessage={message.sender === nickname}>
+                        {formatTime(new Date(message.timestamp))}
                       </MessageTimestamp>
                     )}
                   </MessageWrapper>
@@ -197,8 +299,11 @@ const ChatPage = () => {
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyPress={handleKeyPress} 
+            disabled={!isConnected || isSending} // 연결이 끊겼거나 전송 중일 때 입력 비활성화
           />
-          <SendButton onClick={handleSendMessage}>전송</SendButton>
+          <SendButton onClick={handleSendMessage} disabled={!isConnected || isSending}>
+            {isSending ? '전송 중...' : '전송'}
+          </SendButton>
         </MessageInputContainer>
       </ChatContainer>
 
@@ -210,7 +315,6 @@ const ChatPage = () => {
 };
 
 export default ChatPage;
-
 
 const Container = styled.div`
   display: flex;
@@ -395,20 +499,25 @@ const MessageInput = styled.input`
     border-color: #007bff;
     box-shadow: 0 0 3px rgba(0, 123, 255, 0.3);
   }
+
+  &:disabled {
+    background-color: #e0e0e0;
+    cursor: not-allowed;
+  }
 `;
 
 const SendButton = styled.button`
   padding: 12px 15px;
-  background-color: #007bff;
+  background-color: ${props => props.disabled ? '#cccccc' : '#007bff'};
   color: #fff;
   border: none;
   border-radius: 50px;
-  cursor: pointer;
+  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
   font-weight: bold;
   transition: all 0.3s ease;
 
   &:hover {
-    background-color: #0069d9;
+    background-color: ${props => props.disabled ? '#cccccc' : '#0069d9'};
   }
 `;
 
@@ -454,3 +563,56 @@ const CancelButton = styled.button`
     background-color: #0069d9;
   }
 `;
+
+const ConnectionStatus = styled.div`
+  background-color: #f8d7da;
+  color: #721c24;
+  text-align: center;
+  padding: 15px;
+  font-weight: bold;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  max-width: 400px;
+  z-index: 1000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  animation: fadeInOut 2s ease-in-out infinite;
+
+  &:before {
+    content: '';
+    display: inline-block;
+    margin-right: 10px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #721c24;
+    animation: pulse 1s infinite;
+  }
+
+  @keyframes fadeInOut {
+    0%, 100% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.2);
+      opacity: 0.7;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+`;
+
