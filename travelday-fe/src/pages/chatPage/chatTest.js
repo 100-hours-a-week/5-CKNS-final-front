@@ -184,7 +184,7 @@ const ChatPage = () => {
       <ChatContainer>
         <Navbar>
           <BackButton onClick={handleBackButtonClick}>뒤로</BackButton>
-          <RoomTitle>챗팅방 이름</RoomTitle>
+          <RoomTitle>채팅방 이름</RoomTitle>
           <IconsContainer>
             <IoSearch size={22} onClick={toggleSearch} />  
             <IoMenuOutline size={22} onClick={toggleSidebar} /> 

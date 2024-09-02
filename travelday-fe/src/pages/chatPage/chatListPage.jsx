@@ -6,9 +6,9 @@ import { useNavigate } from 'react-router-dom';
 
 const ChatListPage = () => {
   const [chatRooms, setChatRooms] = useState([
-    { id: 1, name: '챗팅방 1', lastMessage: '마지막 메시지입니다#1', timestamp: new Date() },
-    { id: 2, name: '챗팅방 2', lastMessage: '마지막 메시지입니다#2', timestamp: new Date() },
-    { id: 3, name: '챗팅방 3', lastMessage: '마지막 메세지입니다#3', timestamp: new Date() },
+    { id: 1, name: '채팅방 1', lastMessage: '마지막 메시지입니다#1', timestamp: new Date() },
+    { id: 2, name: '채팅방 2', lastMessage: '마지막 메시지입니다#2', timestamp: new Date() },
+    { id: 3, name: '채팅방 3', lastMessage: '마지막 메세지입니다#3', timestamp: new Date() },
   ]);
   
   const [searchTerm, setSearchTerm] = useState(''); 
