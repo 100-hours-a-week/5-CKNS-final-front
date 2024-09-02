@@ -147,7 +147,7 @@ const ChatPage = () => {
         {isSearchVisible && (
           <SearchContainer>
             <SearchInput 
-              placeholder="검색어를 입력하세요..." 
+              placeholder="메시지 검색하기" 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyPress={handleSearchKeyPress}
@@ -232,7 +232,7 @@ const ChatContainer = styled.div`
   flex-direction: column;
   width: 100%;
   max-width: 390px;
-  height: calc(100vh - 80px);
+  height: calc(100vh - 130px);
   padding-bottom: 70px;
 `;
 
@@ -242,7 +242,7 @@ const MessageList = styled.div`
   background-color: #fff;
   border-top: 1px solid #e0e0e0;
   overflow-y: auto;
-  
+
   &::-webkit-scrollbar {
     display: none;
   }
@@ -286,7 +286,7 @@ const IconsContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 15px;
-  margin-right: 10px;
+  margin-right: 20px;
 
   svg {
     cursor: pointer;
@@ -300,7 +300,7 @@ const IconsContainer = styled.div`
 `;
 
 const BackButton = styled.button`
-  padding: 6px 12px;
+  padding: 6px 20px;
   background-color: transparent;
   color: #fff;
   border: none;
@@ -386,7 +386,7 @@ const MessageInput = styled.input`
   flex: 1;
   padding: 12px 15px;
   border: 1px solid #ccc;
-  border-radius: 8px;
+  border-radius: 50px;
   margin-right: 8px;
   font-size: 1rem;
   outline: none;
@@ -402,7 +402,7 @@ const SendButton = styled.button`
   background-color: #007bff;
   color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 50px;
   cursor: pointer;
   font-weight: bold;
   transition: all 0.3s ease;

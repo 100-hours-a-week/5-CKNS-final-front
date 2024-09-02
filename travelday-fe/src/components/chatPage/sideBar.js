@@ -48,9 +48,9 @@ const SidebarContainer = styled.div`
   top: 0;
   height: calc(100vh - 40px);
   width: 300px; 
-  background-color: #ffffff; /* Changed to pure white for a clean look */
+  background-color: #ffffff; 
   padding: 20px;
-  box-shadow: -2px 0 15px rgba(0,0,0,0.15); /* Slightly deeper shadow */
+  box-shadow: -2px 0 15px rgba(0,0,0,0.15);
   z-index: 1100; 
   transform: translateX(${props => (props.isSidebarVisible ? '0' : '100%')});
   animation: ${props => (props.isSidebarVisible ? slideIn : slideOut)} 0.3s forwards;
@@ -60,7 +60,7 @@ const SidebarContainer = styled.div`
   justify-content: flex-start;
   
   &:hover {
-    box-shadow: -4px 0 20px rgba(0,0,0,0.25); /* Enhanced shadow on hover */
+    box-shadow: -4px 0 20px rgba(0,0,0,0.25); 
   }
 `;
 
@@ -74,9 +74,8 @@ const Header = styled.div`
 `;
 
 const SidebarTitle = styled.h2`
-  font-size: 20px; /* Slightly increased font size */
-  font-weight: 700; /* Made font bolder */
-  color: #2c3e50; /* Darker shade for a modern look */
+  font-size: 20px; 
+  color: #2c3e50; 
   margin: 0;
 `;
 
@@ -91,7 +90,7 @@ const CloseButton = styled.button`
   transition: color 0.3s ease;
 
   &:hover {
-    color: #e74c3c; /* More vibrant red on hover */
+    color: #e74c3c; 
   }
 `;
 
@@ -106,15 +105,14 @@ const Section = styled.div`
 
 const SectionTitle = styled.h3`
   font-size: 16px;
-  font-weight: 600; /* Increased font weight */
-  color: #34495e; /* Darker color for titles */
+  color: #34495e; 
   margin-bottom: 10px;
 `;
 
 const InviteButton = styled.button`
   width: 100%;
   padding: 12px;
-  background-color: #007bff; /* Original blue color */
+  background-color: #007bff; 
   color: #fff;
   border: none;
   border-radius: 50px;
@@ -137,8 +135,8 @@ const ExitButton = styled.button`
   width: 100%;
   padding: 12px;
   background-color: transparent;
-  color: #e74c3c;
-  border: 2px solid #e74c3c; 
+  color: #7f8c8d;
+  border: 2px solid #7f8c8d;
   border-radius: 50px;
   cursor: pointer;
   font-weight: bold;
@@ -146,8 +144,8 @@ const ExitButton = styled.button`
   transition: color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 
   &:hover {
-    color: #e74c3c; 
-    border-color: #c0392b; 
+    color: #e74c3c;
+    border-color: #e74c3c;
     transform: translateY(-2px);
     box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
   }
@@ -156,3 +154,4 @@ const ExitButton = styled.button`
     transform: translateY(0);
   }
 `;
+
