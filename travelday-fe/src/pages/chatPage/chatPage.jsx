@@ -24,7 +24,7 @@ const linkify = (text) => {
   });
 };
 
-const ChatPage = ({ travelroom_id, nickname }) => {  
+const ChatPage = ({ travelRoomId, nickname }) => {  
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [isSearchVisible, setIsSearchVisible] = useState(false);
@@ -48,13 +48,16 @@ const ChatPage = ({ travelroom_id, nickname }) => {
 
     const connectWebSocket = () => {
       // WebSocket 인스턴스를 생성하여 연결
-      socketRef.current = new WebSocket(`wss://api.thetravelday.co.kr/api/rooms/${travelroom_id}/chat/ws`);
+      socketRef.current = new WebSocket(`ws://thetravelday.co.kr/ws-chat/topic/rooms/${travelRoomId}`);
 
       // WebSocket이 성공적으로 연결되었을 때 호출되는 함수
       socketRef.current.onopen = () => {
-        console.log('WebSocket 연결 성공');
+        console.log('WebSocket 연결 성공 (코드 101)');
         setIsConnected(true); // 연결 상태를 true로 설정
         retryCount = 0; // 연결에 성공하면 재시도 횟수를 초기화
+
+        // 구독 메시지 전송
+        socketRef.current.send(JSON.stringify({ type: 'SUBSCRIBE', roomId: travelRoomId }));
       };
 
       // WebSocket을 통해 메시지를 수신할 때 호출되는 함수
@@ -65,13 +68,16 @@ const ChatPage = ({ travelroom_id, nickname }) => {
 
       // WebSocket에서 오류가 발생했을 때 호출되는 함수
       socketRef.current.onerror = (error) => {
-        console.error('WebSocket 에러:', error);
-    
+        console.error('WebSocket 에러 (코드 1001):', error);
       };
 
       // WebSocket 연결이 닫혔을 때 호출되는 함수
       socketRef.current.onclose = (event) => {
-        console.warn('WebSocket 연결 종료:', event);
+        if (event.code === 1000) {
+          console.warn('WebSocket 연결 정상 종료 (코드 1000):', event);
+        } else if (event.code === 1001) {
+          console.error('WebSocket 서버 에러로 연결 종료 (코드 1001):', event);
+        }
         setIsConnected(false); // 연결 상태를 false로 설정
 
         // 비정상적인 종료 시 재연결 시도
@@ -94,27 +100,36 @@ const ChatPage = ({ travelroom_id, nickname }) => {
         socketRef.current.close(); // WebSocket 연결 해제
       }
     };
-  }, [travelroom_id]); // travelroom_id가 변경될 때마다 WebSocket 연결을 재설정
+  }, [travelRoomId]); // travelroom_id가 변경될 때마다 WebSocket 연결을 재설정
 
   useEffect(() => {
-    // 초기 채팅 내역을 불러오는 함수
     const fetchChatHistory = async () => {
       try {
-        const response = await axios.get(`https://api.thetravelday.co.kr/api/rooms/${travelroom_id}/chat`, {
+        const response = await axios.get(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/chats`, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
           withCredentials: true,
         });
-        setMessages(response.data); // 불러온 채팅 내역을 상태에 저장
+  
+        // API 응답의 data 속성에서 메시지 데이터를 추출
+        const messages = response.data.data.map(msg => ({
+          ...msg,
+          content: msg.message,  // message를 content로 변환
+          timestamp: msg.createdAt ? new Date(msg.createdAt).toISOString() : null, // createdAt을 ISO string으로 변환, null이면 그대로 유지
+          sender: msg.senderNickname // senderNickname을 sender로 매핑
+        }));
+  
+        setMessages(messages); // 변환된 메시지 데이터를 상태에 저장
       } catch (error) {
         console.error('채팅 내역을 불러오지 못했습니다:', error);
       }
     };
-
+  
     fetchChatHistory(); // 컴포넌트 마운트 시 채팅 내역을 불러옴
-  }, [travelroom_id, token]); // travelroom_id 또는 token이 변경될 때마다 채팅 내역을 다시 불러옴
+  }, [travelRoomId, token]); // travelroom_id 또는 token이 변경될 때마다 채팅 내역을 다시 불러옴
+  
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -127,18 +142,11 @@ const ChatPage = ({ travelroom_id, nickname }) => {
       };
 
       try {
-        // 메시지 전송 API 호출
-        await axios.post(`https://api.thetravelday.co.kr/api/rooms/${travelroom_id}/chat`, messageData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },//헤더에 토큰 필요한지 확인
-          withCredentials: true,
-        });
-
         // WebSocket을 통해 메시지 전송
         if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
           socketRef.current.send(JSON.stringify(messageData));
+        } else {
+          console.error('WebSocket이 열려있지 않습니다.');
         }
 
         setNewMessage(''); // 메시지 입력 필드를 초기화
