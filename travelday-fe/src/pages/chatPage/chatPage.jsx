@@ -29,6 +29,8 @@ const ChatPage = ({ travelroom_id, nickname }) => {
   const [newMessage, setNewMessage] = useState('');
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [currentSearchIndex, setCurrentSearchIndex] = useState(0);
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [isConnected, setIsConnected] = useState(true); // WebSocket 연결 상태를 관리하는 상태 변수
   const [isSending, setIsSending] = useState(false); // 메시지 전송 중 상태를 관리하는 상태 변수
@@ -209,14 +211,48 @@ const ChatPage = ({ travelroom_id, nickname }) => {
   const handleSearch = () => {
     if (searchTerm.trim() === '') return;
 
-    const index = messages.findIndex(message => 
-      message.content.includes(searchTerm)
-    );
+    const results = messages.reduce((acc, message, index) => {
+      if (message.content.includes(searchTerm)) {
+        acc.push(index);
+      }
+      return acc;
+    }, []);
 
-    if (index !== -1 && messageListRef.current) {
+    setSearchResults(results);
+    setCurrentSearchIndex(0);
+
+    if (results.length > 0 && messageListRef.current) {
       const messageElements = messageListRef.current.children;
-      if (messageElements[index]) {
-        messageElements[index].scrollIntoView({ behavior: 'smooth', block: 'center' }); // 검색 결과로 스크롤 이동
+      if (messageElements[results[0]]) {
+        messageElements[results[0]].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  };
+
+  const handleNextSearchResult = () => {
+    if (searchResults.length === 0) return;
+
+    const nextIndex = (currentSearchIndex + 1) % searchResults.length;
+    setCurrentSearchIndex(nextIndex);
+
+    if (messageListRef.current) {
+      const messageElements = messageListRef.current.children;
+      if (messageElements[searchResults[nextIndex]]) {
+        messageElements[searchResults[nextIndex]].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  };
+
+  const handlePreviousSearchResult = () => {
+    if (searchResults.length === 0) return;
+
+    const prevIndex = (currentSearchIndex - 1 + searchResults.length) % searchResults.length;
+    setCurrentSearchIndex(prevIndex);
+
+    if (messageListRef.current) {
+      const messageElements = messageListRef.current.children;
+      if (messageElements[searchResults[prevIndex]]) {
+        messageElements[searchResults[prevIndex]].scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }
   };
@@ -254,6 +290,10 @@ const ChatPage = ({ travelroom_id, nickname }) => {
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyPress={handleSearchKeyPress}
             />
+            <SearchControls>
+              <SearchButton onClick={handlePreviousSearchResult}>이전</SearchButton>
+              <SearchButton onClick={handleNextSearchResult}>다음</SearchButton>
+            </SearchControls>
             <CancelButton onClick={handleCancelSearch}>취소</CancelButton>
           </SearchContainer>
         )}
@@ -266,12 +306,15 @@ const ChatPage = ({ travelroom_id, nickname }) => {
             const showTimestamp = !isSameSenderAndTime(message, nextMessage);
             const showDate = !isSameDay(message, previousMessage) || index === 0;
 
+            const isHighlighted = searchResults.includes(index);
+            const isActiveResult = isHighlighted && index === searchResults[currentSearchIndex];
+
             return (
               <React.Fragment key={index}>
                 {showDate && (
                   <DateSeparator>{formatDate(new Date(message.timestamp))}</DateSeparator>
                 )}
-                <MessageItem isOwnMessage={message.sender === nickname}>
+                <MessageItem isOwnMessage={message.sender === nickname} isActiveResult={isActiveResult}>
                   {showSender && (
                     <MessageSender>{message.sender}</MessageSender>
                   )}
@@ -423,6 +466,8 @@ const MessageItem = styled.div`
   flex-direction: column;
   align-items: ${(props) => (props.isOwnMessage ? 'flex-end' : 'flex-start')};
   margin-bottom: 15px;
+  border-radius: 8px;
+  background-color: ${(props) => (props.isActiveResult ? '#eee' : 'transparent')};
 `;
 
 const MessageWrapper = styled.div`
@@ -548,6 +593,25 @@ const SearchInput = styled.input`
   font-size: 1rem;
 `;
 
+const SearchControls = styled.div`
+  display: flex;
+  gap: 5px;
+`;
+
+const SearchButton = styled.button`
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+
+  &:hover {
+    background-color: #0069d9;
+  }
+`;
+
 const CancelButton = styled.button`
   padding: 10px;
   margin-left: 10px;
@@ -615,4 +679,3 @@ const ConnectionStatus = styled.div`
     }
   }
 `;
-
