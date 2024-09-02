@@ -39,10 +39,10 @@ const ChatPage = ({ travelroom_id, nickname }) => {
 
   const token = localStorage.getItem('accessToken');
   const MAX_RETRY_COUNT = 5; // 최대 재연결 시도 횟수
-  const RETRY_DELAY = 2000; // 재연결 시도 간격 (밀리초)
+  const RETRY_DELAY = 2000; // 재연결 시도 간격
 
   useEffect(() => {
-    let retryCount = 0; // 재연결 시도 횟수를 추적하는 변수
+    let retryCount = 0; // 재연결 시도 횟수를 추적
 
     const connectWebSocket = () => {
       // WebSocket 인스턴스를 생성하여 연결
@@ -64,7 +64,7 @@ const ChatPage = ({ travelroom_id, nickname }) => {
       // WebSocket에서 오류가 발생했을 때 호출되는 함수
       socketRef.current.onerror = (error) => {
         console.error('WebSocket 에러:', error);
-        alert('채팅 서버에 연결할 수 없습니다. 잠시 후 다시 시도하세요.');
+    
       };
 
       // WebSocket 연결이 닫혔을 때 호출되는 함수
@@ -565,13 +565,54 @@ const CancelButton = styled.button`
 `;
 
 const ConnectionStatus = styled.div`
-  background-color: #ffcccc;
-  color: #900;
+  background-color: #f8d7da;
+  color: #721c24;
   text-align: center;
-  padding: 10px;
+  padding: 15px;
   font-weight: bold;
   position: fixed;
-  top: 0;
-  width: 100%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  max-width: 400px;
   z-index: 1000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  animation: fadeInOut 2s ease-in-out infinite;
+
+  &:before {
+    content: '';
+    display: inline-block;
+    margin-right: 10px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #721c24;
+    animation: pulse 1s infinite;
+  }
+
+  @keyframes fadeInOut {
+    0%, 100% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.2);
+      opacity: 0.7;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
 `;
+
