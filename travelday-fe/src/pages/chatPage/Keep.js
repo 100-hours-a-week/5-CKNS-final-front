@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useParams } from 'react-router-dom'; // useParams 훅을 import
 import styled from 'styled-components';
 import axios from 'axios';
 import BottomNav from '../../components/shared/bottomNav.js'; 
@@ -25,9 +24,7 @@ const linkify = (text) => {
   });
 };
 
-const ChatPage = ({ nickname }) => {  
-  const { travelRoomId } = useParams(); // URL에서 travelRoomId를 추출
-
+const ChatPage = ({ travelRoomId, nickname }) => {  
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [isSearchVisible, setIsSearchVisible] = useState(false);
@@ -43,16 +40,15 @@ const ChatPage = ({ nickname }) => {
   const socketRef = useRef(null); // WebSocket 인스턴스를 저장할 Ref
 
   const token = localStorage.getItem('accessToken');
-  const MAX_RETRY_COUNT = 10; // 최대 재연결 시도 횟수
-  const RETRY_DELAY = 3000; // 재연결 시도 간격
+  const MAX_RETRY_COUNT = 5; // 최대 재연결 시도 횟수
+  const RETRY_DELAY = 2000; // 재연결 시도 간격
 
   useEffect(() => {
     let retryCount = 0; // 재연결 시도 횟수를 추적
 
     const connectWebSocket = () => {
-      console.log(travelRoomId);
       // WebSocket 인스턴스를 생성하여 연결
-      socketRef.current = new WebSocket(`ws://localhost:8080/ws-chat/topic/rooms/${travelRoomId}`);
+      socketRef.current = new WebSocket(`ws://thetravelday.co.kr/ws-chat/topic/rooms/${travelRoomId}`);
 
       // WebSocket이 성공적으로 연결되었을 때 호출되는 함수
       socketRef.current.onopen = () => {
@@ -104,12 +100,12 @@ const ChatPage = ({ nickname }) => {
         socketRef.current.close(); // WebSocket 연결 해제
       }
     };
-  }, [travelRoomId]); // travelRoomId가 변경될 때마다 WebSocket 연결을 재설정
+  }, [travelRoomId]); // travelroom_id가 변경될 때마다 WebSocket 연결을 재설정
 
   useEffect(() => {
     const fetchChatHistory = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/rooms/${travelRoomId}/chats`, {
+        const response = await axios.get(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/chats`, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
@@ -132,7 +128,7 @@ const ChatPage = ({ nickname }) => {
     };
   
     fetchChatHistory(); // 컴포넌트 마운트 시 채팅 내역을 불러옴
-  }, [travelRoomId, token]); // travelRoomId 또는 token이 변경될 때마다 채팅 내역을 다시 불러옴
+  }, [travelRoomId, token]); // travelroom_id 또는 token이 변경될 때마다 채팅 내역을 다시 불러옴
   
 
   const handleSendMessage = async (e) => {

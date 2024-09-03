@@ -85,7 +85,7 @@ function MainRouter() {
       <Route path="/createschedule" element={<CreateSchedulePage />} />
       <Route path="/fixschedule/:travelRoomId" element={<FixSchedulePage />} />
       <Route path="/privacy" element={<PrivacyPage />} />
-      <Route path="/chat" element={<ChatPage />} />
+      <Route path="/chat/:travelRoomId" element={<ChatPage />} />
       <Route path="/chat/test" element={<ChatTest />} />
       <Route path="/chatList" element={<ChatListPage />}/>
     </Routes>

@@ -31,6 +31,7 @@ const airportNames = {
   FRA: '프랑크푸르트 공항',
   FCO: '피우미치노 공항',
   ICN: '인천국제공항',
+  NRT: '나리타 공항'
 };
 
 const airlineNames = {
