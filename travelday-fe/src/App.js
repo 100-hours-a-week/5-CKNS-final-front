@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
 import { useJsApiLoader } from '@react-google-maps/api';
 import FindPage from './pages/searchPage/searchingPage';
@@ -29,6 +29,8 @@ import ChatListPage from './pages/chatPage/chatListPage';
 import './App.css';
 import './i18n';
 
+import { requestForToken } from './firebase'; // FCM 관련 임포트
+
 const libraries = ['places'];
 
 function App() {
@@ -37,13 +39,22 @@ function App() {
     libraries,
   });
 
+  const [isTokenFound, setTokenFound] = useState(false);
+
+  useEffect(() => {
+    requestForToken(setTokenFound); // FCM 토큰 요청
+  }, []);
+
   if (!isLoaded) {
-    return null; 
+    return null;
   }
 
   return (
     <Router>
       <TokenRefresher />
+      <div className="App">
+        <h1>FCM Token {isTokenFound ? "found" : "not found"}</h1> {/* FCM 토큰 상태 표시 */}
+      </div>
       <Routes>
         <Route path="/*" element={<MainRouter />} />
       </Routes>
@@ -87,7 +98,7 @@ function MainRouter() {
       <Route path="/privacy" element={<PrivacyPage />} />
       <Route path="/chat/:travelRoomId" element={<ChatPage />} />
       <Route path="/chat/test" element={<ChatTest />} />
-      <Route path="/chatList" element={<ChatListPage />}/>
+      <Route path="/chatList" element={<ChatListPage />} />
     </Routes>
   );
 }

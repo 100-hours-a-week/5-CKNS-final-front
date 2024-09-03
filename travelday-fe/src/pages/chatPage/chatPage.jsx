@@ -44,7 +44,7 @@ const ChatPage = ({ nickname }) => {
 
   const token = localStorage.getItem('accessToken');
   const MAX_RETRY_COUNT = 10; // 최대 재연결 시도 횟수
-  const RETRY_DELAY = 3000; // 재연결 시도 간격
+  const RETRY_DELAY = 5000; // 재연결 시도 간격
 
   useEffect(() => {
     let retryCount = 0; // 재연결 시도 횟수를 추적
@@ -52,7 +52,7 @@ const ChatPage = ({ nickname }) => {
     const connectWebSocket = () => {
       console.log(travelRoomId);
       // WebSocket 인스턴스를 생성하여 연결
-      socketRef.current = new WebSocket(`ws://localhost:8080/ws-chat/topic/rooms/${travelRoomId}`);
+      socketRef.current = new WebSocket(`ws://localhost:8080/ws/topic/rooms/${travelRoomId}`);
 
       // WebSocket이 성공적으로 연결되었을 때 호출되는 함수
       socketRef.current.onopen = () => {
@@ -148,7 +148,12 @@ const ChatPage = ({ nickname }) => {
       try {
         // WebSocket을 통해 메시지 전송
         if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-          socketRef.current.send(JSON.stringify(messageData));
+          // 메시지를 지정된 경로로 전송
+          socketRef.current.send(JSON.stringify({
+            type: 'SEND',
+            destination: `/pub/rooms/${travelRoomId}/chats`,
+            message: messageData,
+          }));
         } else {
           console.error('WebSocket이 열려있지 않습니다.');
         }
