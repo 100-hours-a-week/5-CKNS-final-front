@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getMessaging, getToken } from "firebase/messaging";
 
+
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_KEY,
   authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIM,
@@ -13,8 +14,10 @@ const firebaseConfig = {
 // Firebase 초기화
 const app = initializeApp(firebaseConfig);
 
+
 // FCM 초기화
 const messaging = getMessaging(app);
+
 
 export const requestForToken = (setTokenFound) => {
   return getToken(messaging, { vapidKey: process.env.REACT_APP_FIREBASE_VAPID_KEY })

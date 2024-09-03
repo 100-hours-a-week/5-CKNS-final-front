@@ -42,6 +42,7 @@ function App() {
   const [isTokenFound, setTokenFound] = useState(false);
 
   useEffect(() => {
+    console.log('hi')
     requestForToken(setTokenFound); // FCM 토큰 요청
   }, []);
 
@@ -53,7 +54,6 @@ function App() {
     <Router>
       <TokenRefresher />
       <div className="App">
-        <h1>FCM Token {isTokenFound ? "found" : "not found"}</h1> {/* FCM 토큰 상태 표시 */}
       </div>
       <Routes>
         <Route path="/*" element={<MainRouter />} />
