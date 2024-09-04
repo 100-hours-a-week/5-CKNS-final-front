@@ -46,7 +46,7 @@ function Footer() {
           <button style={styles.toggleButton} onClick={navigateToPrivacy}>개인정보 처리방침</button>
         </div>
 
-        <p style={styles.contact}>문의: support@travelday.com | 전화: 123-456-7890</p>
+        <p style={styles.contact}>문의: ktbjejuckns@gmail.com | 전화: 123-456-7890</p>
 
         <div style={styles.newsletter}>
           <p style={styles.newsletterText}>업데이트 소식 받아보기.</p>
@@ -70,7 +70,7 @@ function Footer() {
             구독
           </button>
           {!isEmailValid && email && (
-            <p style={styles.helperText}>support@travelday.com 이메일 형식을 지켜주세요!</p>
+            <p style={styles.helperText}>ktbjejuckns@gmail.com 이메일 형식을 지켜주세요!</p>
           )}
         </div>
 
