@@ -32,7 +32,8 @@ const airportNames = {
   FCO: '피우미치노 공항',
   ICN: '인천국제공항',
   NRT: '나리타 공항',
-  KUL: '쿠알라룸푸르국제공항'
+  KUL: '쿠알라룸푸르국제공항',
+  TAO: '칭다오자오둥국제공항'
 };
 
 const airlineNames = {
@@ -66,8 +67,7 @@ const airlineNames = {
     YP: '에어프레미아',
     OD: '말린도항공',
     TW: '티웨이항공'
-  };
-
+};
 
 const airlineUrls = {
     KE: 'https://www.koreanair.com', // 대한항공
@@ -97,12 +97,11 @@ const airlineUrls = {
     SU: 'https://www.aeroflot.ru', // 아에로플로트
     '7C': 'https://www.jejuair.net', // 제주항공
     'H1': 'https://www.hahnair.com', // 한에어항공
-    YP: 'https://www.airpremia.com' ,// 에어프레미아
+    YP: 'https://www.airpremia.com', // 에어프레미아
     OD: 'https://www.malindoair.com/kr/ko/',
     TW: 'https://www.twayair.com/app/main'
-  };
-  
-  
+};
+
 const getAirportName = (iataCode) => airportNames[iataCode] || iataCode;
 const getAirlineName = (carrierCode) => airlineNames[carrierCode] || carrierCode;
 const getAirlineUrl = (carrierCode) => airlineUrls[carrierCode] || '#';
@@ -183,7 +182,7 @@ const MainDetailPage = () => {
               </FlightDetails>
               {segIndex === itineraries[0].segments.length - 1 && (
                 <FlightInfo>
-                  <InfoItem>{formatDuration(itineraries[0].duration)}, {segment.numberOfStops > 0 ? `${t('stops', { count: segment.numberOfStops })}` : t('nonStop')}</InfoItem>
+                  <InfoItem>{formatDuration(itineraries[0].duration)}</InfoItem>
                 </FlightInfo>
               )}
             </FlightSegment>
@@ -225,7 +224,6 @@ const MainDetailPage = () => {
 };
 
 export default MainDetailPage;
-
 
 const PageContainer = styled.div`
   display: flex;
@@ -408,5 +406,3 @@ const ReservationButton = styled.a`
     transform: translateY(1px);
   }
 `;
-
-
