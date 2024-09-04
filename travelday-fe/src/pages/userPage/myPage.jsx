@@ -28,18 +28,13 @@ const MyPage = () => {
 
   }, [navigate]);
 
-  const fetchKakaoUserProfile = async (token) => {
+  const fetchKakaoUserProfile = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/user', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        } 
-      });
+      const response = await axiosInstance.get('/api/user');
   
       if (response.status === 200) {
-        console.log('닉네임:', nickname);
         const nickname = response.data.data.nickname; 
+        console.log('닉네임:', nickname);
         setNickname(nickname);
         setIsLoading(false); 
       } else {
@@ -48,14 +43,13 @@ const MyPage = () => {
     } catch (error) {
       if (error.response) {
         console.log('에러 응답 상태 코드:', error.response.status);
-        console.log('에러 응답 데이터:', error.response.data);
       } else {
         console.log('응답을 받지 못했습니다:', error.message);
       }
-      setErrorMessage('사용자 정보를 불러오는 중 오류가 발생했습니다.');
       setIsLoading(false); 
     }
   };
+  
   
   const handleLogout = async () => {
     try {
