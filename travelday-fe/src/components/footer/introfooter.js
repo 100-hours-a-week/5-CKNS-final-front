@@ -3,21 +3,12 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom'; 
 
 function Footer() {
-  const [showTerms, setShowTerms] = useState(false);
-  const [showPrivacy, setShowPrivacy] = useState(false);
   const [email, setEmail] = useState('');
   const [isEmailValid, setIsEmailValid] = useState(false); // 이메일 유효성 상태
   const [showModal, setShowModal] = useState(false); // 모달 표시 여부를 관리하는 state
 
   const navigate = useNavigate(); // navigate 함수 초기화
 
-  const toggleTerms = () => {
-    setShowTerms(!showTerms);
-  };
-
-  const togglePrivacy = () => {
-    setShowPrivacy(!showPrivacy);
-  };
 
   const handleEmailChange = (e) => {
     const newEmail = e.target.value;
@@ -47,7 +38,6 @@ function Footer() {
     navigate('/privacy'); // /privacy 페이지로 이동
   };
 
-
   return (
     <footer style={styles.footer}>
       <div style={styles.container}>
@@ -55,11 +45,8 @@ function Footer() {
         <p style={styles.description}>함께 만드는 여행 이야기, 그 순간을 담아주세요.</p>
 
         <div style={styles.toggleContainer}>
-          <button style={styles.toggleButton} onClick={toggleTerms}>이용약관</button>
           <button style={styles.toggleButton} onClick={navigateToPrivacy}>개인정보 처리방침</button>
         </div>
-
-        {showTerms && <p style={styles.terms}>[이용약관 추가 예정]</p>}
 
         <p style={styles.contact}>문의: support@travelday.com | 전화: 123-456-7890</p>
 
@@ -151,16 +138,6 @@ const styles = {
     borderRadius: '5px',
     cursor: 'pointer',
     transition: 'background-color 0.3s ease',
-  },
-  terms: {
-    fontSize: '12px',
-    color: '#666',
-    margin: '10px 0',
-  },
-  privacy: {
-    fontSize: '12px',
-    color: '#666',
-    margin: '10px 0',
   },
   contact: {
     fontSize: '12px',
