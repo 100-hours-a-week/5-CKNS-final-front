@@ -118,6 +118,17 @@ const formatDuration = (duration) => {
   return `${hours ? hours[1] + '시간 ' : ''}${minutes ? minutes[1] + '분' : ''} 소요`;
 };
 
+const exchangeRates = {
+  EUR: 1400, // 1 EUR = 1400 KRW
+  // 필요한 경우 다른 통화도 추가 가능
+};
+
+const convertToKRW = (amount, currency) => {
+  const rate = exchangeRates[currency];
+  if (!rate) return amount; // 환율이 없으면 변환하지 않음
+  return amount * rate;
+};
+
 const MainDetailPage = () => {
   const { id } = useParams(); 
   const { t } = useTranslation();
@@ -149,6 +160,7 @@ const MainDetailPage = () => {
   const includedBags = travelerPricings && travelerPricings[0].fareDetailsBySegment[0].includedCheckedBags.quantity;
   const airlineUrl = getAirlineUrl(itineraries[0]?.segments[0]?.carrierCode);
 
+  const priceInKRW = convertToKRW(parseFloat(price.grandTotal), price.currency);
 
   return (
     <PageContainer>
@@ -185,7 +197,7 @@ const MainDetailPage = () => {
           </SectionTitle>
           {price ? (
             <>
-              <Price>{t('price.perAdult')}: {price.grandTotal} {price.currency}</Price>
+              <Price>{t('price.perAdult')}: {priceInKRW.toLocaleString()} 원 ~</Price>
               <Price>{t('includedCheckedBags')}: {includedBags} {t('bags')}</Price>
             </>
           ) : (
@@ -213,6 +225,7 @@ const MainDetailPage = () => {
 };
 
 export default MainDetailPage;
+
 
 const PageContainer = styled.div`
   display: flex;
