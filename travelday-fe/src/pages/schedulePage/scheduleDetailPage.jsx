@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
+// import MockAdapter from 'axios-mock-adapter';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { GoogleMap, Marker, InfoWindow } from '@react-google-maps/api';
@@ -9,136 +9,137 @@ import BottomNav from '../../components/shared/bottomNav.js';
 import calendarIcon from '../../images/filter/calendar.png';
 import penIcon from '../../images/pen.png'; // 펜 아이콘 임포트
 import ScheduleDetailList from '../../components/schedulePage/scheduleDetailList';
+// import {tr} from "react-date-range/dist/locale";
 
-const mock = new MockAdapter(axios);
+// const mock = new MockAdapter(axios);
 
 const ScheduleDetail = () => {
-  const { travelRoomId } = useParams();
+  let { travelRoomId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { schedule } = location.state || {};
 
-  const [scheduleDetails, setScheduleDetails] = useState([]);
   const [fetchedSchedule, setFetchedSchedule] = useState(null);
   const [mapMarkers, setMapMarkers] = useState([]);
   const [selectedMarker, setSelectedMarker] = useState(null);
   const mapCenter = { lat: 37.5400456, lng: 126.9921017 };
 
-  // 목 데이터 설정
-  useEffect(() => {
-    mock.onGet(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}`).reply(200, {
-      travelRoomId: 1,
-      name: '구라쟁이의 여행',
-      date: '2024-01-01 ~ 2024-01-03',
-    });
 
-    mock.onGet(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan`).reply(200, [
-      {
-        id: travelRoomId,
-        name: '롯데월드',
-        scheduledDay: '2024-01-01',
-        position: 1,
-        latitude: 37.6000456,
-        longitude: 126.9921017,
-      },
-      {
-        id: travelRoomId,
-        name: '롯데월드',
-        scheduledDay: '2024-01-01',
-        position: 2,
-        latitude: 37.5000456,
-        longitude: 126.9921017,
-      },
-      {
-        id: travelRoomId,
-        name: '에버랜드',
-        scheduledDay: '2024-01-02',
-        position: 1,
-        latitude: 37.00456,
-        longitude: 126.9921017,
-      },
-    ]);
-  }, [travelRoomId]);
+  // // 목 데이터 설정
+  // useEffect(() => {
+  //   mock.onGet(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}`).reply(200, {
+  //     travelRoomId: 1,
+  //     name: '구라쟁이의 여행',
+  //     date: '2024-01-01 ~ 2024-01-03',
+  //   });
+  //
+  //   mock.onGet(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan`).reply(200, [
+  //     {
+  //       id: travelRoomId,
+  //       name: '롯데월드',
+  //       scheduledDay: '2024-01-01',
+  //       position: 1,
+  //       latitude: 37.6000456,
+  //       longitude: 126.9921017,
+  //     },
+  //     {
+  //       id: travelRoomId,
+  //       name: '롯데월드',
+  //       scheduledDay: '2024-01-01',
+  //       position: 2,
+  //       latitude: 37.5000456,
+  //       longitude: 126.9921017,
+  //     },
+  //     {
+  //       id: travelRoomId,
+  //       name: '에버랜드',
+  //       scheduledDay: '2024-01-02',
+  //       position: 1,
+  //       latitude: 37.00456,
+  //       longitude: 126.9921017,
+  //     },
+  //   ]);
+  // }, [travelRoomId]);
 
-  useEffect(() => {
-    const fetchRoomDetails = async () => {
-      try {
-        const token = localStorage.getItem('accessToken');
-        const response = await axios.get(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          withCredentials: true
-        });
+  // useEffect(() => {
+  //   const fetchRoomDetails = async () => {
+  //     try {
+  //       const token = localStorage.getItem('accessToken');
+  //       const response = await axios.get(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}`, {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`
+  //         },
+  //         withCredentials: true
+  //       });
+  //
+  //       setFetchedSchedule(response.data);
+  //
+  //       // 일자 계산
+  //       const { date } = response.data;
+  //       const [startDateStr, endDateStr] = date.split(' ~ ');
+  //       const startDate = new Date(startDateStr);
+  //       const endDate = new Date(endDateStr);
+  //
+  //       const tempDetails = [];
+  //       let currentDate = new Date(startDate);
+  //
+  //       while (currentDate <= endDate) {
+  //         tempDetails.push({
+  //           date: currentDate.toISOString().split('T')[0],
+  //           schedules: []
+  //         });
+  //         currentDate.setDate(currentDate.getDate() + 1);
+  //       }
+  //
+  //       setScheduleDetails(tempDetails);
+  //     } catch (error) {
+  //       console.error('여행방 정보 로드 중 오류 발생:', error);
+  //     }
+  //   };
+  //
+  //   fetchRoomDetails();
+  // }, [travelRoomId]);
 
-        setFetchedSchedule(response.data);
 
-        // 일자 계산
-        const { date } = response.data;
-        const [startDateStr, endDateStr] = date.split(' ~ ');
-        const startDate = new Date(startDateStr);
-        const endDate = new Date(endDateStr);
-
-        const tempDetails = [];
-        let currentDate = new Date(startDate);
-
-        while (currentDate <= endDate) {
-          tempDetails.push({
-            date: currentDate.toISOString().split('T')[0],
-            schedules: []
-          });
-          currentDate.setDate(currentDate.getDate() + 1);
-        }
-
-        setScheduleDetails(tempDetails);
-      } catch (error) {
-        console.error('여행방 정보 로드 중 오류 발생:', error);
-      }
-    };
-
-    fetchRoomDetails();
-  }, [travelRoomId]);
-
-
-  useEffect(() => {
-    const fetchScheduleDetails = async () => {
-      try {
-        const token = localStorage.getItem('accessToken');
-        const response = await axios.get(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          withCredentials: true,
-        });
-
-        const updatedDetails = scheduleDetails.map(day => {
-          const dayDetails = { ...day };
-          dayDetails.schedules = response.data
-            .filter(detail => detail.scheduledDay === day.date)
-            .sort((a, b) => a.position - b.position);
-          return dayDetails;
-        });
-
-        setScheduleDetails(updatedDetails);
-
-        // 지도에 표시할 마커 데이터 설정
-        const markers = response.data.map(detail => ({
-          lat: detail.latitude,
-          lng: detail.longitude,
-          label: `${detail.position}`, // 위치를 라벨로 설정
-          name: detail.name, // 장소 이름 추가
-        }));
-        setMapMarkers(markers);
-
-      } catch (error) {
-        console.error('일정 데이터를 불러오는 중 오류 발생:', error);
-      }
-    };
-
-    if (fetchedSchedule) {
-      fetchScheduleDetails();
-    }
-  }, [fetchedSchedule]);
+  // useEffect(() => {
+  //   const fetchScheduleDetails = async () => {
+  //     try {
+  //       const token = localStorage.getItem('accessToken');
+  //       const response = await axios.get(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan`, {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //         withCredentials: true,
+  //       });
+  //
+  //       const updatedDetails = scheduleDetails.map(day => {
+  //         const dayDetails = { ...day };
+  //         dayDetails.schedules = response.data
+  //           .filter(detail => detail.scheduledDay === day.date)
+  //           .sort((a, b) => a.position - b.position);
+  //         return dayDetails;
+  //       });
+  //
+  //       setScheduleDetails(updatedDetails);
+  //
+  //       // 지도에 표시할 마커 데이터 설정
+  //       const markers = response.data.map(detail => ({
+  //         lat: detail.latitude,
+  //         lng: detail.longitude,
+  //         label: `${detail.position}`, // 위치를 라벨로 설정
+  //         name: detail.name, // 장소 이름 추가
+  //       }));
+  //       setMapMarkers(markers);
+  //
+  //     } catch (error) {
+  //       console.error('일정 데이터를 불러오는 중 오류 발생:', error);
+  //     }
+  //   };
+  //
+  //   if (fetchedSchedule) {
+  //     fetchScheduleDetails();
+  //   }
+  // }, [fetchedSchedule]);
 
   const handleAddFromWish = () => {
     navigate(`/wishlist/${travelRoomId}`, { state: { schedule: fetchedSchedule || schedule } });
@@ -151,9 +152,8 @@ const ScheduleDetail = () => {
   const handleEditClick = () => {
     navigate(`/fixschedule/${travelRoomId}`, { state: { schedule: fetchedSchedule || schedule } });
   };
-
-  const currentSchedule = fetchedSchedule || schedule;
-
+  const currentSchedule = fetchedSchedule || true;
+  // const currentSchedule = fetchedSchedule || schedule;
   return (
     <Container>
       <Header showBackButton={true} onBackClick={() => navigate('/schedule')} />
@@ -177,7 +177,7 @@ const ScheduleDetail = () => {
                   center={mapCenter}
                   zoom={10}
                 >
-                  {mapMarkers.map((marker, index) => (
+                  {mapMarkers?.map((marker, index) => (
                     <Marker 
                       key={index} 
                       position={marker} 
@@ -213,7 +213,7 @@ const ScheduleDetail = () => {
                   <PlusIcon>+</PlusIcon>지도에서 장소 추가
                 </ActionButton>
               </ButtonWrapper>
-              <ScheduleDetailList scheduleDetails={scheduleDetails} />
+              <ScheduleDetailList travelRoomId={travelRoomId} />
             </ContentContainer>
           </>
         ) : (
@@ -300,6 +300,7 @@ const ContentContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding-bottom: 20vh;
 `;
 
 const MapContainer = styled.div`
