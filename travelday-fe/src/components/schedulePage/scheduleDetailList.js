@@ -2,15 +2,13 @@ import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
 import axios from "axios";
 import { CSS } from '@dnd-kit/utilities';
-import {DndContext, MouseSensor, PointerSensor, useDroppable, useSensor, useSensors} from '@dnd-kit/core';
+import {DndContext, PointerSensor, useSensor, useSensors} from '@dnd-kit/core';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import {
-    // arrayMove,
     SortableContext,
     useSortable,
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import {MenuOutlined} from "@ant-design/icons";
 
 /**
  * Customizing arrayMove function from @dnd-kit
@@ -97,7 +95,7 @@ const ScheduleDetailList = ({ travelRoomId }) => {
             const group = grouped[scheduledDay];
             // 날짜마다 position 0 객체 추가
             result.push({ scheduledDay: scheduledDay*1, id:10e9 + scheduledDay*1 , position: 0, name: `${scheduledDay}일차` });
-            // 날짜별로 position을 기준으로 정렬하여 추가
+            // 날짜별 position 기준으로 정렬하여 추가
             group.sort((a, b) => a.position - b.position);
             result.push(...group);
             // // Add position 999 object at the end of each day
@@ -136,20 +134,6 @@ const ScheduleDetailList = ({ travelRoomId }) => {
         });
   }, []);  // 빈 배열을 전달하여 컴포넌트 마운트 시 한 번만 실행되도록 함
 
-    const columns = [
-        {
-            title: 'Drag',
-            dataIndex: 'sort',
-            width: 30,
-            render: () => <MenuOutlined style={{ cursor: 'grab', color: '#999' }} />,
-        },
-        {
-            title: 'Name',
-            dataIndex: 'name',
-            key: 'name',
-        },
-    ];
-
   return (
     <ListContainer>
       <Title>일정 보기</Title>
@@ -160,16 +144,7 @@ const ScheduleDetailList = ({ travelRoomId }) => {
             >
                 {scheduleDetails.map((item, index) => (
                     item.position === 0 ? (
-                        // <Day key={index}>{item.name}
-                        //     <hr/>
-                        // </Day>
-                        <SortableItem item={item} key={index} id={item?.id} customStyle={StyledDay}></SortableItem>
-                    // ) :
-                    // item.position === 999 ? (
-                    //     <DroppableItem key={index} id={index}>
-                    //         <br/>
-                    //         <hr/>
-                    //     </DroppableItem>
+                        <SortableItem item={item} key={index} id={item.id} customStyle={StyledDay}></SortableItem>
                     ) : (
                         <SortableItem key={index} id={item.id} item={item} />
                         // <Item key={index} props={item}>{item.name}</Item>
@@ -217,20 +192,20 @@ const StyledDay = styled.div`
     z-index: 5;
     cursor: default;
 `;
-const Position = styled.div`
-  margin-right: 10px;
-  color: #333;
-  font-size: 15px;
-  font-weight: bold;
-`;
-
-const Date = styled.div`
-  flex-grow: 1;
-  color: #666;
-  font-size: 13px;
-  display: flex;
-  align-items: flex-end;
-`;
+// const Position = styled.div`
+//   margin-right: 10px;
+//   color: #333;
+//   font-size: 15px;
+//   font-weight: bold;
+// `;
+//
+// const Date = styled.div`
+//   flex-grow: 1;
+//   color: #666;
+//   font-size: 13px;
+//   display: flex;
+//   align-items: flex-end;
+// `;
 
 const SortableItem = ({id, item, customStyle: CustomStyleComponent}) => {
     const {
@@ -240,7 +215,9 @@ const SortableItem = ({id, item, customStyle: CustomStyleComponent}) => {
         transform,
         transition,
         isDragging,
-    } = useSortable({ id });
+    } = useSortable({
+        id
+    });
 
     const style = {
         transform: CSS.Translate.toString(transform),
@@ -261,9 +238,9 @@ const SortableItem = ({id, item, customStyle: CustomStyleComponent}) => {
             ref={setNodeRef}
             {...attributes}
             {...listeners}
-            style={CustomStyleComponent ? null : style}  // customStyle이 있으면 style null로
+            style={CustomStyleComponent ? null : style}  // customStyle 있으면 style null
         >
-            {/* customStyle이 있으면 해당 컴포넌트로 감싸서 렌더링 */
+            {/* customStyle 있으면 해당 컴포넌트로 감싸서 렌더링 */
                 CustomStyleComponent ? (
                 <CustomStyleComponent>{item.name}</CustomStyleComponent>
             ) : (
