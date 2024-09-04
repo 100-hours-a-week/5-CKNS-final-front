@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom'; 
 
 function Footer() {
   const [showTerms, setShowTerms] = useState(false);
@@ -7,6 +8,8 @@ function Footer() {
   const [email, setEmail] = useState('');
   const [isEmailValid, setIsEmailValid] = useState(false); // 이메일 유효성 상태
   const [showModal, setShowModal] = useState(false); // 모달 표시 여부를 관리하는 state
+
+  const navigate = useNavigate(); // navigate 함수 초기화
 
   const toggleTerms = () => {
     setShowTerms(!showTerms);
@@ -40,6 +43,11 @@ function Footer() {
     setShowModal(false); // 모달을 닫음
   };
 
+  const navigateToPrivacy = () => {
+    navigate('/privacy'); // /privacy 페이지로 이동
+  };
+
+
   return (
     <footer style={styles.footer}>
       <div style={styles.container}>
@@ -48,11 +56,10 @@ function Footer() {
 
         <div style={styles.toggleContainer}>
           <button style={styles.toggleButton} onClick={toggleTerms}>이용약관</button>
-          <button style={styles.toggleButton} onClick={togglePrivacy}>개인정보 처리방침</button>
+          <button style={styles.toggleButton} onClick={navigateToPrivacy}>개인정보 처리방침</button>
         </div>
 
         {showTerms && <p style={styles.terms}>[이용약관 추가 예정]</p>}
-        {showPrivacy && <p style={styles.privacy}>[개인정보 처리방침 추가 예정]</p>}
 
         <p style={styles.contact}>문의: support@travelday.com | 전화: 123-456-7890</p>
 
@@ -83,7 +90,7 @@ function Footer() {
         </div>
 
         <p style={styles.address}>주소: 제주 제주시 도남로 168-12</p>
-        <p style={styles.copyright}>© 2024 여행한 DAY. All rights reserved.</p>
+        <p style={styles.copyright}>© 2024 CKNS. All rights reserved.</p>
       </div>
 
       {/* 모달 컴포넌트 */}
