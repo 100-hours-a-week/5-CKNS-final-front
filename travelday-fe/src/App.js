@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
 import { useJsApiLoader } from '@react-google-maps/api';
 import FindPage from './pages/searchPage/searchingPage';
@@ -20,7 +20,6 @@ import ScheduleDetail from './pages/schedulePage/scheduleDetailPage';
 import WishListPage from './pages/schedulePage/wishListPage';
 import MapLocationPage from './pages/schedulePage/mapLocationPage';
 import CreateSchedulePage from './pages/schedulePage/createSchedulePage';
-import TokenRefresher from './utils/useTokenRefresher';
 import PrivacyPage from './pages/mainPage/privacyPage';
 import ChatPage from './pages/chatPage/chatPage';
 import ChatTest from './pages/chatPage/chatTest';
@@ -39,30 +38,6 @@ function App() {
     libraries,
   });
 
-  const [isTokenFound, setTokenFound] = useState(false);
-
-  useEffect(() => {
-    console.log('hi')
-    requestForToken(setTokenFound); // FCM 토큰 요청
-  }, []);
-
-  if (!isLoaded) {
-    return null;
-  }
-
-  return (
-    <Router>
-      <TokenRefresher />
-      <div className="App">
-      </div>
-      <Routes>
-        <Route path="/*" element={<MainRouter />} />
-      </Routes>
-    </Router>
-  );
-}
-
-function MainRouter() {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -73,33 +48,43 @@ function MainRouter() {
     }
   }, [navigate]);
 
+  useEffect(() => {
+    requestForToken(); // FCM 토큰 요청
+  }, []);
+
+  if (!isLoaded) {
+    return null;
+  }
+
   return (
-    <Routes>
-      <Route path="/" element={<MainPage />} />
-      <Route path="/maindetail/:id" element={<MainDetailPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/search" element={<FindPage />} />
-      <Route path="/flight" element={<FlightResultPage />} />
-      <Route path="/hotel" element={<HotelResultPage />} />
-      <Route path="/hotel/hotel-detail" element={<HotelDetailPage />} />
-      <Route path="/login/oauth2/success" element={<Callback />} />
-      <Route path="/mypage" element={<MyPage />} />
-      <Route path="/nickname" element={<Nickname />} />
-      <Route path="/map" element={<MapPage />} />
-      <Route path="/schedule" element={<SchedulePage />} />
-      <Route path="/schedule/:travelRoomId" element={<ScheduleDetail />} />
-      <Route path="/edit/:travelRoomId" element={<FixSchedulePage />} />
-      <Route path="/wishlist/:travelRoomId" element={<WishListPage />} />
-      <Route path="/maplocation/:travelRoomId" element={<MapLocationPage />} />
-      <Route path="/alarm" element={<AlarmPage />} />
-      <Route path="/intro" element={<IntroPage />} />
-      <Route path="/createschedule" element={<CreateSchedulePage />} />
-      <Route path="/fixschedule/:travelRoomId" element={<FixSchedulePage />} />
-      <Route path="/privacy" element={<PrivacyPage />} />
-      <Route path="/chat/:travelRoomId" element={<ChatPage />} />
-      <Route path="/chat/test" element={<ChatTest />} />
-      <Route path="/chatList" element={<ChatListPage />} />
-    </Routes>
+    <Router>
+      <Routes>
+        <Route path="/" element={<MainPage />} />
+        <Route path="/maindetail/:id" element={<MainDetailPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/search" element={<FindPage />} />
+        <Route path="/flight" element={<FlightResultPage />} />
+        <Route path="/hotel" element={<HotelResultPage />} />
+        <Route path="/hotel/hotel-detail" element={<HotelDetailPage />} />
+        <Route path="/login/oauth2/success" element={<Callback />} />
+        <Route path="/mypage" element={<MyPage />} />
+        <Route path="/nickname" element={<Nickname />} />
+        <Route path="/map" element={<MapPage />} />
+        <Route path="/schedule" element={<SchedulePage />} />
+        <Route path="/schedule/:travelRoomId" element={<ScheduleDetail />} />
+        <Route path="/edit/:travelRoomId" element={<FixSchedulePage />} />
+        <Route path="/wishlist/:travelRoomId" element={<WishListPage />} />
+        <Route path="/maplocation/:travelRoomId" element={<MapLocationPage />} />
+        <Route path="/alarm" element={<AlarmPage />} />
+        <Route path="/intro" element={<IntroPage />} />
+        <Route path="/createschedule" element={<CreateSchedulePage />} />
+        <Route path="/fixschedule/:travelRoomId" element={<FixSchedulePage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/chat/:travelRoomId" element={<ChatPage />} />
+        <Route path="/chat/test" element={<ChatTest />} />
+        <Route path="/chatList" element={<ChatListPage />} />
+      </Routes>
+    </Router>
   );
 }
 
