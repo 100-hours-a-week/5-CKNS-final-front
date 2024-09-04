@@ -1,55 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
 import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import calendarIcon from '../../images/filter/calendar.png';
 import backIcon from '../../images/header/back.png';
 
 const WishListPage = () => {
-  const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
 
-  // location.state가 null일 경우를 대비해 기본값 설정
+  // URL에서 ID 추출
+  const id = window.location.pathname.split('/').pop();
+  
   const { schedule } = location.state || { schedule: { title: 'Default Title', date: '2024-01-01 ~ 2024-01-07', details: [] } };
-
   const [wishListItems, setWishListItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
 
   useEffect(() => {
-    // 모킹 어댑터 설정
-    const mock = new MockAdapter(axios);
-
-    // 모킹 데이터 설정
-    const mockData = [
-      { wishId: 1, title: 'Mock Item 1', location: 'Location 1' },
-      { wishId: 2, title: 'Mock Item 2', location: 'Location 2' },
-      { wishId: 3, title: 'Mock Item 3', location: 'Location 3' },
-    ];
-
-    // 모킹된 GET 요청 처리
-    mock.onGet(`https://api.thetravelday.co.kr/api/rooms/${id}/wishlist`).reply(200, {
-      data: [
-        {
-          wishlist: mockData,
-        },
-      ],
-    });
-
-    // 실제 API 호출
     const fetchWishList = async () => {
       try {
-        const response = await axios.get(`https://api.thetravelday.co.kr/api/rooms/${id}/wishlist`);
+        const accessToken = localStorage.getItem('accessToken');
+        
+        // 디버깅 로그 추가
+        console.log('위시리스트 가져오기 시작, 방 ID:', id);
+        
+        const response = await axios.get(`https://api.thetravelday.co.kr/api/rooms/${id}/wishlist`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        console.log('위시리스트 가져오기 응답:', response);
+
         if (response.status === 200) {
-          setWishListItems(response.data.data[0].wishlist);
+          setWishListItems(response.data.data);
         } else {
-          console.error('데이터를 불러오는 데 실패했습니다.');
+          console.error('위시리스트 가져오기 실패:', response.statusText);
         }
       } catch (error) {
-        console.error('API 요청 중 에러 발생:', error);
+        // 오류에 대한 디버깅 로그 추가
+        console.error('위시리스트 가져오는 중 오류 발생:', error);
+        if (error.response) {
+          console.error('서버 에러 응답 데이터:', error.response.data);
+          console.error('서버 에러 상태 코드:', error.response.status);
+        }
       }
     };
 
@@ -57,23 +54,16 @@ const WishListPage = () => {
   }, [id]);
 
   const handleItemClick = (index) => {
-    setSelectedItems((prevSelected) => {
-      if (prevSelected.includes(index)) {
-        return prevSelected.filter((item) => item !== index);
-      } else {
-        return [...prevSelected, index];
-      }
-    });
+    setSelectedItems(prevSelected =>
+      prevSelected.includes(index)
+        ? prevSelected.filter(item => item !== index)
+        : [...prevSelected, index]
+    );
   };
 
   const handleRemoveItem = async (index) => {
     const itemToRemove = wishListItems[index];
     const accessToken = localStorage.getItem('accessToken');
-
-    if (!accessToken) {
-      console.error('액세스 토큰이 없습니다.');
-      return;
-    }
 
     try {
       const response = await axios.delete(`https://api.thetravelday.co.kr/api/rooms/${id}/wishlist/${itemToRemove.wishId}`, {
@@ -83,20 +73,18 @@ const WishListPage = () => {
       });
 
       if (response.status === 200) {
-        // 성공적으로 삭제되었으면, 로컬 상태에서 항목 제거
-        setWishListItems((prevItems) => prevItems.filter((_, i) => i !== index));
-        setSelectedItems((prevSelected) => prevSelected.filter((item) => item !== index));
+        setWishListItems(prevItems => prevItems.filter((_, i) => i !== index));
+        setSelectedItems(prevSelected => prevSelected.filter(item => item !== index));
       } else {
-        console.error('아이템 삭제에 실패했습니다.');
+        console.error('Failed to delete item:', response.statusText);
       }
     } catch (error) {
-      console.error('삭제 요청 중 에러 발생:', error);
+      console.error('Error deleting wishlist item:', error);
     }
   };
 
   const handleAddItems = () => {
-    const selectedDetails = selectedItems.map((index) => wishListItems[index]);
-
+    const selectedDetails = selectedItems.map(index => wishListItems[index]);
     navigate(`/schedule/${id}`, {
       state: {
         schedule: {
@@ -119,17 +107,17 @@ const WishListPage = () => {
       <Header />
       <ContentWrapper>
         <BackButton onClick={handleBackClick}>
-          <BackIcon src={backIcon} alt="뒤로가기 아이콘" />
+          <BackIcon src={backIcon} alt="Back Icon" />
         </BackButton>
         <TitleWrapper>
-          <Title>{schedule.name || '위시 리스트'}</Title>
+          <Title>{schedule.name || 'Wishlist'}</Title>
           <ScheduleDateWrapper>
-            <Icon src={calendarIcon} alt="달력 아이콘" />
+            <Icon src={calendarIcon} alt="Calendar Icon" />
             <ScheduleDate>{schedule.date}</ScheduleDate>
           </ScheduleDateWrapper>
         </TitleWrapper>
         <SectionWrapper>
-          <SectionTitle>위시리스트 보기</SectionTitle>
+          <SectionTitle>위시리스트</SectionTitle>
           <AddButton onClick={handleAddItems} disabled={selectedItems.length === 0}>
             추가하기
           </AddButton>
@@ -142,12 +130,12 @@ const WishListPage = () => {
               selected={selectedItems.includes(index)}
             >
               <WishListItemContent>
-                <WishListItemTitle>{item.title}</WishListItemTitle>
-                <WishListItemLocation>{item.location}</WishListItemLocation>
+                <WishListItemTitle>{item.name}</WishListItemTitle>
+                <WishListItemLocation>{`Lat: ${item.latitude}, Lng: ${item.longitude}`}</WishListItemLocation>
               </WishListItemContent>
               <RemoveButton
                 onClick={(e) => {
-                  e.stopPropagation(); // 부모 onClick 이벤트 전파 방지
+                  e.stopPropagation(); 
                   handleRemoveItem(index);
                 }}
               >

@@ -47,7 +47,7 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
-  height: 100%;
+  height: 100vh;
   background-color: #fafafa;
   position: relative;
 `;
@@ -62,20 +62,19 @@ const Content = styled.div`
 `;
 
 const BottomPadding = styled.div`
-  height: 110px;  /* 하단 네비게이션 바의 높이만큼 여유 공간 추가 */
+  height: 80px;  /* 하단 네비게이션 바의 높이만큼 여유 공간 추가 */
 `;
 
 const Overlay = styled.div`
-  position: absolute;
-  top: 60px; /* 헤더 아래로 오버레이 위치를 조정 */
+  position: fixed; /* 화면에 고정 */
+  top: 0; /* 화면의 최상단에서 시작 */
   left: 0;
   width: 100%;
-  height: calc(100% - 60px); /* 헤더를 제외한 나머지 영역을 오버레이로 커버 */
+  height: 100%; /* 화면 전체를 덮음 */
   background-color: rgba(255, 255, 255, 0.9); /* 반투명 하얀 배경 */
   display: flex;
   justify-content: center;
-  align-items: flex-start; /* 콘텐츠를 위쪽에 배치 */
-  padding-top: 40px; /* 콘텐츠가 화면 상단에서 약간 떨어지도록 여백 추가 */
+  align-items: center; /* 콘텐츠를 화면 가운데에 위치 */
   z-index: 999; /* 오버레이를 최상단에 표시 */
 `;
 
@@ -84,7 +83,6 @@ const OverlayContent = styled.div`
   flex-direction: column;
   align-items: center;
   text-align: center;
-  margin-top: 40px;
   color: #333; /* 텍스트 색상을 어두운 회색으로 변경 */
 `;
 

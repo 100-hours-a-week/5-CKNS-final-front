@@ -1,0 +1,33 @@
+{
+    "airline": "항공사",
+    "flightNumber": "항공편 번호",
+    "aircraft": "항공기",
+    "duration": "비행 시간",
+    "stops": "{{count}}회 경유",
+    "nonStop": "직항",
+    "price": {
+      "grandTotal": "총요금",
+      "total": "총 요금",
+      "base": "기본 요금",
+      "fees": "수수료",
+      "perAdult": "성인 1인당 요금"
+    },
+    "includedCheckedBags": "포함된 수하물",
+    "bags": "개",
+    "bookingInfo": {
+      "availableSeats": "예약 가능한 좌석 수",
+      "lastTicketingDate": "마지막 발권 날짜"
+    },
+    "outbound": "출발",
+    "inbound": "도착",
+    "numberOfStops": "경유 횟수",
+    "numberOfBookableSeats": "예약 가능한 좌석 수",
+    "departure": "출발",
+    "arrival": "도착",
+    "itinerary": "여정",
+    "segment": "구간",
+    "fareBasis": "요금 기준",
+    "class": "클래스",
+    "includedCheckedBags.quantity": "포함된 수하물 개수"
+  }
+  

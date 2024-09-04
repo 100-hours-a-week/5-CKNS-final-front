@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { GoogleMap, Marker, InfoWindow } from '@react-google-maps/api';
+import { useNavigate } from 'react-router-dom'; // 추가
 import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import searchIcon from '../../images/search/search.png'; 
 import SearchResultsPopup from '../../components/mapPage/searchResultsPopup.js';
+import Footer from '../../components/footer/footer.js';
 
 const center = {
   lat: 37.5400456,
@@ -19,6 +21,16 @@ function MapPage() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [isSearchComplete, setIsSearchComplete] = useState(false);
+  const navigate = useNavigate(); // 추가
+
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      console.error('토큰이 없습니다. 로그인 페이지로 이동합니다.');
+      navigate('/login'); // 로그인 페이지로 리다이렉트
+      return;
+    }
+  }, [navigate]);
 
   const handleSearch = () => {
     if (map && searchInput) {
@@ -137,6 +149,7 @@ function MapPage() {
               </InfoWindow>
             )}
           </GoogleMap>
+          <Footer />
         </MapButtonContainer>
         <BottomPadding />
         <BottomNav />
@@ -156,12 +169,12 @@ export default React.memo(MapPage);
 
 const containerStyle = {
   width: '390px',
-  height: '910px'  
+  height: '80vh'  
 };
 
 const containerStyleWithButton = {
   width: '390px',
-  height: '860px'  
+  height: '70vh'  
 };
 
 const Container = styled.div`
@@ -169,8 +182,8 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   width: 390px;
-  height: 100%;
-  background-color: #fff;  /* 전체 배경색을 흰색으로 설정 */
+  height: 100vh;
+  background-color: #fff; 
 `;
 
 const Content = styled.div`
@@ -222,7 +235,7 @@ const SearchIcon = styled.img`
 `;
 
 const BottomPadding = styled.div`
-  height: 110px; 
+  height: 80px; 
 `;
 
 const InfoWindowContent = styled.div`

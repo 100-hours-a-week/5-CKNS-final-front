@@ -31,7 +31,6 @@ const BottomNav = () => {
             <NavText isActive={location.pathname === '/schedule'}>일정</NavText>
           </NavItem>
     </NavContainer>
-
   );
 };
 
@@ -41,7 +40,7 @@ const NavContainer = styled.div`
   position: fixed;
   bottom: 0;
   width: 390px;
-  height: 100px;
+  height: 80px;
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -54,12 +53,16 @@ const NavItem = styled.a`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center; /* Center align the content */
   text-decoration: none;
-  color: ${({ isActive }) => (isActive ? '#007bff' : '#000')}; 
+  color: ${({ isActive }) => (isActive ? '#007bff' : '#000')};
   transition: transform 0.2s, color 0.2s;
-
+  width: 60px; /* Increase the width for a larger clickable area */
+  height: 60px; /* Increase the height for a larger clickable area */
+  padding: 10px; /* Add padding to create a larger clickable area */
+  box-sizing: border-box; /* Ensure padding does not affect size */
   &:active {
-    transform: scale(1.1); 
+    transform: scale(1.1);
   }
 `;
 
@@ -67,10 +70,10 @@ const NavIcon = styled.img`
   width: 23px;
   height: 23px;
   margin-bottom: 5px;
-  filter: ${({ isActive }) => (isActive ? 'invert(50%) sepia(100%) saturate(500%) hue-rotate(200deg)' : 'none')}; 
+  filter: ${({ isActive }) => (isActive ? 'invert(50%) sepia(100%) saturate(500%) hue-rotate(200deg)' : 'none')};
 `;
 
 const NavText = styled.span`
   font-size: 12px;
-  color: ${({ isActive }) => (isActive ? '#007bff' : '#000')}; 
+  color: ${({ isActive }) => (isActive ? '#007bff' : '#000')};
 `;

@@ -6,15 +6,13 @@ import { GoogleMap, Marker, InfoWindow } from '@react-google-maps/api';
 import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import calendarIcon from '../../images/filter/calendar.png';
-import penIcon from '../../images/pen.png'; // 펜 아이콘 임포트
+import penIcon from '../../images/pen.png'; 
 import ScheduleDetailList from '../../components/schedulePage/scheduleDetailList';
-
 
 const ScheduleDetail = () => {
   let { travelRoomId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { schedule } = location.state || {};
 
   const [fetchedSchedule, setFetchedSchedule] = useState(null);
   const [mapMarkers, setMapMarkers] = useState([]);
@@ -38,18 +36,19 @@ const ScheduleDetail = () => {
             })
   },[]);
 
-
+  // 이 함수들은 useEffect 외부에 정의되어야 합니다.
   const handleAddFromWish = () => {
-    navigate(`/wishlist/${travelRoomId}`, { state: { schedule: fetchedSchedule || schedule } });
+    navigate(`/wishlist/${travelRoomId}`, { state: { schedule: fetchedSchedule } });
   };
 
   const handleAddFromMap = () => {
-    navigate(`/maplocation/${travelRoomId}`, { state: { schedule: fetchedSchedule || schedule } });
+    navigate(`/maplocation/${travelRoomId}`, { state: { schedule: fetchedSchedule } });
   };
 
   const handleEditClick = () => {
-    navigate(`/fixschedule/${travelRoomId}`, { state: { schedule: fetchedSchedule || schedule } });
+    navigate(`/fixschedule/${travelRoomId}`, { state: { schedule: fetchedSchedule } });
   };
+
   return (
     <Container>
       <Header showBackButton={true} onBackClick={() => navigate('/schedule')} />
@@ -59,7 +58,7 @@ const ScheduleDetail = () => {
             <TitleWrapper>
               <Title>{fetchedSchedule.name}</Title>
               <IconButton onClick={handleEditClick}>
-                <EditIcon src={penIcon} alt="편집 아이콘" />
+                <EditIcon src={penIcon} alt="Edit Icon" />
               </IconButton>
               <ScheduleDateWrapper>
                 <Icon src={calendarIcon} alt="달력 아이콘" />
@@ -113,7 +112,7 @@ const ScheduleDetail = () => {
             </ContentContainer>
           </>
         ) : (
-          <p>로딩 중...</p>
+          <p>Loading...</p>
         )}
       </ContentWrapper>
       <BottomNav />
@@ -204,11 +203,6 @@ const MapContainer = styled.div`
   height: 240px;
   margin-top: 20px;
 `;
-
-const containerStyle = {
-  width: '100%',
-  height: '100%',
-};
 
 const ButtonWrapper = styled.div`
   display: flex;

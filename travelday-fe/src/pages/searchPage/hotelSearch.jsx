@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import styled, { keyframes } from 'styled-components';  // Import keyframes here
 import { useNavigate } from 'react-router-dom';
-import styled, { keyframes } from 'styled-components';
 import AreaPopup from '../../components/shared/areaPopup';
 import DateRangePopup from '../../components/shared/datePopup';
 import GuestSelectorPopup from '../../components/shared/guestPopup';
@@ -19,8 +19,6 @@ const HotelSearch = () => {
   const {
     location,
     dates,
-    adults,
-    children,
     setLocation,
     setDates,
     setAdults,
@@ -29,6 +27,7 @@ const HotelSearch = () => {
 
   const navigate = useNavigate();
 
+  // Define locations array
   const locations = [
     '서울, 대한민국',
     '부산, 대한민국',
@@ -57,12 +56,12 @@ const HotelSearch = () => {
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
       const results = locations.filter(location => location.includes(searchInput));
-      setFilteredResults(results.length > 0 ? results : ['검색결과가 없습니다.']);
+      setFilteredResults(results.length > 0 ? results : ['No results found.']);
     }
   };
 
   const handleResultClick = (result) => {
-    if (result !== '검색결과가 없습니다.') {
+    if (result !== 'No results found.') {
       setLocation(result);
       handlePopupClose();
       setTimeout(() => {
@@ -90,18 +89,11 @@ const HotelSearch = () => {
     navigate('/hotel');
   };
 
-  // 예시 호텔 데이터
-  const mockHotels = [
-    { image: '', name: 'Hilton New York', location: 'New York, USA', rating: '5 stars', price: '1,500,000원' },
-    { image: '', name: 'Hotel de Paris', location: 'Paris, France', rating: '5 stars', price: '2,000,000원' },
-    { image: '', name: 'Tokyo Inn', location: 'Tokyo, Japan', rating: '3 stars', price: '800,000원' },
-  ];
-
   return (
     <Container>
       <AreaSearchingContainer>
         <ButtonContainer>
-          <Button onClick={handleButtonClick}>도시, 호텔 이름을 검색하세요.</Button>
+          <Button onClick={handleButtonClick}>Search for cities or hotel names.</Button>
         </ButtonContainer>
       </AreaSearchingContainer>
       <AnimatedPopup 
@@ -112,7 +104,7 @@ const HotelSearch = () => {
       >
         <input 
           type="text" 
-          placeholder="도시, 호텔 위치를 검색하세요." 
+          placeholder="Search for a city or hotel location." 
           value={searchInput}
           onChange={handleSearchInputChange} 
           onKeyDown={handleKeyDown} 
@@ -123,7 +115,7 @@ const HotelSearch = () => {
         onClose={() => setIsDatePopupOpen(false)}
         onDateRangeChange={handleDateSelect}
         onSearchClick={handleDateSearchClick} 
-        buttonText="검색"
+        buttonText="Search"
         dateRange={dates} 
       />
       {isGuestPopupOpen && (
@@ -133,7 +125,7 @@ const HotelSearch = () => {
           onGuestSelect={handleGuestSelect}
         />
       )}
-      <HotelList hotels={hotelData || mockHotels} />  
+      <HotelList hotels={hotelData || []} />  
     </Container>
   );
 };
@@ -141,6 +133,7 @@ const HotelSearch = () => {
 export default HotelSearch;
 
 // Styled Components ...
+
 
 
 

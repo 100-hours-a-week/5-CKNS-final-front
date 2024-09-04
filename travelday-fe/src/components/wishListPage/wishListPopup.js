@@ -24,17 +24,37 @@ const WishlistPopup = ({ isOpen, onClose, selectedPlace }) => {
   const setTravelRooms = useTravelStore((state) => state.setTravelRooms);
 
   useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      console.error('토큰이 없습니다. 로그인 페이지로 이동하세요.');
+      return;
+    }
+
     const fetchTravelRooms = async () => {
       try {
-        const response = await axios.get('http://api.thetravelday.co.kr/api/rooms');
-        setTravelRooms(response.data);  // 가져온 데이터를 store에 저장
-      } catch (error) {
-        console.error('여행방 목록 불러오기 실패:', error);
+        console.log('여행방 목록을 불러오는 중...');
+        const response = await axios.get('https://api.thetravelday.co.kr/api/rooms', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
 
-        setTravelRooms([
-          { id: 1, name: '공듀들의 일본 여행' },
-          { id: 2, name: '하이든의 네팔 여행' }
-        ]);
+        console.log('여행방 API 응답:', response.data);
+
+        if (response.status === 200) {
+          const formattedRooms = response.data.data.map((room) => ({
+            id: room.id,
+            name: room.name,
+            startDate: room.startDate,
+            endDate: room.endDate,
+          }));
+          setTravelRooms(formattedRooms);
+        } else {
+          console.error('여행방 로딩 실패:', response.statusText);
+        }
+      } catch (error) {
+        console.error('여행방 불러오기 중 오류 발생:', error);
       }
     };
 
@@ -92,7 +112,7 @@ const WishlistPopup = ({ isOpen, onClose, selectedPlace }) => {
 
 export default WishlistPopup;
 
-// Styled Components
+
 const PopupOverlay = styled.div`
   position: fixed;
   top: 0;

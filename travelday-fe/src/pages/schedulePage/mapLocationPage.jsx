@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { GoogleMap, Marker, InfoWindow } from '@react-google-maps/api';
 import Header from '../../components/shared/header.js';
@@ -8,6 +8,7 @@ import calendarIcon from '../../images/filter/calendar.png';
 import backIcon from '../../images/header/back.png';
 import searchIcon from '../../images/search/search.png'; 
 import MapSearchResultsPopup from '../../components/mapPage/mapSearchResultsPopup.js';
+
 
 const center = {
   lat: 37.5400456,
@@ -28,6 +29,19 @@ function MapLocationPage() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [isSearchComplete, setIsSearchComplete] = useState(false);
+
+
+ useEffect(() => {
+  const token = localStorage.getItem('accessToken');
+  if (!token) {
+    console.error('토큰이 없습니다. 로그인 페이지로 이동합니다.');
+    navigate('/login');
+    return;
+  }
+}, [navigate]); // 이 줄을 추가하여 useEffect 블록을 완성합니다.
+
+  
+
 
   const handleSearch = () => {
     if (map && searchInput) {
@@ -289,7 +303,7 @@ const MapButtonContainer = styled.div`
 `;
 
 const BottomPadding = styled.div`
-  height: 110px; 
+  height: 80px; 
 `;
 
 const InfoWindowContent = styled.div`

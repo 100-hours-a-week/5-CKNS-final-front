@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import axios from 'axios';
 import TrashIcon from '../../images/trash.png';
 
-
 const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
   const [sortedSchedules, setSortedSchedules] = useState([]);
   const [sortOrder, setSortOrder] = useState('nearest');
@@ -17,8 +16,9 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
     const pastSchedules = [];
 
     schedules.forEach((schedule) => {
-      const date = new Date(schedule.date.split(' ~ ')[0]);
-      if (date < today) {
+      // 끝나는 날을 기준으로 분류
+      const endDate = new Date(schedule.date.split(' ~ ')[1]);
+      if (endDate < today) {
         pastSchedules.push(schedule);
       } else {
         upcomingSchedules.push(schedule);
@@ -41,14 +41,36 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
   };
 
   const confirmDelete = async () => {
-    if (selectedScheduleId) {
-      try {
-        await axios.delete(`https://api.thetravelday.co.kr/api/rooms/${selectedScheduleId}`);
-        onDeleteClick(selectedScheduleId); 
-        setIsModalOpen(false); 
-      } catch (error) {
-        console.error("일정 삭제 중 오류 발생:", error);
+    if (!selectedScheduleId) {
+      console.error("selectedScheduleId가 설정되지 않았습니다.");
+      return;
+    }
+
+    const accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) {
+      console.error("액세스 토큰을 찾을 수 없습니다.");
+      return;
+    }
+
+    try {
+      const response = await axios.delete(`https://api.thetravelday.co.kr/api/rooms/${selectedScheduleId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.status === 200) {
+        setSortedSchedules(prevSchedules =>
+          prevSchedules.filter(schedule => schedule.id !== selectedScheduleId)
+        );
+        window.alert('삭제되었습니다!');
+        setIsModalOpen(false);
+      } else {
+        console.error('Failed to delete schedule:', response.statusText);
       }
+    } catch (error) {
+      console.error('Error deleting schedule:', error);
+      window.alert('스케줄 삭제에 실패했습니다. 다시 시도해 주세요.');
     }
   };
 
@@ -78,11 +100,12 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
             return <PastLabel key={index}>지나간 여행</PastLabel>;
           }
 
-          const isPast = new Date(schedule.date.split(' ~ ')[0]) < new Date();
+          const endDate = new Date(schedule.date.split(' ~ ')[1]);
+          const isPast = endDate < new Date();
 
           return (
             <ScheduleItem
-              key={index}
+              key={schedule.id}
               isPast={isPast}
             >
               <ScheduleContent onClick={() => onItemClick(schedule.id)}>
@@ -118,6 +141,7 @@ export default ScheduleList;
 const Container = styled.div`
   width: 100%;
   max-width: 340px;
+  min-height: 600px;
   display: flex;
   flex-direction: column;
   align-items: center;

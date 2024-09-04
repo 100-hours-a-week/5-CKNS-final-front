@@ -10,6 +10,8 @@ const CreateSchedulePage = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [countdown, setCountdown] = useState(3); 
   const navigate = useNavigate();
 
   const today = new Date().toISOString().split('T')[0];
@@ -32,11 +34,11 @@ const CreateSchedulePage = () => {
   const handleCreateSchedule = async () => {
     if (!isButtonEnabled) return;
 
-    const token = localStorage.getItem('accessToken'); 
+    const token = localStorage.getItem('accessToken');
 
     try {
       const response = await axios.post(
-        'https://api.thetravelday.co.kr/api/rooms', 
+        'https://api.thetravelday.co.kr/api/rooms',
         {
           name: title,
           startDate: startDate.replace(/-/g, '.'),
@@ -51,9 +53,17 @@ const CreateSchedulePage = () => {
         }
       );
 
-      if (response.status === 201) { 
-        console.log('새로운 일정 생성:', response.data);
-        navigate('/schedule');
+      if (response.status === 200) { 
+        setShowSuccessPopup(true);
+        const interval = setInterval(() => {
+          setCountdown(prev => {
+            if (prev === 1) {
+              clearInterval(interval);
+              navigate('/schedule');
+            }
+            return prev - 1;
+          });
+        }, 1000);
       }
     } catch (error) {
       console.error('일정 생성 중 오류 발생:', error);
@@ -80,7 +90,7 @@ const CreateSchedulePage = () => {
             type="date" 
             value={startDate} 
             onChange={(e) => setStartDate(e.target.value)} 
-            min={today} // 시작 날짜의 최소값을 오늘로 설정
+            min={today} 
           />
         </InputField>
         <InputField>
@@ -89,7 +99,7 @@ const CreateSchedulePage = () => {
             type="date" 
             value={endDate} 
             onChange={(e) => setEndDate(e.target.value)} 
-            min={startDate || today} // 종료 날짜의 최소값을 시작 날짜로 설정
+            min={startDate || today} 
           />
         </InputField>
         <CreateButton 
@@ -99,6 +109,15 @@ const CreateSchedulePage = () => {
         >
           일정 만들기
         </CreateButton>
+        {showSuccessPopup && (
+          <SuccessPopup>
+            <PopupContent>
+              <p>일정이 성공적으로 생성되었습니다!</p>
+              <CountdownBar countdown={countdown} />
+              <CountdownText>{countdown}초 후에 페이지가 이동합니다.</CountdownText>
+            </PopupContent>
+          </SuccessPopup>
+        )}
       </ContentWrapper>
       <BottomNav />
     </Container>
@@ -108,6 +127,61 @@ const CreateSchedulePage = () => {
 export default CreateSchedulePage;
 
 // 스타일 컴포넌트 정의
+
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+`;
+
+const countdownAnimation = keyframes`
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0;
+  }
+`;
+
+const SuccessPopup = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: ${fadeIn} 0.5s ease-in-out;
+  z-index: 9999;
+`;
+
+const PopupContent = styled.div`
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+`;
+
+const CountdownBar = styled.div`
+  width: 100%;
+  height: 5px;
+  background-color: #f12e5e;
+  margin-top: 15px;
+  border-radius: 5px;
+  animation: ${countdownAnimation} ${props => props.countdown}s linear forwards;
+`;
+
+const CountdownText = styled.p`
+  font-size: 14px;
+  color: #333;
+  margin-top: 10px;
+`;
 
 const Container = styled.div`
   display: flex;

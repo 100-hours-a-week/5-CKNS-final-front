@@ -4,7 +4,8 @@ import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';  
 import ImageSlider from '../../components/mainPage/imageSlider.js';
 import NewFlightList from '../../components/mainPage/newFlightList.js'; 
-import JapanSaleList from '../../components/mainPage/japanSaleList.js';  // 일본 세일 리스트 컴포넌트 임포트
+import JapanSaleList from '../../components/mainPage/japanSaleList.js';  
+import Footer from '../../components/footer/footer.js'
 
 const MainPage = () => {
   return (
@@ -14,12 +15,13 @@ const MainPage = () => {
         <ImageSlider />
       </SliderContainer>
       <Content>
-        <SectionTitle>신규 노선은 뭐가 있을까?</SectionTitle>
-        <SectionSubTitle>#새로운 노선만 모아 뒀어요!</SectionSubTitle>
+        <SectionTitle>신규 노선은 뭐가 있을까? 👀</SectionTitle>
+        <SectionSubTitle>#바로 떠나는 새로운 노선만 모아 뒀어요!</SectionSubTitle>
         <NewFlightList />
-        <SectionTitle>3일 안에 떠나는 일본 ✈️</SectionTitle>
+        <SectionTitle>바로 떠나는 일본 ✈️</SectionTitle>
         <SectionSubTitle>#바로 출발해 봐요</SectionSubTitle>
         <JapanSaleList />  
+        <Footer />
       </Content>
       <BottomPadding />
       <BottomNav />
@@ -27,7 +29,7 @@ const MainPage = () => {
   );
 };
 
-export default MainPage;
+export default MainPage; 
 
 const PageContainer = styled.div`
   display: flex;
@@ -60,7 +62,7 @@ const SectionTitle = styled.h2`
   width: 370px;
   margin-left: 10px;
   font-weight: bold;
-  margin-top: 30px;
+  margin-top: 40px;
   margin-bottom: 0px;
 `;
 
@@ -69,11 +71,11 @@ const SectionSubTitle = styled.h2`
   text-align: left;
   width: 370px;
   margin-left: 10px;
-  margin-top: 15px;
+  margin-top: 7px;
   margin-bottom: 15px;
   color: #c2c2c2;
 `;
 
 const BottomPadding = styled.div`
-  height: 110px;  /* 하단 네비게이션 바의 높이만큼 여유 공간 추가 */
+  height: 80px; 
 `;

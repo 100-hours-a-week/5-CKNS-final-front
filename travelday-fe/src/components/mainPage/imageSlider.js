@@ -25,6 +25,10 @@ const ImageSlider = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const handleIndicatorClick = (index) => {
+    setActiveIndex(index);
+  };
+
   return (
     <Slider>
       <SliderContent activeIndex={activeIndex}>
@@ -39,6 +43,7 @@ const ImageSlider = () => {
           <Indicator
             key={index}
             isActive={index === activeIndex}
+            onClick={() => handleIndicatorClick(index)} 
           />
         ))}
       </Indicators>
@@ -86,11 +91,45 @@ const Indicators = styled.div`
   transform: translateX(-50%);
   display: flex;
   gap: 8px;
+  align-items: center; /* 수직 중앙 정렬 */
 `;
-
 const Indicator = styled.div`
-  width: 10px;
-  height: 10px;
-  background-color: ${({ isActive }) => (isActive ? '#333' : '#ccc')};
-  border-radius: 50%;
-`;
+  width: ${({ isActive }) => (isActive ? '24px' : '10px')}; 
+  height: ${({ isActive }) => (isActive ? '8px' : '4px')};
+  background-color: ${({ isActive }) => (isActive ? 'rgba(90, 155, 255, 0.8)' : 'rgba(208, 228, 255, 0.5)')}; 
+  border-radius: 10px; /* 둥근 모서리 설정 */
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  box-shadow: ${({ isActive }) => (isActive ? '0 0 8px rgba(90, 155, 255, 0.7)' : 'none')};
+  transform: ${({ isActive }) => (isActive ? 'scale(1.2)' : 'scale(1)')};
+  position: relative;
+  opacity: ${({ isActive }) => (isActive ? '1' : '0.7')};
+
+  &:after {
+    content: '';
+    display: ${({ isActive }) => (isActive ? 'block' : 'none')};
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    border: 1px solid rgba(90, 155, 255, 0.8); 
+    opacity: 0.6;
+    animation: pulse 1.5s infinite; 
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      opacity: 0.6;
+    }
+    50% {
+      transform: scale(1.2);
+      opacity: 0.2;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 0.6;
+    }
+  }
+  `;
