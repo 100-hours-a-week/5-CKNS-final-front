@@ -69,8 +69,8 @@ const ScheduleDetailList = ({ travelRoomId }) => {
                     ? overIdx + 1 // Place the item after the Day
                     : overIdx;
                 const temp = arrayMoveWithPosition(prev,activeIdx,overIdx);
-                console.log(activeIdx,targetIdx);
-                console.table(temp)
+                // console.log(activeIdx,targetIdx);
+                // console.table(temp)
                 return temp;
                 // return arrayMove(prev, activeIndex, targetIndex);
             });
@@ -184,6 +184,7 @@ const ListItem = styled.div`
 
 const StyledDay = styled.div`
     display: flex;
+    justify-content: space-between;
     font-weight: bold;
     width : 390px;
     margin: 20px 0 10px 0;
@@ -192,20 +193,22 @@ const StyledDay = styled.div`
     z-index: 5;
     cursor: default;
 `;
-// const Position = styled.div`
-//   margin-right: 10px;
-//   color: #333;
-//   font-size: 15px;
-//   font-weight: bold;
-// `;
-//
-// const Date = styled.div`
-//   flex-grow: 1;
-//   color: #666;
-//   font-size: 13px;
-//   display: flex;
-//   align-items: flex-end;
-// `;
+const Position = styled.div`
+    margin-right: 10px;
+    color: #333;
+    font-size: 30px;
+    font-weight: bold;
+    cursor: move;
+`;
+
+const Date = styled.div`
+    font-size: 18px;
+    width : 390px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: default;
+`;
 
 const SortableItem = ({id, item, customStyle: CustomStyleComponent}) => {
     const {
@@ -222,7 +225,7 @@ const SortableItem = ({id, item, customStyle: CustomStyleComponent}) => {
     const style = {
         transform: CSS.Translate.toString(transform),
         transition,
-        cursor: 'move',
+        // cursor: 'move',
         ...(isDragging
             ? {
                 position: 'relative',
@@ -234,17 +237,16 @@ const SortableItem = ({id, item, customStyle: CustomStyleComponent}) => {
 
     return (
         <ListItem
-            onClick={(e)=>{console.log(e.target)}}
+            // onClick={(e)=>{console.log(e.target)}}
             ref={setNodeRef}
             {...attributes}
-            {...listeners}
             style={CustomStyleComponent ? null : style}  // customStyle 있으면 style null
         >
             {/* customStyle 있으면 해당 컴포넌트로 감싸서 렌더링 */
                 CustomStyleComponent ? (
                 <CustomStyleComponent>{item.name}</CustomStyleComponent>
             ) : (
-                item.name
+                <Date>{item.name}<Position {...listeners}>=</Position></Date>
             )}
         </ListItem>
     );
