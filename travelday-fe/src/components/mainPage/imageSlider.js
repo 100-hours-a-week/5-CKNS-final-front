@@ -7,11 +7,11 @@ import SliderImage4 from '../../images/main/slider/ppl4.png';
 import SliderImage5 from '../../images/main/slider/ppl5.png'; 
 
 const images = [
-  { src: SliderImage, alt: "slide-0", onClick: () => window.location.href = 'https://www.jeju-the-rentcar.com/detail?id=1026' },
-  { src: SliderImage2, alt: "slide-1", onClick: () => window.location.href = 'https://www.hanatour.com/promotion/plan/PM0000114126' },
-  { src: SliderImage3, alt: "slide-2", onClick: () => window.location.href = 'https://www.skyscanner.co.kr/news/summer-foodie-roadtrips' },
-  { src: SliderImage4, alt: "slide-3", onClick: () => window.location.href = 'https://www.jejuair.net/ko/event/eventDetail.do?eventNo=0000002180' },
-  { src: SliderImage5, alt: "slide-4", onClick: () => window.location.href = 'https://web.travelover.co.kr/insu/intro?utm_campaign=pckey&utm_source=google&utm_medium=ads&utm_term=%EC%97%AC%ED%96%89%EC%9E%90%EB%B3%B4%ED%97%98&gad_source=1&gclid=Cj0KCQjwlIG2BhC4ARIsADBgpVRVqlzAfUvGjKnBTugrESV3nILtThScC5pO7OPRax0_pe3ZwTD_oHkaAhkGEALw_wcB' }
+  { src: SliderImage, alt: "slide-0", onClick: () => window.open('https://www.jeju-the-rentcar.com/detail?id=1026', '_blank') },
+  { src: SliderImage2, alt: "slide-1", onClick: () => window.open('https://www.hanatour.com/promotion/plan/PM0000114126', '_blank') },
+  { src: SliderImage3, alt: "slide-2", onClick: () => window.open('https://www.skyscanner.co.kr/news/summer-foodie-roadtrips', '_blank') },
+  { src: SliderImage4, alt: "slide-3", onClick: () => window.open('https://www.jejuair.net/ko/event/eventDetail.do?eventNo=0000002180', '_blank') },
+  { src: SliderImage5, alt: "slide-4", onClick: () => window.open('https://web.travelover.co.kr/insu/intro?utm_campaign=pckey&utm_source=google&utm_medium=ads&utm_term=%EC%97%AC%ED%96%89%EC%9E%90%EB%B3%B4%ED%97%98&gad_source=1&gclid=Cj0KCQjwlIG2BhC4ARIsADBgpVRVqlzAfUvGjKnBTugrESV3nILtThScC5pO7OPRax0_pe3ZwTD_oHkaAhkGEALw_wcB', '_blank') }
 ];
 
 const ImageSlider = () => {
@@ -93,6 +93,7 @@ const Indicators = styled.div`
   gap: 8px;
   align-items: center; /* 수직 중앙 정렬 */
 `;
+
 const Indicator = styled.div`
   width: ${({ isActive }) => (isActive ? '24px' : '10px')}; 
   height: ${({ isActive }) => (isActive ? '8px' : '4px')};
@@ -132,4 +133,4 @@ const Indicator = styled.div`
       opacity: 0.6;
     }
   }
-  `;
+`;

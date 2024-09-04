@@ -213,9 +213,13 @@ const MainDetailPage = () => {
           <ReservationButton href={airlineUrl} target="_blank" rel="noopener noreferrer">
             {t('예약하러가기')}
           </ReservationButton>
-        <PplImage src={PplIcon} alt="People" onClick={() => {
-          window.location.href = "https://air.gmarket.co.kr/gm/init/lp/lpMain.do?cosemkid=ov17128974211865606&jaehuid=200012886&gad_source=1&gclid=CjwKCAjwiaa2BhAiEiwAQBgyHu1gIeblGLOlGjnggp0j71uxJcmXX_6QxLqVYw2HcDJDIzjeFOezCRoC2kgQAvD_BwE&gate_id=ED9298F9-E43D-4BD0-B2FE-A5F9DC062212";
-        }} />
+          <PplImage 
+            src={PplIcon} 
+            alt="People" 
+            onClick={() => {
+              window.open("https://air.gmarket.co.kr/gm/init/lp/lpMain.do?cosemkid=ov17128974211865606&jaehuid=200012886&gad_source=1&gclid=CjwKCAjwiaa2BhAiEiwAQBgyHu1gIeblGLOlGjnggp0j71uxJcmXX_6QxLqVYw2HcDJDIzjeFOezCRoC2kgQAvD_BwE&gate_id=ED9298F9-E43D-4BD0-B2FE-A5F9DC062212", "_blank");
+            }} 
+          />
       </Content>
       
       <BottomNav />
