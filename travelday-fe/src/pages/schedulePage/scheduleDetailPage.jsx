@@ -141,6 +141,11 @@ const ContentWrapper = styled.div`
   background-color: #fafafa;
 `;
 
+const containerStyle = {
+    width: '100%',
+    height: '100%',
+};
+
 const TitleWrapper = styled.div`
   width: 390px;
   display: flex;
