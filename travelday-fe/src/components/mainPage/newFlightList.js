@@ -32,6 +32,17 @@ const IATACodeToCity = {
   'ICN': '인천',
 };
 
+const exchangeRates = {
+  EUR: 1400, // 1 EUR = 1300 KRW
+  // 다른 통화도 추가 가능
+};
+
+const convertToKRW = (amount, currency) => {
+  const rate = exchangeRates[currency];
+  if (!rate) return amount; // 환율이 없으면 변환하지 않음
+  return amount * rate;
+};
+
 const NewFlightList = () => {
   const navigate = useNavigate();
   const [flights, setFlights] = useState([]);
@@ -55,13 +66,14 @@ const NewFlightList = () => {
             .map((flight, index) => {
               const destinationCode = flight.itineraries[0].segments[flight.itineraries[0].segments.length - 1].arrival.iataCode;
               const departureCode = flight.itineraries[0].segments[0].departure.iataCode;
+              const priceInKRW = convertToKRW(parseFloat(flight.price.grandTotal), flight.price.currency);
 
               return {
                 id: index + 1,
                 destination: IATACodeToCity[destinationCode] || destinationCode,
                 departure: IATACodeToCity[departureCode] || departureCode,
                 date: flight.lastTicketingDate,
-                price: `${flight.price.grandTotal} ${flight.price.currency}`,
+                price: `${priceInKRW.toLocaleString()} 원 ~`,
                 image: imageMap[destinationCode] || null,
                 iataCode: destinationCode,
               };
@@ -116,6 +128,7 @@ const NewFlightList = () => {
 };
 
 export default NewFlightList;
+
 
 const Wrapper = styled.div`
   width: 100%;

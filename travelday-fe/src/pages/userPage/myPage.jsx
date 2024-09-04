@@ -5,6 +5,7 @@ import SimpleHeader from '../../components/shared/simpleHeader.js';
 import BottomNav from '../../components/shared/bottomNav.js';  
 import LogoImage from '../../images/logo/logo12.png';  
 import PenIcon from '../../images/pen.png'; 
+import axiosInstance from '../../utils/axiosInstance.js';
 import axios from 'axios';
 
 const MyPage = () => {
@@ -29,14 +30,15 @@ const MyPage = () => {
 
   const fetchKakaoUserProfile = async (token) => {
     try {
-      const response = await axios.get('https://api.thetravelday.co.kr/api/user', {
+      const response = await axios.get('http://localhost:8080/api/user', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
-        }
+        } 
       });
   
       if (response.status === 200) {
+        console.log('닉네임:', nickname);
         const nickname = response.data.data.nickname; 
         setNickname(nickname);
         setIsLoading(false); 
@@ -44,6 +46,12 @@ const MyPage = () => {
         throw new Error('사용자 정보 요청 실패');
       }
     } catch (error) {
+      if (error.response) {
+        console.log('에러 응답 상태 코드:', error.response.status);
+        console.log('에러 응답 데이터:', error.response.data);
+      } else {
+        console.log('응답을 받지 못했습니다:', error.message);
+      }
       setErrorMessage('사용자 정보를 불러오는 중 오류가 발생했습니다.');
       setIsLoading(false); 
     }
