@@ -12,7 +12,7 @@ import ScheduleDetailList from '../../components/schedulePage/scheduleDetailList
 const ScheduleDetail = () => {
   let { travelRoomId } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
+  // const location = useLocation();
 
   const [fetchedSchedule, setFetchedSchedule] = useState(null);
   const [mapMarkers, setMapMarkers] = useState([]);
@@ -108,7 +108,7 @@ const ScheduleDetail = () => {
                   <PlusIcon>+</PlusIcon>지도에서 장소 추가
                 </ActionButton>
               </ButtonWrapper>
-              <ScheduleDetailList travelRoomId={travelRoomId} />
+              <ScheduleDetailList travelRoomId={travelRoomId} startDate={fetchedSchedule.startDate} endDate={fetchedSchedule.endDate} />
             </ContentContainer>
           </>
         ) : (
