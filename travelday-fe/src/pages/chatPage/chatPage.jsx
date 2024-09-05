@@ -52,7 +52,7 @@ const ChatPage = ({ nickname }) => {
     const connectWebSocket = () => {
       console.log(travelRoomId);
       // WebSocket 인스턴스를 생성하여 연결
-      socketRef.current = new WebSocket(`ws://localhost:8080/ws/topic/rooms/${travelRoomId}`);
+      socketRef.current = new WebSocket(`ws://localhost:8080/ws`);
 
       // WebSocket이 성공적으로 연결되었을 때 호출되는 함수
       socketRef.current.onopen = () => {
@@ -151,7 +151,7 @@ const ChatPage = ({ nickname }) => {
           // 메시지를 지정된 경로로 전송
           socketRef.current.send(JSON.stringify({
             type: 'SEND',
-            destination: `/pub/rooms/${travelRoomId}/chats`,
+            destination: `/pub/${travelRoomId}/chat/send`,
             message: messageData,
           }));
         } else {
