@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom'; // useParams 훅을 import
 import styled from 'styled-components';
-import axios from 'axios';
+import axiosInstance from '../../utils/axiosInstance.js';
 import BottomNav from '../../components/shared/bottomNav.js'; 
 import { useNavigate } from 'react-router-dom';
 import { IoSearch, IoMenuOutline } from "react-icons/io5";
@@ -109,7 +109,7 @@ const ChatPage = ({ nickname }) => {
   useEffect(() => {
     const fetchChatHistory = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/rooms/${travelRoomId}/chats`, {
+        const response = await axiosInstance.get(`http://localhost:8080/api/rooms/${travelRoomId}/chats`, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',

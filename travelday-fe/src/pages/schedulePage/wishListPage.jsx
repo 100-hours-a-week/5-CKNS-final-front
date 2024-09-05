@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import { useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../../utils/axiosInstance.js';
 import calendarIcon from '../../images/filter/calendar.png';
 import backIcon from '../../images/header/back.png';
 
@@ -26,7 +26,7 @@ const WishListPage = () => {
         // 디버깅 로그 추가
         console.log('위시리스트 가져오기 시작, 방 ID:', id);
         
-        const response = await axios.get(`https://api.thetravelday.co.kr/api/rooms/${id}/wishlist`, {
+        const response = await axiosInstance.get(`/api/rooms/${id}/wishlist`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ const WishListPage = () => {
     const accessToken = localStorage.getItem('accessToken');
 
     try {
-      const response = await axios.delete(`https://api.thetravelday.co.kr/api/rooms/${id}/wishlist/${itemToRemove.wishId}`, {
+      const response = await axiosInstance.delete(`/api/rooms/${id}/wishlist/${itemToRemove.wishId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../utils/axiosInstance.js';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { GoogleMap, Marker, InfoWindow } from '@react-google-maps/api';
@@ -24,7 +24,7 @@ const ScheduleDetail = () => {
     const fetchRoomDetails = async () => {
       const token = localStorage.getItem('accessToken');
       try {
-        const response = await axios.get(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}`, {
+        const response = await axiosInstance.get(`/api/rooms/${travelRoomId}`, {
           headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         });
@@ -63,7 +63,7 @@ const ScheduleDetail = () => {
     const fetchScheduleDetails = async () => {
       const token = localStorage.getItem('accessToken');
       try {
-        const response = await axios.get(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan`, {
+        const response = await axiosInstance.get(`/api/rooms/${travelRoomId}/plan`, {
           headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         });

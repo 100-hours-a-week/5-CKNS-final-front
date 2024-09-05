@@ -3,8 +3,8 @@ import styled, { keyframes } from 'styled-components';
 import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import axios from 'axios';
 import backIcon from '../../images/header/back.png'; // 뒤로가기 아이콘 추가
+import axiosInstance from '../../utils/axiosInstance.js';
 
 const FixSchedulePage = () => {
   const { travelRoomId } = useParams();
@@ -39,8 +39,8 @@ const FixSchedulePage = () => {
     console.log('수정하려는 종료 날짜:', endDate);
 
     try {
-      const response = await axios.post(
-        `https://api.thetravelday.co.kr/api/rooms/${travelRoomId}`, 
+      const response = await axiosInstance.post(
+        `/api/rooms/${travelRoomId}`, 
         {
           name: title,
           startDate: startDate.replace(/-/g, '.'),

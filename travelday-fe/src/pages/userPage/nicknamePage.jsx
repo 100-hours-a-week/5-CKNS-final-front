@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import SimpleHeader from '../../components/shared/simpleHeader.js';
 import BottomNav from '../../components/shared/bottomNav.js';
+import axiosInstance from '../../utils/axiosInstance.js';
 
 const LoginPage = () => {
   const [nickname, setNickname] = useState('');
@@ -34,8 +34,8 @@ const LoginPage = () => {
 
       // 중복 닉네임 검사
       try {
-        const response = await axios.get(
-          `https://api.thetravelday.co.kr/api/user/nickname/check?nickname=${nickname}`,
+        const response = await axiosInstance.get(
+          `/api/user/nickname/check?nickname=${nickname}`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -75,8 +75,8 @@ const LoginPage = () => {
   const handleSubmit = async () => {
     try {
       console.log('닉네임 제출:', nickname);
-      const response = await axios.put(
-        'https://api.thetravelday.co.kr/api/user/nickname',
+      const response = await axiosInstance.put(
+        '/api/user/nickname',
         { nickname },
         {
           headers: {

@@ -3,7 +3,8 @@ import styled, { keyframes } from 'styled-components';
 import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../../utils/axiosInstance.js';
+
 
 const CreateSchedulePage = () => {
   const [title, setTitle] = useState('');
@@ -37,8 +38,8 @@ const CreateSchedulePage = () => {
     const token = localStorage.getItem('accessToken');
 
     try {
-      const response = await axios.post(
-        'https://api.thetravelday.co.kr/api/rooms',
+      const response = await axiosInstance.post(
+        '/api/rooms',
         {
           name: title,
           startDate: startDate.replace(/-/g, '.'),

@@ -6,7 +6,7 @@ import BottomNav from '../../components/shared/bottomNav.js';
 import LogoImage from '../../images/logo/logo12.png';  
 import PenIcon from '../../images/pen.png'; 
 import axiosInstance from '../../utils/axiosInstance.js';
-import axios from 'axios';
+
 
 const MyPage = () => {
   const navigate = useNavigate();
@@ -57,7 +57,7 @@ const MyPage = () => {
   const handleLogout = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      await axios.post('https://api.thetravelday.co.kr/api/user/logout', {}, {
+      await axiosInstance.post('/api/user/logout', {}, {
         headers: {
           Authorization: `Bearer ${token}`
         },

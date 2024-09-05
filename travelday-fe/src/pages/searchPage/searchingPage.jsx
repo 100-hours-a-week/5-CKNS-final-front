@@ -75,7 +75,7 @@ const Overlay = styled.div`
   display: flex;
   justify-content: center;
   align-items: center; /* 콘텐츠를 화면 가운데에 위치 */
-  z-index: 999; /* 오버레이를 최상단에 표시 */
+  z-index: 888; /* 오버레이를 최상단에 표시 */
 `;
 
 const OverlayContent = styled.div`
