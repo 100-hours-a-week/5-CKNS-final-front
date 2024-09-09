@@ -1,114 +1,207 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
 import axios from "axios";
-import { CSS } from '@dnd-kit/utilities';
-import {DndContext, MouseSensor, PointerSensor, useDroppable, useSensor, useSensors} from '@dnd-kit/core';
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
-import {
-    arrayMove,
-    SortableContext,
-    useSortable,
-    verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import {MenuOutlined} from "@ant-design/icons";
+import {CSS} from '@dnd-kit/utilities';
+import {DndContext, PointerSensor, useSensor, useSensors} from '@dnd-kit/core';
+import {restrictToVerticalAxis} from '@dnd-kit/modifiers';
+import {SortableContext, useSortable, verticalListSortingStrategy,} from '@dnd-kit/sortable';
+import {SaveOutlined} from "@ant-design/icons";
+
+/**
+ * Customizing arrayMove function from @dnd-kit
+ * Move an array item to a different position.
+ * Returns a new array with the item moved to the new position.
+ */
+const arrayMoveWithPosition = (array, fromIndex, toIndex) => {
+    // Day indicator should not change its position
+    if (array[fromIndex].position === 0 || toIndex === undefined) {
+        return array;
+    }
+    const newArray = [...array];
+    const [movedItem] = newArray.splice(fromIndex, 1);
+    newArray.splice(toIndex, 0, movedItem);
+
+    // Update the position attribute after the move
+    let currentDayIndex = -1;
+    let currentPosition = 1;
+
+    for (let i = 0; i < newArray.length; i++) {
+        if (newArray[i].position === 0) {
+            // This is a Day indicator
+            currentDayIndex = newArray[i].scheduledDay;
+            currentPosition = 1;
+            // newArray[i].name = `${currentDayIndex}일차`;
+        } else {
+            // This is an item in a day column
+            newArray[i].scheduledDay = currentDayIndex; // Assuming day starts from 1
+            newArray[i].position = currentPosition++;
+        }
+        newArray[i].index = i
+    }
+    return newArray;
+};
 
 
-const ScheduleDetailList = ({ travelRoomId }) => {
+/** 배열을 그룹으로 나누고 정렬하는 함수 */
+function groupAndSort(arr, startDate,endDate) {
+    // 두 날짜 생성
+    const date1 = new Date(startDate);
+    const date2 = new Date(endDate);
+
+    // 밀리초 단위로 변환
+    const timeDifference = date2.getTime() - date1.getTime();
+
+    // 밀리초를 일 단위로 변환
+    const dayDifference = timeDifference / (1000 * 60 * 60 * 24);
+
+    const minDay = 0
+    const maxDay = dayDifference
+
+    // Step 1: 날짜별로 그룹화
+    const grouped = arr.reduce((acc, curr) => {
+        const key = curr.scheduledDay;
+        if (!acc[key]) {
+            acc[key] = [];
+        }
+        acc[key].push(curr);
+        return acc;
+    }, {});
+
+    // Step 2: 비어있는 날짜 처리
+    for (let day = minDay; day <= maxDay; day++) {
+        if (!grouped[day]) {
+            grouped[day] = []; // 빈 그룹 추가
+        }
+    }
+
+    // Step 3: 각 날짜에 position 0을 추가하고 정렬
+    const result = [];
+    Object.keys(grouped).sort((a, b) => a - b).forEach(scheduledDay => {
+        const group = grouped[scheduledDay];
+        // 날짜마다 position 0 객체 추가
+        if(Number(scheduledDay) !== 0){
+            result.push({ scheduledDay: Number(scheduledDay), id: 10e9 + Number(scheduledDay), position: 0, name: `${scheduledDay}일차` });
+        }
+        // 날짜별 position 기준으로 정렬하여 추가
+        group.sort((a, b) => a.position - b.position);
+        result.push(...group);
+    });
+
+    // Step 4: 각 객체에 index 추가
+    return result.map((item, index) => ({
+        ...item, // 기존 객체를 유지하고
+        index // index 값을 추가
+    }));
+}
+
+
+
+function reverseGroupAndSort(arr) {
+    // Step 1: index 필드를 제거하고 scheduledDay가 -1인 경우 0으로 변경
+    const arrWithoutIndex = arr.map(({ index, name, latitude, longitude, scheduledDay, ...rest }) => {
+        return {
+            ...rest,
+            scheduledDay: scheduledDay === -1 ? 0 : scheduledDay, // scheduledDay가 -1이면 0으로 변경
+        };
+    });
+    // Step 2: 날짜별로 position: 0 객체를 제거
+    const filteredArr = arrWithoutIndex.filter(item => item.position !== 0);
+
+    // Step 3: 날짜별로 그룹화된 객체에서 원래 배열로 복원
+    const groupedByDate = filteredArr.reduce((acc, curr) => {
+        const { scheduledDay, ...rest } = curr;
+        if (!acc[scheduledDay]) {
+            acc[scheduledDay] = [];
+        }
+        acc[scheduledDay].push({ scheduledDay, ...rest });
+        return acc;
+    }, {});
+
+    // Step 4: 각 그룹을 날짜별로 원래대로 합쳐서 반환
+    return Object.values(groupedByDate).flat();
+}
+
+
+const ScheduleDetailList = ({ travelRoomId, startDate, endDate }) => {
     const [scheduleDetails, setScheduleDetails] = useState([]);
     const sensors = useSensors(
-        useSensor(MouseSensor, {
+        useSensor(PointerSensor, {
             activationConstraint: {
                 // https://docs.dndkit.com/api-documentation/sensors/pointer#activation-constraints
                 distance: 10,
             },
         }),
     );
+    /** 드래그 이벤트가 끝나면 어레이 변형 */
     const onDragEnd = ({ active, over }) => {
-        if (active.id !== over?.id) {
+
+        const activeIdx = active?.data.current.sortable.index
+        const overIdx = over?.data.current.sortable.index
+
+        if (activeIdx !== overIdx) {
             setScheduleDetails((prev) => {
-                const activeIndex = prev.findIndex((i) => i.id === active.id);
-
-                // Handling case when the over item is a Day
-                const overIndex = prev.findIndex((i) => i.id === over?.id);
-                const isOverDay = prev[overIndex]?.position === 0;
-
-                // Determine the target index for repositioning
-                const targetIndex = isOverDay
-                    ? overIndex + 1 // Place the item after the Day
-                    : overIndex;
-
-                return arrayMove(prev, activeIndex, targetIndex);
+                return arrayMoveWithPosition(prev, activeIdx, overIdx);
             });
         }
     };
 
-    /** 배열을 그룹으로 나누고 정렬하는 함수 */
-    function groupAndSort(arr) {
-        // Step 1: 날짜별로 그룹화
-        const grouped = arr.reduce((acc, curr) => {
-            const key = curr.scheduledDay;
-            if (!acc[key]) {
-                acc[key] = [];
-            }
-            acc[key].push(curr);
-            return acc;
-        }, {});
-
-        // Step 2: 각 날짜에 position 0을 추가하고 정렬
-        const result = [];
-        Object.keys(grouped).forEach(scheduledDay => {
-            const group = grouped[scheduledDay];
-            // 날짜마다 position 0 객체 추가
-            result.push({ scheduledDay:scheduledDay*1, position: 0, name: `${scheduledDay}일차` });
-            // 날짜별로 position을 기준으로 정렬하여 추가
-            group.sort((a, b) => a.position - b.position);
-            result.push(...group);
-        });
-
-        return result;
+    /** 서버에서 일정을 받아옴 */
+    function fetchPlans(token) {
+        axios.get(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan`, {
+            headers: {Authorization: `Bearer ${token}`},
+            withCredentials: true
+        })
+            .then(response => {
+                // console.log(response.data);
+                if (response.data?.data?.length > 0) {
+                    // console.table(response.data.data);
+                    modifySchedule(response.data.data);
+                }
+            })
+            .catch(error => {
+                console.error('여행방 정보 로드 중 오류 발생:', error);
+            });
     }
 
-  /** 서버에서 일정을 반환받아 원하는 형태로 가공 */
-  function postSchedule(schedule) {
-      const sortedList  = groupAndSort(schedule)
+    /** 서버에서 받아온 일정을 필요한 형태로 가공 */
+    function modifySchedule(schedule) {
+      const sortedList  = groupAndSort(schedule,startDate,endDate)
       setScheduleDetails(sortedList);
   }
 
-  useEffect(() => {
+   /** 서버에 저장할 형태로 일정을 가공 */
+   function retrieveSchedule(schedule) {
+        return reverseGroupAndSort(schedule)
+   }
+
+   /** 서버에 변환한 리스트를 다시 저장 */
+   function postPlans(){
+       const token= localStorage.getItem("accessToken");
+       axios.post(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan`,{
+           body:retrieveSchedule(scheduleDetails)
+       }, {
+           headers: {Authorization: `Bearer ${token}`},
+           withCredentials: true
+       })
+           .then(response => {
+               console.log(response.data.data);
+           })
+           .catch(error => {
+               console.error('여행방 정보 로드 중 오류 발생:', error);
+           });
+   }
+
+    useEffect(() => {
     const token= localStorage.getItem("accessToken");
-    
-      // useEffect 내부에서 axios GET 요청 수행
-    axios.get(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan`, {
-      headers: {Authorization: `Bearer ${token}`},
-      withCredentials: true
-    })
-        .then(response => {
-          if (response.data?.data?.length > 0) {
-            postSchedule(response.data.data);
-          }
-        })
-        .catch(error => {
-          console.error('여행방 정보 로드 중 오류 발생:', error);
-        });
-  }, []);  // 빈 배열을 전달하여 컴포넌트 마운트 시 한 번만 실행되도록 함
+    fetchPlans(token)
+    }, []);
 
-    const columns = [
-        {
-            title: 'Drag',
-            dataIndex: 'sort',
-            width: 30,
-            render: () => <MenuOutlined style={{ cursor: 'grab', color: '#999' }} />,
-        },
-        {
-            title: 'Name',
-            dataIndex: 'name',
-            key: 'name',
-        },
-    ];
-
-  return (
-    <ListContainer>
-      <Title>일정 보기</Title>
+    return (
+        <ListContainer>
+        <TitleWrapper>
+            <Title>일정 보기</Title>
+            <SaveOutlined style={{ fontSize: '30px' }} onClick={postPlans} />
+        </TitleWrapper>
         <DndContext sensors={sensors} modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
             <SortableContext
               items={scheduleDetails}
@@ -116,16 +209,16 @@ const ScheduleDetailList = ({ travelRoomId }) => {
             >
                 {scheduleDetails.map((item, index) => (
                     item.position === 0 ? (
-                        <Day key={index}>{item.name}</Day>
+                        <SortableItem item={item} key={index} id={item.id} customStyle={StyledDay}></SortableItem>
                     ) : (
-                        <SortableItem key={item.id} id={item.id} item={item} />
+                        <SortableItem key={index} id={item.id} item={item} />
                         // <Item key={index} props={item}>{item.name}</Item>
                     )
                 ))}
             </SortableContext>
         </DndContext>
     </ListContainer>
-  );
+    );
 };
 
 export default ScheduleDetailList;
@@ -135,6 +228,13 @@ const ListContainer = styled.div`
   background-color: #fff;
   margin-top: 20px;
 `;
+const TitleWrapper = styled.div`
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 20px;
+`
 
 const Title = styled.h2`
   font-size: 18px;
@@ -144,6 +244,7 @@ const Title = styled.h2`
   color: #333;
   text-align: left;
 `;
+
 
 const ListItem = styled.div`
   display: flex;
@@ -155,40 +256,34 @@ const ListItem = styled.div`
 `;
 
 const StyledDay = styled.div`
-  display: flex;
-  font-weight: bold;
-  width : 390px;
-  margin: 20px 0px 10px 20px;
-  font-size: 18px;
-  color: #333;
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    width : 390px;
+    margin: 20px 0 10px 0;
+    font-size: 18px;
+    color: #333;
+    z-index: 5;
+    cursor: default;
 `;
-const Day = ({ id, children }) => {
-    const { setNodeRef } = useDroppable({
-        id,
-    });
-
-    return (
-        <StyledDay ref={setNodeRef}>
-            {children}
-        </StyledDay>
-    );
-};
 const Position = styled.div`
-  margin-right: 10px;
-  color: #333;
-  font-size: 15px;
-  font-weight: bold;
+    //margin-right: 10px;
+    color: #333;
+    font-size: 30px;
+    font-weight: bold;
+    cursor: move;
 `;
 
-const Date = styled.div`
-  flex-grow: 1;
-  color: #666;
-  font-size: 13px;
-  display: flex;
-  align-items: flex-end;
+const Datediv = styled.div`
+    font-size: 18px;
+    width : 390px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: default;
 `;
 
-const SortableItem = ({id,item}) => {
+const SortableItem = ({id, item, customStyle: CustomStyleComponent}) => {
     const {
         attributes,
         listeners,
@@ -196,27 +291,36 @@ const SortableItem = ({id,item}) => {
         transform,
         transition,
         isDragging,
-    } = useSortable({ id });
+    } = useSortable({
+        id
+    });
+
     const style = {
         transform: CSS.Translate.toString(transform),
         transition,
-        cursor: 'move',
+        // cursor: 'move',
         ...(isDragging
             ? {
                 position: 'relative',
+                opacity: 0.3,
                 zIndex: 2,
             }
             : {}),
     };
+
     return (
         <ListItem
-            onClick={(e)=>{console.log(e.target)}}
+            // onClick={(e)=>{console.log(e.target)}}
             ref={setNodeRef}
             {...attributes}
-            {...listeners}
-            style={style}
+            style={CustomStyleComponent ? null : style}  // customStyle 있으면 style null
         >
-            {item.name}
+            {/* customStyle 있으면 해당 컴포넌트로 감싸서 렌더링 */
+                CustomStyleComponent ? (
+                <CustomStyleComponent>{item.name}</CustomStyleComponent>
+            ) : (
+                <Datediv>{item.name}<Position {...listeners}>=</Position></Datediv>
+            )}
         </ListItem>
     );
 };

@@ -16,12 +16,11 @@ const center = {
 };
 
 function MapLocationPage() {
-  const { id } = useParams();
+  const { travelRoomId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { schedule } = location.state || { schedule: { title: 'Default Title', date: '2024-01-01 ~ 2024-01-07', details: [] } };
-
+  const { schedule } = location.state
   const [map, setMap] = useState(null);
   const [searchInput, setSearchInput] = useState('');
   const [markers, setMarkers] = useState([]); 
@@ -102,8 +101,8 @@ function MapLocationPage() {
   };
 
   const handleBackClick = () => {
-    navigate(`/schedule/${id}`, {
-      state: { schedule, id },
+    navigate(`/schedule/${travelRoomId}`, {
+      state: { schedule, travelRoomId },
     });
   };
 
@@ -118,7 +117,7 @@ function MapLocationPage() {
           <Title>{schedule.name || 'Map Location'}</Title>
           <ScheduleDateWrapper>
             <Icon src={calendarIcon} alt="달력 아이콘" />
-            <ScheduleDate>{schedule.date}</ScheduleDate>
+            <ScheduleDate>{schedule.startDate} ~ {schedule.endDate}</ScheduleDate>
           </ScheduleDateWrapper>
         </TitleWrapper>
         <SearchContainer>
@@ -179,6 +178,7 @@ function MapLocationPage() {
           onClose={() => setIsPopupOpen(false)} 
           searchResults={places} 
           onResultClick={handleResultClick}
+          travelRoomId={travelRoomId}
         />
       </ContentWrapper>
     </Container>
