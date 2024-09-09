@@ -134,7 +134,7 @@ const MainDetailPage = () => {
   const [flight, setFlight] = useState(null);
 
   useEffect(() => {
-    axios.get(`https://api.thetravelday.co.kr/api/flights/lowest-price/list`)
+    axios.get(`https://api.thetravelday.co.kr/api/flights/lowestPrice/list`)
       .then(response => {
         const filteredFlight = response.data.data.find(flight => {
           const destinationCode = flight.itineraries[0]?.segments[flight.itineraries[0].segments.length - 1]?.arrival.iataCode;

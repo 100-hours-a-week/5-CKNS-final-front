@@ -31,7 +31,7 @@ const SearchingPage = () => {
         <Overlay>
           <OverlayContent>
             <Image src={InfoImage} alt="Information" />
-            <Text>9/7일에 업데이트 됩니다!</Text>
+            <Text>9/23일에 업데이트 됩니다!</Text>
           </OverlayContent>
         </Overlay>
       )}

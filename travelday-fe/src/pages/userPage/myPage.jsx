@@ -6,7 +6,6 @@ import BottomNav from '../../components/shared/bottomNav.js';
 import LogoImage from '../../images/logo/logo12.png';  
 import PenIcon from '../../images/pen.png'; 
 import axiosInstance from '../../utils/axiosInstance.js';
-import axios from 'axios';
 
 
 

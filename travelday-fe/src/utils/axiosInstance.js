@@ -1,5 +1,18 @@
 import axios from 'axios';
 
+// 세션 만료 상태를 추적하는 변수
+let isSessionExpired = false;
+
+// 세션 만료 알림 및 리디렉션 함수
+function handleSessionExpiration() {
+  if (!isSessionExpired) {
+    isSessionExpired = true; // 세션 만료 상태 설정
+    alert('세션이 만료되었습니다. 다시 로그인해 주세요.');
+    localStorage.removeItem('accessToken');
+    window.location.href = '/login'; // 로그인 페이지로 리디렉션
+  }
+}
+
 // Axios 인스턴스 생성
 const axiosInstance = axios.create({
   baseURL: 'https://api.thetravelday.co.kr', // 백엔드 API의 기본 URL
@@ -49,23 +62,17 @@ axiosInstance.interceptors.response.use(
           // 원래 요청을 다시 시도
           return axiosInstance(originalRequest);
         } catch (err) {
-          alert('토큰 갱신에 실패했습니다! 로그인 페이지로 이동합니다.');
           console.error('토큰 갱신에 실패:', err);
-        //   return Promise.reject(err);  
-          localStorage.removeItem('accessToken');
-          window.location.href = '/login'; // 로그인 페이지로 리디렉션
+          handleSessionExpiration();
         }
       } else if (errorCode === 'AU002') {
         console.log('유효하지 않은 액세스 토큰입니다. 로그아웃 시킵니다.');
-        // 로그아웃 로직을 추가합니다.
-        localStorage.removeItem('accessToken');
-        window.location.href = '/login'; // 로그인 페이지로 리디렉션
+        handleSessionExpiration();
       } else if (errorCode === 'AU003') {
         console.log('접근 권한이 없는 액세스 토큰입니다.');
       } else if (errorCode === 'AU004') {
         console.log('리프레시 토큰도 만료되었습니다.');
-        localStorage.removeItem('accessToken');
-        window.location.href = '/login'; // 로그인 페이지로 리디렉션
+        handleSessionExpiration();
       }
     }
 

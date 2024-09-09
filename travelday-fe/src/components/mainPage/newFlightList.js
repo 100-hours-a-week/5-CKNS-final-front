@@ -51,7 +51,7 @@ const NewFlightList = () => {
   useEffect(() => {
     const fetchFlights = async () => {
       try {
-        const response = await axios.get('https://api.thetravelday.co.kr/api/flights/lowest-price/list');
+        const response = await axios.get('https://api.thetravelday.co.kr/api/flights/lowestPrice/list');
         if (response.status === 200) {
           const imageMap = {
             'PQC': Image1,
