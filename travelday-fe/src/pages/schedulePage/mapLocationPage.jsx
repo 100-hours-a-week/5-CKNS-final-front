@@ -178,6 +178,7 @@ function MapLocationPage() {
           onClose={() => setIsPopupOpen(false)} 
           searchResults={places} 
           onResultClick={handleResultClick}
+          travelRoomId={travelRoomId}
         />
       </ContentWrapper>
     </Container>
