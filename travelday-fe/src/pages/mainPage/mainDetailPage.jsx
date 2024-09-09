@@ -31,6 +31,9 @@ const airportNames = {
   FRA: '프랑크푸르트 공항',
   FCO: '피우미치노 공항',
   ICN: '인천국제공항',
+  NRT: '나리타 공항',
+  KUL: '쿠알라룸푸르국제공항',
+  TAO: '칭다오자오둥국제공항'
 };
 
 const airlineNames = {
@@ -64,8 +67,7 @@ const airlineNames = {
     YP: '에어프레미아',
     OD: '말린도항공',
     TW: '티웨이항공'
-  };
-
+};
 
 const airlineUrls = {
     KE: 'https://www.koreanair.com', // 대한항공
@@ -95,12 +97,11 @@ const airlineUrls = {
     SU: 'https://www.aeroflot.ru', // 아에로플로트
     '7C': 'https://www.jejuair.net', // 제주항공
     'H1': 'https://www.hahnair.com', // 한에어항공
-    YP: 'https://www.airpremia.com' ,// 에어프레미아
+    YP: 'https://www.airpremia.com', // 에어프레미아
     OD: 'https://www.malindoair.com/kr/ko/',
     TW: 'https://www.twayair.com/app/main'
-  };
-  
-  
+};
+
 const getAirportName = (iataCode) => airportNames[iataCode] || iataCode;
 const getAirlineName = (carrierCode) => airlineNames[carrierCode] || carrierCode;
 const getAirlineUrl = (carrierCode) => airlineUrls[carrierCode] || '#';
@@ -116,13 +117,24 @@ const formatDuration = (duration) => {
   return `${hours ? hours[1] + '시간 ' : ''}${minutes ? minutes[1] + '분' : ''} 소요`;
 };
 
+const exchangeRates = {
+  EUR: 1400, // 1 EUR = 1400 KRW
+  // 필요한 경우 다른 통화도 추가 가능
+};
+
+const convertToKRW = (amount, currency) => {
+  const rate = exchangeRates[currency];
+  if (!rate) return amount; // 환율이 없으면 변환하지 않음
+  return amount * rate;
+};
+
 const MainDetailPage = () => {
   const { id } = useParams(); 
   const { t } = useTranslation();
   const [flight, setFlight] = useState(null);
 
   useEffect(() => {
-    axios.get(`https://api.thetravelday.co.kr/api/flights/lowest-price/list`)
+    axios.get(`https://api.thetravelday.co.kr/api/flights/lowestPrice/list`)
       .then(response => {
         const filteredFlight = response.data.data.find(flight => {
           const destinationCode = flight.itineraries[0]?.segments[flight.itineraries[0].segments.length - 1]?.arrival.iataCode;
@@ -147,6 +159,7 @@ const MainDetailPage = () => {
   const includedBags = travelerPricings && travelerPricings[0].fareDetailsBySegment[0].includedCheckedBags.quantity;
   const airlineUrl = getAirlineUrl(itineraries[0]?.segments[0]?.carrierCode);
 
+  const priceInKRW = convertToKRW(parseFloat(price.grandTotal), price.currency);
 
   return (
     <PageContainer>
@@ -169,7 +182,7 @@ const MainDetailPage = () => {
               </FlightDetails>
               {segIndex === itineraries[0].segments.length - 1 && (
                 <FlightInfo>
-                  <InfoItem>{formatDuration(itineraries[0].duration)}, {segment.numberOfStops > 0 ? `${t('stops', { count: segment.numberOfStops })}` : t('nonStop')}</InfoItem>
+                  <InfoItem>{formatDuration(itineraries[0].duration)}</InfoItem>
                 </FlightInfo>
               )}
             </FlightSegment>
@@ -183,7 +196,7 @@ const MainDetailPage = () => {
           </SectionTitle>
           {price ? (
             <>
-              <Price>{t('price.perAdult')}: {price.grandTotal} {price.currency}</Price>
+              <Price>{t('price.perAdult')}: {priceInKRW.toLocaleString()} 원 ~</Price>
               <Price>{t('includedCheckedBags')}: {includedBags} {t('bags')}</Price>
             </>
           ) : (
@@ -200,9 +213,13 @@ const MainDetailPage = () => {
           <ReservationButton href={airlineUrl} target="_blank" rel="noopener noreferrer">
             {t('예약하러가기')}
           </ReservationButton>
-        <PplImage src={PplIcon} alt="People" onClick={() => {
-          window.location.href = "https://air.gmarket.co.kr/gm/init/lp/lpMain.do?cosemkid=ov17128974211865606&jaehuid=200012886&gad_source=1&gclid=CjwKCAjwiaa2BhAiEiwAQBgyHu1gIeblGLOlGjnggp0j71uxJcmXX_6QxLqVYw2HcDJDIzjeFOezCRoC2kgQAvD_BwE&gate_id=ED9298F9-E43D-4BD0-B2FE-A5F9DC062212";
-        }} />
+          <PplImage 
+            src={PplIcon} 
+            alt="People" 
+            onClick={() => {
+              window.open("https://air.gmarket.co.kr/gm/init/lp/lpMain.do?cosemkid=ov17128974211865606&jaehuid=200012886&gad_source=1&gclid=CjwKCAjwiaa2BhAiEiwAQBgyHu1gIeblGLOlGjnggp0j71uxJcmXX_6QxLqVYw2HcDJDIzjeFOezCRoC2kgQAvD_BwE&gate_id=ED9298F9-E43D-4BD0-B2FE-A5F9DC062212", "_blank");
+            }} 
+          />
       </Content>
       
       <BottomNav />
@@ -393,5 +410,3 @@ const ReservationButton = styled.a`
     transform: translateY(1px);
   }
 `;
-
-

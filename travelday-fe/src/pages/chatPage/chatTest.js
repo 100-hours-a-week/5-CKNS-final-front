@@ -1,7 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useParams } from 'react-router-dom'; // useParams 훅을 import
 import styled from 'styled-components';
-import axiosInstance from '../../utils/axiosInstance.js';
 import BottomNav from '../../components/shared/bottomNav.js'; 
 import { useNavigate } from 'react-router-dom';
 import { IoSearch, IoMenuOutline } from "react-icons/io5";
@@ -9,173 +7,63 @@ import Sidebar from '../../components/chatPage/sideBar.js';
 
 const linkify = (text) => {
   const urlPattern = /https?:\/\/[^\s]+/g;
-  return text.split(urlPattern).map((part, index) => {
-    const match = text.match(urlPattern);
-    if (match && match[index]) {
-      return (
-        <React.Fragment key={index}>
-          {part}
-          <StyledLink href={match[index]} target="_blank" rel="noopener noreferrer">
-            {match[index]}
-          </StyledLink>
-        </React.Fragment>
+  const parts = text.split(urlPattern);
+  const matches = text.match(urlPattern);
+
+  if (!matches) {
+    return text;
+  }
+
+  return parts.reduce((acc, part, index) => {
+    if (matches[index]) {
+      acc.push(part);
+      acc.push(
+        <StyledLink key={index} href={matches[index]} target="_blank" rel="noopener noreferrer">
+          {matches[index]}
+        </StyledLink>
       );
+    } else {
+      acc.push(part);
     }
-    return part;
-  });
+    return acc;
+  }, []);
 };
 
-const ChatPage = ({ nickname }) => {  
-  const { travelRoomId } = useParams(); // URL에서 travelRoomId를 추출
-
-  const [messages, setMessages] = useState([]);
+const ChatPage = () => {
+  const [messages, setMessages] = useState([
+    { sender: '나', content: '안녕하세요!', timestamp: new Date() },
+    { sender: '다른 사용자', content: '안녕하세요! 반갑습니다.', timestamp: new Date() },
+    { sender: '나', content: '이 링크를 확인해 보세요 https://www.naver.com/ ', timestamp: new Date() }, 
+  ]);
   const [newMessage, setNewMessage] = useState('');
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [currentSearchIndex, setCurrentSearchIndex] = useState(0);
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
-  const [isConnected, setIsConnected] = useState(true); // WebSocket 연결 상태를 관리하는 상태 변수
-  const [isSending, setIsSending] = useState(false); // 메시지 전송 중 상태를 관리하는 상태 변수
   const navigate = useNavigate();
   const messageEndRef = useRef(null);
   const messageListRef = useRef(null);
-  const socketRef = useRef(null); // WebSocket 인스턴스를 저장할 Ref
 
-  const token = localStorage.getItem('accessToken');
-  const MAX_RETRY_COUNT = 10; // 최대 재연결 시도 횟수
-  const RETRY_DELAY = 5000; // 재연결 시도 간격
-
-  useEffect(() => {
-    let retryCount = 0; // 재연결 시도 횟수를 추적
-
-    const connectWebSocket = () => {
-      console.log(travelRoomId);
-      // WebSocket 인스턴스를 생성하여 연결
-      socketRef.current = new WebSocket(`ws://localhost:8080/ws`);
-
-      // WebSocket이 성공적으로 연결되었을 때 호출되는 함수
-      socketRef.current.onopen = () => {
-        console.log('WebSocket 연결 성공 (코드 101)');
-        setIsConnected(true); // 연결 상태를 true로 설정
-        retryCount = 0; // 연결에 성공하면 재시도 횟수를 초기화
-
-        // 구독 메시지 전송
-        socketRef.current.send(JSON.stringify({ type: 'SUBSCRIBE', roomId: travelRoomId }));
-      };
-
-      // WebSocket을 통해 메시지를 수신할 때 호출되는 함수
-      socketRef.current.onmessage = (event) => {
-        const message = JSON.parse(event.data); // 수신된 메시지를 JSON으로 파싱
-        setMessages((prevMessages) => [...prevMessages, message]); // 수신된 메시지를 상태에 추가
-      };
-
-      // WebSocket에서 오류가 발생했을 때 호출되는 함수
-      socketRef.current.onerror = (error) => {
-        console.error('WebSocket 에러 (코드 1001):', error);
-      };
-
-      // WebSocket 연결이 닫혔을 때 호출되는 함수
-      socketRef.current.onclose = (event) => {
-        if (event.code === 1000) {
-          console.warn('WebSocket 연결 정상 종료 (코드 1000):', event);
-        } else if (event.code === 1001) {
-          console.error('WebSocket 서버 에러로 연결 종료 (코드 1001):', event);
-        }
-        setIsConnected(false); // 연결 상태를 false로 설정
-
-        // 비정상적인 종료 시 재연결 시도
-        if (retryCount < MAX_RETRY_COUNT) {
-          setTimeout(() => {
-            retryCount++; // 재연결 시도 횟수 증가
-            connectWebSocket(); // 재연결 시도
-          }, RETRY_DELAY * retryCount); // 점진적 딜레이를 적용하여 재연결 시도
-        } else {
-          console.error('WebSocket 재연결 실패: 최대 재시도 횟수 초과');
-        }
-      };
-    };
-
-    connectWebSocket(); // WebSocket 연결 시도
-
-    // 컴포넌트가 언마운트될 때 WebSocket 연결을 해제하는 함수
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.close(); // WebSocket 연결 해제
-      }
-    };
-  }, [travelRoomId]); // travelRoomId가 변경될 때마다 WebSocket 연결을 재설정
-
-  useEffect(() => {
-    const fetchChatHistory = async () => {
-      try {
-        const response = await axiosInstance.get(`http://localhost:8080/api/rooms/${travelRoomId}/chats`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true,
-        });
-  
-        // API 응답의 data 속성에서 메시지 데이터를 추출
-        const messages = response.data.data.map(msg => ({
-          ...msg,
-          content: msg.message,  // message를 content로 변환
-          timestamp: msg.createdAt ? new Date(msg.createdAt).toISOString() : null, // createdAt을 ISO string으로 변환, null이면 그대로 유지
-          sender: msg.senderNickname // senderNickname을 sender로 매핑
-        }));
-  
-        setMessages(messages); // 변환된 메시지 데이터를 상태에 저장
-      } catch (error) {
-        console.error('채팅 내역을 불러오지 못했습니다:', error);
-      }
-    };
-  
-    fetchChatHistory(); // 컴포넌트 마운트 시 채팅 내역을 불러옴
-  }, [travelRoomId, token]); // travelRoomId 또는 token이 변경될 때마다 채팅 내역을 다시 불러옴
-  
-
-  const handleSendMessage = async (e) => {
+  const handleSendMessage = (e) => {
     e.preventDefault();
-    if (newMessage.trim() !== '' && !isSending) {
-      setIsSending(true); // 메시지 전송 상태를 true로 설정
-      const messageData = {
-        sender: nickname, // sender를 nickname으로 설정
-        content: newMessage,
-        timestamp: new Date().toISOString(),
-      };
-
-      try {
-        // WebSocket을 통해 메시지 전송
-        if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-          // 메시지를 지정된 경로로 전송
-          socketRef.current.send(JSON.stringify({
-            type: 'SEND',
-            destination: `/pub/${travelRoomId}/chat/send`,
-            message: messageData,
-          }));
-        } else {
-          console.error('WebSocket이 열려있지 않습니다.');
-        }
-
-        setNewMessage(''); // 메시지 입력 필드를 초기화
-      } catch (error) {
-        console.error('메시지 전송 실패:', error);
-      } finally {
-        setIsSending(false); // 메시지 전송 완료 후 상태를 false로 설정
-      }
+    if (newMessage.trim() !== '') {
+      const newTimestamp = new Date();
+      const updatedMessages = [...messages, { sender: '나', content: newMessage, timestamp: newTimestamp }];
+      setMessages(updatedMessages);
+      setNewMessage('');
     }
   };
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
-      handleSendMessage(e); // 엔터 키를 누르면 메시지 전송
+      handleSendMessage(e);
     }
   };
 
   const handleSearchKeyPress = (e) => {
     if (e.key === 'Enter') {
-      handleSearch(); // 엔터 키를 누르면 검색 수행
+      handleSearch();
     }
   };
 
@@ -200,29 +88,33 @@ const ChatPage = ({ nickname }) => {
 
     return (
       currentMessage.sender === previousMessage.sender &&
-      formatTime(new Date(currentMessage.timestamp)) === formatTime(new Date(previousMessage.timestamp))
+      formatTime(currentMessage.timestamp) === formatTime(previousMessage.timestamp)
     );
   };
 
   const isSameDay = (currentMessage, previousMessage) => {
     if (!previousMessage) return false;
 
-    const currentDate = formatDate(new Date(currentMessage.timestamp));
-    const previousDate = formatDate(new Date(previousMessage.timestamp));
+    const currentDate = formatDate(currentMessage.timestamp);
+    const previousDate = formatDate(previousMessage.timestamp);
 
     return currentDate === previousDate;
   };
 
   const handleBackButtonClick = () => { 
-    navigate(-1); // 뒤로 가기 버튼 클릭 시 이전 페이지로 이동
+    navigate(-1); 
   };
 
   const toggleSearch = () => {
-    setIsSearchVisible(!isSearchVisible); // 검색 창 토글
+    setIsSearchVisible(!isSearchVisible);
+    if (!isSearchVisible) {
+      setSearchResults([]);
+      setCurrentSearchIndex(0);
+    }
   };
 
   const toggleSidebar = () => {
-    setIsSidebarVisible(!isSidebarVisible); // 사이드바 토글
+    setIsSidebarVisible(!isSidebarVisible);
   };
 
   const handleSearch = () => {
@@ -275,13 +167,15 @@ const ChatPage = ({ nickname }) => {
   };
 
   const handleCancelSearch = () => {
-    setIsSearchVisible(false); // 검색 창 닫기
-    setSearchTerm(''); // 검색어 초기화
+    setIsSearchVisible(false);
+    setSearchTerm('');
+    setSearchResults([]);
+    setCurrentSearchIndex(0);
   };
 
   useEffect(() => {
     if (messageEndRef.current) {
-      messageEndRef.current.scrollIntoView({ behavior: 'smooth' }); // 새 메시지가 수신되면 스크롤을 맨 아래로 이동
+      messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages]);
 
@@ -296,8 +190,6 @@ const ChatPage = ({ nickname }) => {
             <IoMenuOutline size={22} onClick={toggleSidebar} /> 
           </IconsContainer>
         </Navbar>
-
-        {!isConnected && <ConnectionStatus>연결이 끊겼습니다. 재연결 시도 중...</ConnectionStatus>}
 
         {isSearchVisible && (
           <SearchContainer>
@@ -329,19 +221,19 @@ const ChatPage = ({ nickname }) => {
             return (
               <React.Fragment key={index}>
                 {showDate && (
-                  <DateSeparator>{formatDate(new Date(message.timestamp))}</DateSeparator>
+                  <DateSeparator>{formatDate(message.timestamp)}</DateSeparator>
                 )}
-                <MessageItem isOwnMessage={message.sender === nickname} isActiveResult={isActiveResult}>
+                <MessageItem isOwnMessage={message.sender === '나'} isActiveResult={isActiveResult}>
                   {showSender && (
                     <MessageSender>{message.sender}</MessageSender>
                   )}
-                  <MessageWrapper isOwnMessage={message.sender === nickname}>
-                    <MessageContent isOwnMessage={message.sender === nickname}>
+                  <MessageWrapper isOwnMessage={message.sender === '나'}>
+                    <MessageContent isOwnMessage={message.sender === '나'}>
                       {linkify(message.content)}
                     </MessageContent>
                     {showTimestamp && (
-                      <MessageTimestamp isOwnMessage={message.sender === nickname}>
-                        {formatTime(new Date(message.timestamp))}
+                      <MessageTimestamp isOwnMessage={message.sender === '나'}>
+                        {formatTime(message.timestamp)}
                       </MessageTimestamp>
                     )}
                   </MessageWrapper>
@@ -359,11 +251,8 @@ const ChatPage = ({ nickname }) => {
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyPress={handleKeyPress} 
-            disabled={!isConnected || isSending} // 연결이 끊겼거나 전송 중일 때 입력 비활성화
           />
-          <SendButton onClick={handleSendMessage} disabled={!isConnected || isSending}>
-            {isSending ? '전송 중...' : '전송'}
-          </SendButton>
+          <SendButton onClick={handleSendMessage}>전송</SendButton>
         </MessageInputContainer>
       </ChatContainer>
 
@@ -521,10 +410,15 @@ const MessageContent = styled.div`
     width: 0;
     z-index: 1;
     bottom: 8px; 
-    left: ${(props) => (props.isOwnMessage ? 'auto' : '-12px')};
+    left: ${(props) => (props.isOwnMessage ? 'auto' : '-10px')};
     right: ${(props) => (props.isOwnMessage ? '-10px' : 'auto')};
     transform: translateY(0);
   }
+`;
+
+const HighlightedText = styled.span`
+  background-color: #E0E0E0; 
+  font-weight: bold;
 `;
 
 const MessageTimestamp = styled.span`
@@ -561,25 +455,20 @@ const MessageInput = styled.input`
     border-color: #007bff;
     box-shadow: 0 0 3px rgba(0, 123, 255, 0.3);
   }
-
-  &:disabled {
-    background-color: #e0e0e0;
-    cursor: not-allowed;
-  }
 `;
 
 const SendButton = styled.button`
   padding: 12px 15px;
-  background-color: ${props => props.disabled ? '#cccccc' : '#007bff'};
+  background-color: #007bff;
   color: #fff;
   border: none;
   border-radius: 50px;
-  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+  cursor: pointer;
   font-weight: bold;
   transition: all 0.3s ease;
 
   &:hover {
-    background-color: ${props => props.disabled ? '#cccccc' : '#0069d9'};
+    background-color: #0069d9;
   }
 `;
 
@@ -591,41 +480,40 @@ const DateSeparator = styled.div`
 
 const SearchContainer = styled.div`
   display: flex;
-  justify-content: center;
   align-items: center;
-  padding: 10px  0px ;
+  justify-content: space-between;
+  padding: 10px;
   background-color: #e8f0fe;
   position: fixed;
   top: 68px;
   width: 100%;
-  max-width: 390px;
+  max-width: 370px;
   z-index: 100;
 `;
 
 const SearchInput = styled.input`
-  width: 70%;
+  flex: 1;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 1rem;
+  margin-right: 10px;
 `;
 
 const SearchControls = styled.div`
   display: flex;
-  gap: 5px;
 `;
 
 const SearchButton = styled.button`
-  padding: 5px 10px;
-  background-color: #007bff;
-  color: #fff;
+  background-color: #e8f0fe;
+  color: #007bff;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 12px;
 
   &:hover {
-    background-color: #0069d9;
+     color: #fff;
   }
 `;
 
@@ -642,57 +530,5 @@ const CancelButton = styled.button`
 
   &:hover {
     background-color: #0069d9;
-  }
-`;
-
-const ConnectionStatus = styled.div`
-  background-color: #f8d7da;
-  color: #721c24;
-  text-align: center;
-  padding: 15px;
-  font-weight: bold;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80%;
-  max-width: 400px;
-  z-index: 1000;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  animation: fadeInOut 2s ease-in-out infinite;
-
-  &:before {
-    content: '';
-    display: inline-block;
-    margin-right: 10px;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background-color: #721c24;
-    animation: pulse 1s infinite;
-  }
-
-  @keyframes fadeInOut {
-    0%, 100% {
-      opacity: 0;
-    }
-    50% {
-      opacity: 1;
-    }
-  }
-
-  @keyframes pulse {
-    0% {
-      transform: scale(1);
-      opacity: 1;
-    }
-    50% {
-      transform: scale(1.2);
-      opacity: 0.7;
-    }
-    100% {
-      transform: scale(1);
-      opacity: 1;
-    }
   }
 `;

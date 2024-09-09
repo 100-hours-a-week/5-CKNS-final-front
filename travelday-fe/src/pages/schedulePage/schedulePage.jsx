@@ -5,7 +5,7 @@ import BottomNav from '../../components/shared/bottomNav.js';
 import ScheduleList from '../../components/schedulePage/scheduleList';
 import { useNavigate } from 'react-router-dom';
 import Footer from '../../components/footer/footer.js';
-import axios from 'axios';
+import axiosInstance from '../../utils/axiosInstance.js';
 import backgroundVideo from '../../images/schedule/null.mp4'; // 비디오 파일의 경로를 import로 수정
 
 const SchedulePage = () => {
@@ -26,7 +26,7 @@ const SchedulePage = () => {
     const fetchSchedules = async () => {
       try {
         console.log('스케줄을 불러오는 중...');
-        const response = await axios.get('https://api.thetravelday.co.kr/api/rooms', {
+        const response = await axiosInstance.get('/api/rooms', {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',

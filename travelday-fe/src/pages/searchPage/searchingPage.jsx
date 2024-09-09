@@ -31,7 +31,7 @@ const SearchingPage = () => {
         <Overlay>
           <OverlayContent>
             <Image src={InfoImage} alt="Information" />
-            <Text>9/7일에 업데이트 됩니다!</Text>
+            <Text>9/23일에 업데이트 됩니다!</Text>
           </OverlayContent>
         </Overlay>
       )}
@@ -75,7 +75,7 @@ const Overlay = styled.div`
   display: flex;
   justify-content: center;
   align-items: center; /* 콘텐츠를 화면 가운데에 위치 */
-  z-index: 999; /* 오버레이를 최상단에 표시 */
+  z-index: 888; /* 오버레이를 최상단에 표시 */
 `;
 
 const OverlayContent = styled.div`

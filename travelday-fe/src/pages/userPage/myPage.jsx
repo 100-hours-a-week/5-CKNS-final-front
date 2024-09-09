@@ -5,12 +5,15 @@ import SimpleHeader from '../../components/shared/simpleHeader.js';
 import BottomNav from '../../components/shared/bottomNav.js';  
 import LogoImage from '../../images/logo/logo12.png';  
 import PenIcon from '../../images/pen.png'; 
-import axios from 'axios';
+import axiosInstance from '../../utils/axiosInstance.js';
+
+
 
 const MyPage = () => {
   const navigate = useNavigate();
   const [nickname, setNickname] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false); // 확인 모달 상태 추가
   const [errorMessage, setErrorMessage] = useState(''); 
   const [isLoading, setIsLoading] = useState(true); 
 
@@ -27,32 +30,52 @@ const MyPage = () => {
 
   }, [navigate]);
 
-  const fetchKakaoUserProfile = async (token) => {
+  const fetchKakaoUserProfile = async () => {
     try {
-      const response = await axios.get('https://api.thetravelday.co.kr/api/user', {
+      const token = localStorage.getItem('accessToken'); // 로컬 스토리지에서 토큰 가져오기
+      if (!token) {
+        throw new Error('토큰이 없습니다.');
+      }
+  
+      const response = await axiosInstance.get('/api/user', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
-        }
+        },
       });
+
+      // const response = await axios.get('http://localhost:8080/api/user', {
+      //   headers: {
+      //     Authorization: `Bearer ${token}`,
+      //     'Content-Type': 'application/json',
+      //   },
+      // });
   
       if (response.status === 200) {
         const nickname = response.data.data.nickname; 
+        console.log('닉네임:', nickname);
         setNickname(nickname);
         setIsLoading(false); 
       } else {
         throw new Error('사용자 정보 요청 실패');
       }
     } catch (error) {
-      setErrorMessage('사용자 정보를 불러오는 중 오류가 발생했습니다.');
+      if (error.response) {
+        // console.log('에러 응답 상태 코드:', error.response.status);
+        // console.log(error.response.data);
+        console.log(error.response.data.code);
+      } else {
+        console.log('응답을 받지 못했습니다:', error.message);
+      }
       setIsLoading(false); 
     }
   };
   
+  
   const handleLogout = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      await axios.post('https://api.thetravelday.co.kr/api/user/logout', {}, {
+      await axiosInstance.post('/api/user/logout', {}, {
         headers: {
           Authorization: `Bearer ${token}`
         },
@@ -105,14 +128,34 @@ const MyPage = () => {
 
         <Button onClick={handleRecommend}>친구에게 추천하기</Button>
         <Button onClick={handleLogout}>로그아웃</Button>
-        <DeleteButton onClick={() => setShowModal(true)}>회원 탈퇴</DeleteButton>
+        <DeleteButton onClick={() => setShowConfirmModal(true)}>회원 탈퇴</DeleteButton>
       </Content>
 
       <BottomNav />  
 
+      {showConfirmModal && (
+        <ModalOverlay>
+          <ModalContainer>
+            <ModalTitle>정말 탈퇴하시겠습니까?</ModalTitle>
+            <ButtonGroup>
+              <ConfirmButton onClick={() => {
+                setShowConfirmModal(false); 
+                setShowModal(true);
+              }}>
+                예
+              </ConfirmButton>
+              <CancelButton onClick={() => setShowConfirmModal(false)}>
+                아니오
+              </CancelButton>
+            </ButtonGroup>
+          </ModalContainer>
+        </ModalOverlay>
+      )}
+
       {showModal && (
         <ModalOverlay>
-          <ModalContent>
+          <ModalContainer>
+            <CloseModalButton onClick={() => setShowModal(false)}>&times;</CloseModalButton>
             <ModalTitle>여행한DAY를 떠나시려 한다니 정말 아쉽네요.</ModalTitle>
             <ModalMessage>
               언제든지 다시 여행 계획이 필요할 때,<br/>
@@ -121,8 +164,15 @@ const MyPage = () => {
               <br/>
               감사합니다.
             </ModalMessage>
-            <ModalButton onClick={() => navigate('/intro')}>닫기</ModalButton>
-          </ModalContent>
+            <ModalButton 
+              onClick={() => {
+                localStorage.removeItem('accessToken'); // 로컬스토리지에서 토큰 삭제
+                navigate('/intro'); // intro 페이지로 이동
+              }}
+            >
+              닫기
+            </ModalButton>
+          </ModalContainer>
         </ModalOverlay>
       )}
 
@@ -133,9 +183,6 @@ const MyPage = () => {
 };
 
 export default MyPage;
-
-
-// 스타일 컴포넌트 정의
 
 const PageContainer = styled.div`
   display: flex;
@@ -234,33 +281,49 @@ const DeleteButton = styled(Button)`
   }
 `;
 
-// 모달 창 스타일
+// 모달 관련 스타일
 const ModalOverlay = styled.div`
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
 `;
 
-const ModalContent = styled.div`
-  background-color: #fff;
-  padding: 30px;
+const ModalContainer = styled.div`
+  background-color: white;
+  padding: 20px;
   border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   text-align: center;
-  width: 320px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  max-width: 400px;
+`;
+
+const CloseModalButton = styled.button`
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: transparent;
+  border: none;
+  color: #333;
+  cursor: pointer;
+  font-size: 24px;
+
+  &:hover {
+    color: #e74c3c;
+  }
 `;
 
 const ModalTitle = styled.h2`
+  font-size: 18px;
+  margin-top: 10px;
   margin-bottom: 20px;
-  font-size: 17px;
-  font-weight: bold;
   color: #333;
 `;
 
@@ -272,17 +335,27 @@ const ModalMessage = styled.p`
 `;
 
 const ModalButton = styled.button`
-  padding: 10px 20px;
-  font-size: 16px;
+  background: linear-gradient(135deg, #007bff, #00a2ff); 
+  color: white;
   border: none;
-  border-radius: 4px;
+  width: 100px;
+  padding: 10px 20px;
+  border-radius: 50px;
   cursor: pointer;
-  color: #fff;
-  background-color: #007bff;  
-  transition: background-color 0.3s;
-  
+  font-size: 16px;
+  margin-top: 10px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
   &:hover {
-    background-color: #0056b3;
+    background: linear-gradient(135deg, #00a2ff, #007bff);  
+    transform: translateY(-2px);  
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); 
+  }
+
+  &:active {
+    transform: translateY(0); 
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1); 
   }
 `;
 
@@ -294,4 +367,61 @@ const ErrorMessage = styled.p`
 
 const BottomPadding = styled.div`
   height: 80px; 
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  gap: 20px;
+`;
+const ConfirmButton = styled.button`
+  background: linear-gradient(135deg, #d3d3d3, #a9a9a9); 
+  color: white;
+  border: none;
+  width: 82px;
+  padding: 10px 20px;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 0 10px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background: linear-gradient(135deg, #a9a9a9, #d3d3d3);  
+    transform: translateY(-2px);  
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); 
+  }
+
+  &:active {
+    transform: translateY(0); 
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1); 
+  }
+`;
+
+
+const CancelButton = styled.button`
+  background: linear-gradient(135deg, #007bff, #00a2ff); 
+  color: white;
+  border: none;
+  width: 82px;
+  padding: 10px 20px;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 0 10px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background: linear-gradient(135deg, #00a2ff, #007bff);  
+    transform: translateY(-2px);  
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); 
+  }
+
+  &:active {
+    transform: translateY(0); 
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1); 
+  }
 `;

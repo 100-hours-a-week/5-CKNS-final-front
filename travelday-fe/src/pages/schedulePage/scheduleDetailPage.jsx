@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../utils/axiosInstance.js';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { GoogleMap, Marker, InfoWindow } from '@react-google-maps/api';
@@ -35,6 +35,7 @@ const ScheduleDetail = () => {
               console.log(error);
             })
   },[]);
+
 
   // 이 함수들은 useEffect 외부에 정의되어야 합니다.
   const handleAddFromWish = () => {

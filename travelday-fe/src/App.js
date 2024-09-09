@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
 import { useJsApiLoader } from '@react-google-maps/api';
 import FindPage from './pages/searchPage/searchingPage';
@@ -20,13 +20,15 @@ import ScheduleDetail from './pages/schedulePage/scheduleDetailPage';
 import WishListPage from './pages/schedulePage/wishListPage';
 import MapLocationPage from './pages/schedulePage/mapLocationPage';
 import CreateSchedulePage from './pages/schedulePage/createSchedulePage';
-import TokenRefresher from './utils/useTokenRefresher';
 import PrivacyPage from './pages/mainPage/privacyPage';
 import ChatPage from './pages/chatPage/chatPage';
+import ChatTest from './pages/chatPage/chatTest';
 import ChatListPage from './pages/chatPage/chatListPage';
 
 import './App.css';
 import './i18n';
+
+import { requestForToken } from './firebase'; 
 
 const libraries = ['places'];
 
@@ -36,13 +38,18 @@ function App() {
     libraries,
   });
 
+  const [isTokenFound, setTokenFound] = useState(false);
+
+  useEffect(() => {
+    requestForToken(setTokenFound); // FCM 토큰 요청
+  }, []);
+
   if (!isLoaded) {
-    return null; 
+    return null;
   }
 
   return (
     <Router>
-      <TokenRefresher />
       <Routes>
         <Route path="/*" element={<MainRouter />} />
       </Routes>
@@ -84,8 +91,9 @@ function MainRouter() {
       <Route path="/createschedule" element={<CreateSchedulePage />} />
       <Route path="/fixschedule/:travelRoomId" element={<FixSchedulePage />} />
       <Route path="/privacy" element={<PrivacyPage />} />
-      <Route path="/chat" element={<ChatPage />} />
-      <Route path="/chatList" element={<ChatListPage />}/>
+      <Route path="/chat/:travelRoomId" element={<ChatPage />} />
+      <Route path="/chat/test" element={<ChatTest />} />
+      <Route path="/chatList" element={<ChatListPage />} />
     </Routes>
   );
 }

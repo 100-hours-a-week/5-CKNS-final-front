@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import { useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../../utils/axiosInstance.js';
 import calendarIcon from '../../images/filter/calendar.png';
 import backIcon from '../../images/header/back.png';
 
@@ -23,10 +23,10 @@ const WishListPage = () => {
       try {
         const accessToken = localStorage.getItem('accessToken');
 
-        // Debugging log
-        console.log('Fetching wishlist, travelRoomId:', travelRoomId);
-
-        const response = await axios.get(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/wishlist`, {
+        // 디버깅 로그 추가
+        console.log('위시리스트 가져오기 시작, 방 ID:', travelRoomId);
+        
+        const response = await axiosInstance.get(`/api/rooms/${travelRoomId}/wishlist`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
@@ -65,7 +65,8 @@ const WishListPage = () => {
     const accessToken = localStorage.getItem('accessToken');
 
     try {
-      const response = await axios.delete(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/wishlist/${itemToRemove.wishId}`, {
+      const response = await axiosInstance.delete(`/api/rooms/${travelRoomId}/wishlist/${itemToRemove.wishId}`, {
+
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -75,10 +76,10 @@ const WishListPage = () => {
         setWishListItems(prevItems => prevItems.filter((_, i) => i !== index));
         setSelectedItems(prevSelected => prevSelected.filter(item => item !== index));
       } else {
-        console.error('Failed to delete item:', response.statusText);
+        console.error('위시리스트 가져오기 실패:', response.statusText);
       }
     } catch (error) {
-      console.error('Error deleting wishlist item:', error);
+      console.error('위시리스트를 불러오는 중 에러가 발생했습니다:', error);
     }
   };
 

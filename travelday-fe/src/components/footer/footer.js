@@ -3,16 +3,11 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom'; // useNavigate 추가
 
 function Footer() {
-  const [showTerms, setShowTerms] = useState(false);
   const [email, setEmail] = useState('');
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
   const navigate = useNavigate(); // navigate 함수 초기화
-
-  const toggleTerms = () => {
-    setShowTerms(!showTerms);
-  };
 
   const handleEmailChange = (e) => {
     const newEmail = e.target.value;
@@ -48,13 +43,10 @@ function Footer() {
         <p style={styles.description}>함께 만드는 여행 이야기, 그 순간을 담아주세요.</p>
 
         <div style={styles.toggleContainer}>
-          <button style={styles.toggleButton} onClick={toggleTerms}>이용약관</button>
           <button style={styles.toggleButton} onClick={navigateToPrivacy}>개인정보 처리방침</button>
         </div>
 
-        {showTerms && <p style={styles.terms}>[이용약관 추가 예정]</p>}
-
-        <p style={styles.contact}>문의: support@travelday.com | 전화: 123-456-7890</p>
+        <p style={styles.contact}>문의: ktbjejuckns@gmail.com | 전화: 123-456-7890</p>
 
         <div style={styles.newsletter}>
           <p style={styles.newsletterText}>업데이트 소식 받아보기.</p>
@@ -78,7 +70,7 @@ function Footer() {
             구독
           </button>
           {!isEmailValid && email && (
-            <p style={styles.helperText}>support@travelday.com 이메일 형식을 지켜주세요!</p>
+            <p style={styles.helperText}>ktbjejuckns@gmail.com 이메일 형식을 지켜주세요!</p>
           )}
         </div>
 
@@ -98,8 +90,6 @@ function Footer() {
     </footer>
   );
 }
-
-
 
 const styles = {
   footer: {
@@ -144,16 +134,6 @@ const styles = {
     borderRadius: '3px',
     cursor: 'pointer',
     transition: 'background-color 0.3s ease',
-  },
-  terms: {
-    fontSize: '10px',
-    color: '#666',
-    margin: '5px 0',
-  },
-  privacy: {
-    fontSize: '10px',
-    color: '#666',
-    margin: '5px 0',
   },
   contact: {
     fontSize: '10px',

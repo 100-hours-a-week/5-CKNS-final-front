@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import backIcon from '../../images/header/back.png'; 
@@ -6,9 +6,31 @@ import bellIcon from '../../images/header/bell.png';
 import userIcon from '../../images/header/user.png';
 import logoImage from '../../images/logo/logo11.png'; 
 import logoHoverImage from '../../images/logo/logo13.png'; 
+import AlarmSidebar from '../../components/shared/alarm.js';
 
 const Header = ({ showBackButton = false, onBackClick }) => {
   const navigate = useNavigate();
+  const [isAlarmOpen, setIsAlarmOpen] = useState(false);
+  const [alarms, setAlarms] = useState([
+    {
+      roomId: 1,
+      inviter: '엘깅이',
+      roomName: '공듀들의 일본여행',
+      invitedAt: '2024-09-02 14:00',
+    },
+    {
+      roomId: 2,
+      inviter: '션',
+      roomName: '제주도 덩어리즈',
+      invitedAt: '2024-09-01 15:30',
+    },
+    {
+      roomId: 3,
+      inviter: '이든하',
+      roomName: '스껄',
+      invitedAt: '2024-09-01 14:00',
+    },
+  ]);
 
   const handleBackClick = () => {
     if (onBackClick) {
@@ -32,7 +54,7 @@ const Header = ({ showBackButton = false, onBackClick }) => {
   };
 
   const handleBellIconClick = () => {
-    navigate('/alarm');
+    setIsAlarmOpen(!isAlarmOpen); // 알람 사이드바 열기/닫기
   };
 
   return (
@@ -45,13 +67,13 @@ const Header = ({ showBackButton = false, onBackClick }) => {
         <Icon src={bellIcon} alt="알람 아이콘" onClick={handleBellIconClick}/>
         <Icon src={userIcon} alt="유저 아이콘" onClick={handleUserIconClick} />
       </RightSection>
+
+      <AlarmSidebar isOpen={isAlarmOpen} onClose={() => setIsAlarmOpen(false)} alarms={alarms} />
     </HeaderContainer>
   );
 };
 
 export default Header;
-
-// 스타일 컴포넌트 그대로 유지
 
 const HeaderContainer = styled.div`
     display: flex;
