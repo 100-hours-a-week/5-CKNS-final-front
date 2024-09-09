@@ -11,10 +11,10 @@ const WishListPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // URL에서 ID 추출
-  const id = window.location.pathname.split('/').pop();
-  
-  const { schedule } = location.state || { schedule: { title: 'Default Title', date: '2024-01-01 ~ 2024-01-07', details: [] } };
+  // Extract travelRoomId from the URL
+  const travelRoomId = window.location.pathname.split('/').pop();
+
+  const { schedule } = location.state;
   const [wishListItems, setWishListItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
 
@@ -22,42 +22,41 @@ const WishListPage = () => {
     const fetchWishList = async () => {
       try {
         const accessToken = localStorage.getItem('accessToken');
-        
+
         // 디버깅 로그 추가
-        console.log('위시리스트 가져오기 시작, 방 ID:', id);
+        console.log('위시리스트 가져오기 시작, 방 ID:', travelRoomId);
         
-        const response = await axiosInstance.get(`/api/rooms/${id}/wishlist`, {
+        const response = await axiosInstance.get(`/api/rooms/${travelRoomId}/wishlist`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
           },
         });
-        
-        console.log('위시리스트 가져오기 응답:', response);
+
+        console.log('Wishlist fetch response:', response);
 
         if (response.status === 200) {
           setWishListItems(response.data.data);
         } else {
-          console.error('위시리스트 가져오기 실패:', response.statusText);
+          console.error('Failed to fetch wishlist:', response.statusText);
         }
       } catch (error) {
-        // 오류에 대한 디버깅 로그 추가
-        console.error('위시리스트 가져오는 중 오류 발생:', error);
+        console.error('Error fetching wishlist:', error);
         if (error.response) {
-          console.error('서버 에러 응답 데이터:', error.response.data);
-          console.error('서버 에러 상태 코드:', error.response.status);
+          console.error('Server error response data:', error.response.data);
+          console.error('Server error status code:', error.response.status);
         }
       }
     };
 
     fetchWishList();
-  }, [id]);
+  }, [travelRoomId]);
 
   const handleItemClick = (index) => {
     setSelectedItems(prevSelected =>
-      prevSelected.includes(index)
-        ? prevSelected.filter(item => item !== index)
-        : [...prevSelected, index]
+        prevSelected.includes(index)
+            ? prevSelected.filter(item => item !== index)
+            : [...prevSelected, index]
     );
   };
 
@@ -66,7 +65,8 @@ const WishListPage = () => {
     const accessToken = localStorage.getItem('accessToken');
 
     try {
-      const response = await axiosInstance.delete(`/api/rooms/${id}/wishlist/${itemToRemove.wishId}`, {
+      const response = await axiosInstance.delete(`/api/rooms/${travelRoomId}/wishlist/${itemToRemove.wishId}`, {
+
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -85,68 +85,73 @@ const WishListPage = () => {
 
   const handleAddItems = () => {
     const selectedDetails = selectedItems.map(index => wishListItems[index]);
-    navigate(`/schedule/${id}`, {
+    navigate(`/schedule/${travelRoomId}`, {
       state: {
         schedule: {
           ...schedule,
           details: [...selectedDetails, ...(schedule.details || [])],
         },
-        id,
+        travelRoomId,
       },
     });
   };
 
   const handleBackClick = () => {
-    navigate(`/schedule/${id}`, {
-      state: { schedule, id },
+    navigate(`/schedule/${travelRoomId}`, {
+      state: { schedule, travelRoomId },
     });
   };
 
   return (
-    <Container>
-      <Header />
-      <ContentWrapper>
-        <BackButton onClick={handleBackClick}>
-          <BackIcon src={backIcon} alt="Back Icon" />
-        </BackButton>
-        <TitleWrapper>
-          <Title>{schedule.name || 'Wishlist'}</Title>
-          <ScheduleDateWrapper>
-            <Icon src={calendarIcon} alt="Calendar Icon" />
-            <ScheduleDate>{schedule.date}</ScheduleDate>
-          </ScheduleDateWrapper>
-        </TitleWrapper>
-        <SectionWrapper>
-          <SectionTitle>위시리스트</SectionTitle>
-          <AddButton onClick={handleAddItems} disabled={selectedItems.length === 0}>
-            추가하기
-          </AddButton>
-        </SectionWrapper>
-        <WishList>
-          {wishListItems.map((item, index) => (
-            <WishListItem
-              key={item.wishId}
-              onClick={() => handleItemClick(index)}
-              selected={selectedItems.includes(index)}
-            >
-              <WishListItemContent>
-                <WishListItemTitle>{item.name}</WishListItemTitle>
-                <WishListItemLocation>{`Lat: ${item.latitude}, Lng: ${item.longitude}`}</WishListItemLocation>
-              </WishListItemContent>
-              <RemoveButton
-                onClick={(e) => {
-                  e.stopPropagation(); 
-                  handleRemoveItem(index);
-                }}
-              >
-                X
-              </RemoveButton>
-            </WishListItem>
-          ))}
-        </WishList>
-      </ContentWrapper>
-      <BottomNav />
-    </Container>
+      <Container>
+        <Header />
+        <ContentWrapper>
+          <BackButton onClick={handleBackClick}>
+            <BackIcon src={backIcon} alt="Back Icon" />
+          </BackButton>
+          <TitleWrapper>
+            <Title>{schedule?.name || 'Wishlist'}</Title>
+            <ScheduleDateWrapper>
+              <Icon src={calendarIcon} alt="Calendar Icon" />
+              <ScheduleDate>{schedule?.startDate} ~ {schedule?.endDate}</ScheduleDate>
+            </ScheduleDateWrapper>
+          </TitleWrapper>
+          <SectionWrapper>
+            <SectionTitle>Wishlist</SectionTitle>
+            <AddButton onClick={handleAddItems} disabled={selectedItems.length === 0}>
+              Add Items
+            </AddButton>
+          </SectionWrapper>
+          <WishList>
+            {wishListItems.length > 0 ?
+                wishListItems.map((item, index) => (
+                    <WishListItem
+                        key={item.wishId}
+                        onClick={() => handleItemClick(index)}
+                        selected={selectedItems.includes(index)}
+                    >
+                      <WishListItemContent>
+                        <WishListItemTitle>{item.name}</WishListItemTitle>
+                        <WishListItemLocation>{`Lat: ${item.latitude}, Lng: ${item.longitude}`}</WishListItemLocation>
+                      </WishListItemContent>
+                      <RemoveButton
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveItem(index);
+                          }}
+                      >
+                        X
+                      </RemoveButton>
+                    </WishListItem>
+                ))
+                : <WishListItemTitle style={{marginTop:"20vh",textAlign:"center"}}>
+                  위시리스트가 비어있습니다.<br/>지도에서 먼저 추가해주세요!
+                </WishListItemTitle>
+            }
+          </WishList>
+        </ContentWrapper>
+        <BottomNav />
+      </Container>
   );
 };
 
@@ -256,11 +261,11 @@ const WishListItem = styled.div`
   }
 
   ${(props) =>
-    props.selected &&
-    `
-  border-color: #f12e5e;
-  background-color: #fde2e4;
-`}
+      props.selected &&
+      `
+      border-color: #f12e5e;
+      background-color: #fde2e4;
+    `}
 `;
 
 const WishListItemContent = styled.div`
