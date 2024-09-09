@@ -4,7 +4,7 @@ import axios from "axios";
 import {CSS} from '@dnd-kit/utilities';
 import {DndContext, PointerSensor, useSensor, useSensors} from '@dnd-kit/core';
 import {restrictToVerticalAxis} from '@dnd-kit/modifiers';
-import {SortableContext, useSortable, verticalListSortingStrategy,} from '@dnd-kit/sortable';
+import {SortableContext, useSortable, verticalListSortingStrategy} from '@dnd-kit/sortable';
 import {SaveOutlined} from "@ant-design/icons";
 
 /**
@@ -30,7 +30,6 @@ const arrayMoveWithPosition = (array, fromIndex, toIndex) => {
             // This is a Day indicator
             currentDayIndex = newArray[i].scheduledDay;
             currentPosition = 1;
-            // newArray[i].name = `${currentDayIndex}일차`;
         } else {
             // This is an item in a day column
             newArray[i].scheduledDay = currentDayIndex; // Assuming day starts from 1
@@ -124,19 +123,19 @@ function reverseGroupAndSort(arr) {
 
 const ScheduleDetailList = ({ travelRoomId, startDate, endDate }) => {
     const [scheduleDetails, setScheduleDetails] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);  // 모달 상태 추가
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: {
-                // https://docs.dndkit.com/api-documentation/sensors/pointer#activation-constraints
                 distance: 10,
             },
         }),
     );
+
     /** 드래그 이벤트가 끝나면 어레이 변형 */
     const onDragEnd = ({ active, over }) => {
-
-        const activeIdx = active?.data.current.sortable.index
-        const overIdx = over?.data.current.sortable.index
+        const activeIdx = active?.data.current.sortable.index;
+        const overIdx = over?.data.current.sortable.index;
 
         if (activeIdx !== overIdx) {
             setScheduleDetails((prev) => {
@@ -152,9 +151,7 @@ const ScheduleDetailList = ({ travelRoomId, startDate, endDate }) => {
             withCredentials: true
         })
             .then(response => {
-                // console.log(response.data);
                 if (response.data?.data?.length > 0) {
-                    // console.table(response.data.data);
                     modifySchedule(response.data.data);
                 }
             })
@@ -165,59 +162,67 @@ const ScheduleDetailList = ({ travelRoomId, startDate, endDate }) => {
 
     /** 서버에서 받아온 일정을 필요한 형태로 가공 */
     function modifySchedule(schedule) {
-      const sortedList  = groupAndSort(schedule,startDate,endDate)
-      setScheduleDetails(sortedList);
-  }
+        const sortedList = groupAndSort(schedule, startDate, endDate);
+        setScheduleDetails(sortedList);
+    }
 
-   /** 서버에 저장할 형태로 일정을 가공 */
-   function retrieveSchedule(schedule) {
-        return reverseGroupAndSort(schedule)
-   }
+    /** 서버에 저장할 형태로 일정을 가공 */
+    function retrieveSchedule(schedule) {
+        return reverseGroupAndSort(schedule);
+    }
 
-   /** 서버에 변환한 리스트를 다시 저장 */
-   function postPlans(){
-       const token= localStorage.getItem("accessToken");
-       axios.post(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan`,{
-           body:retrieveSchedule(scheduleDetails)
-       }, {
-           headers: {Authorization: `Bearer ${token}`},
-           withCredentials: true
-       })
-           .then(response => {
-               console.log(response.data.data);
-           })
-           .catch(error => {
-               console.error('여행방 정보 로드 중 오류 발생:', error);
-           });
-   }
+    /** 서버에 변환한 리스트를 다시 저장 */
+    function postPlans() {
+        const token = localStorage.getItem("accessToken");
+        axios.post(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan`, {
+            body: retrieveSchedule(scheduleDetails)
+        }, {
+            headers: {Authorization: `Bearer ${token}`},
+            withCredentials: true
+        })
+            .then(response => {
+                console.log(response.data.data);
+                setIsModalOpen(true);  // 저장 후 모달 열기
+                setTimeout(() => setIsModalOpen(false), 2000);  // 2초 후에 모달 자동 닫기
+            })
+            .catch(error => {
+                console.error('여행방 정보 로드 중 오류 발생:', error);
+            });
+    }
 
     useEffect(() => {
-    const token= localStorage.getItem("accessToken");
-    fetchPlans(token)
+        const token = localStorage.getItem("accessToken");
+        fetchPlans(token);
     }, []);
 
     return (
         <ListContainer>
-        <TitleWrapper>
-            <Title>일정 보기</Title>
-            <SaveOutlined style={{ fontSize: '30px' }} onClick={postPlans} />
-        </TitleWrapper>
-        <DndContext sensors={sensors} modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
-            <SortableContext
-              items={scheduleDetails}
-              strategy={verticalListSortingStrategy}
-            >
-                {scheduleDetails.map((item, index) => (
-                    item.position === 0 ? (
-                        <SortableItem item={item} key={index} id={item.id} customStyle={StyledDay}></SortableItem>
-                    ) : (
-                        <SortableItem key={index} id={item.id} item={item} />
-                        // <Item key={index} props={item}>{item.name}</Item>
-                    )
-                ))}
-            </SortableContext>
-        </DndContext>
-    </ListContainer>
+            <TitleWrapper>
+                <Title>일정 보기</Title>
+                <SaveButton onClick={postPlans}>저장하기</SaveButton>
+            </TitleWrapper>
+            <DndContext sensors={sensors} modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
+                <SortableContext
+                    items={scheduleDetails}
+                    strategy={verticalListSortingStrategy}
+                >
+                    {scheduleDetails.map((item, index) => (
+                        item.position === 0 ? (
+                            <SortableItem item={item} key={index} id={item.id} customStyle={StyledDay}></SortableItem>
+                        ) : (
+                            <SortableItem key={index} id={item.id} item={item} />
+                        )
+                    ))}
+                </SortableContext>
+            </DndContext>
+            {isModalOpen && (
+                <Modal>
+                    <ModalContent>
+                        일정이 저장되었습니다.
+                    </ModalContent>
+                </Modal>
+            )}
+        </ListContainer>
     );
 };
 
@@ -234,7 +239,30 @@ const TitleWrapper = styled.div`
     justify-content: space-between;
     align-items: center;
     padding-right: 20px;
-`
+`;
+
+const SaveButton = styled.button`
+    font-size: 16px;
+    padding: 10px 16px;
+    background-color: transparent;
+    color: #333;
+    border: 2px solid #ccc;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: 
+        background-color 0.3s ease, 
+        border-color 0.3s ease, 
+        color 0.3s ease,
+        transform 0.3s ease, 
+        box-shadow 0.3s ease,
+        font-size 0.3s ease;
+
+    &:hover {
+        background-color: #5bbab5; 
+        border-color: #5bbab5; 
+        color: #fff; 
+    }
+`;
 
 const Title = styled.h2`
   font-size: 18px;
@@ -245,21 +273,19 @@ const Title = styled.h2`
   text-align: left;
 `;
 
-
 const ListItem = styled.div`
   display: flex;
   align-items: center;
   padding: 10px 20px;
   background-color: #fff;
   border-radius: 4px;
-  margin-bottom: 8px;
 `;
 
 const StyledDay = styled.div`
     display: flex;
     justify-content: space-between;
     font-weight: bold;
-    width : 390px;
+    width: 390px;
     margin: 20px 0 10px 0;
     font-size: 18px;
     color: #333;
@@ -267,20 +293,47 @@ const StyledDay = styled.div`
     cursor: default;
 `;
 const Position = styled.div`
-    //margin-right: 10px;
     color: #333;
     font-size: 30px;
-    font-weight: bold;
     cursor: move;
 `;
 
 const Datediv = styled.div`
-    font-size: 18px;
-    width : 390px;
+    font-size: 13px;
+    width: 390px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     cursor: default;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 2px solid #ccc;
+    background-color: #fff;
+    color: #333;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out, border-color 0.2s ease-in-out;
+
+    &:hover {
+        box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.15);
+        border-color: #c2c2c2;
+    }
+`;
+
+const Modal = styled.div`
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 8px;
+    z-index: 1000;
+`;
+
+const ModalContent = styled.div`
+    color: #fff;
+    font-size: 18px;
+    text-align: center;
 `;
 
 const SortableItem = ({id, item, customStyle: CustomStyleComponent}) => {
@@ -289,7 +342,6 @@ const SortableItem = ({id, item, customStyle: CustomStyleComponent}) => {
         listeners,
         setNodeRef,
         transform,
-        transition,
         isDragging,
     } = useSortable({
         id
@@ -297,8 +349,7 @@ const SortableItem = ({id, item, customStyle: CustomStyleComponent}) => {
 
     const style = {
         transform: CSS.Translate.toString(transform),
-        transition,
-        // cursor: 'move',
+        transition: 'none',
         ...(isDragging
             ? {
                 position: 'relative',
@@ -310,13 +361,11 @@ const SortableItem = ({id, item, customStyle: CustomStyleComponent}) => {
 
     return (
         <ListItem
-            // onClick={(e)=>{console.log(e.target)}}
             ref={setNodeRef}
             {...attributes}
-            style={CustomStyleComponent ? null : style}  // customStyle 있으면 style null
+            style={CustomStyleComponent ? null : style}
         >
-            {/* customStyle 있으면 해당 컴포넌트로 감싸서 렌더링 */
-                CustomStyleComponent ? (
+            {CustomStyleComponent ? (
                 <CustomStyleComponent>{item.name}</CustomStyleComponent>
             ) : (
                 <Datediv>{item.name}<Position {...listeners}>=</Position></Datediv>

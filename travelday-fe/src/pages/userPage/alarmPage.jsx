@@ -13,7 +13,7 @@ const AlarmPage = () => {
       <Header showBackButton={true} onBackClick={() => navigate('/')} />
       <Content>
         <Image src={InfoImage} alt="Information" />
-        <Text>9/7일에 업데이트 됩니다!</Text>
+        <Text>9/23일에 업데이트 됩니다!</Text>
       </Content>
       <BottomNav />
     </Container>
