@@ -21,10 +21,10 @@ const ScheduleDetail = () => {
 
   useEffect(() => {
         const token = localStorage.getItem('accessToken');
-        axios.get(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
+        axiosInstance.get(`/api/rooms/${travelRoomId}`, {
+          // headers: {
+          //   Authorization: `Bearer ${token}`
+          // },
           withCredentials: true
         }).then(response=>{
             if(response.data) {
