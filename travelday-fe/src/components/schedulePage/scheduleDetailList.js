@@ -1,11 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
-import axios from "axios";
 import {CSS} from '@dnd-kit/utilities';
 import {DndContext, PointerSensor, useSensor, useSensors} from '@dnd-kit/core';
 import {restrictToVerticalAxis} from '@dnd-kit/modifiers';
 import {SortableContext, useSortable, verticalListSortingStrategy} from '@dnd-kit/sortable';
-import {SaveOutlined} from "@ant-design/icons";
+import axiosInstance from "../../utils/axiosInstance";
 
 /**
  * Customizing arrayMove function from @dnd-kit
@@ -146,7 +145,7 @@ const ScheduleDetailList = ({ travelRoomId, startDate, endDate }) => {
 
     /** 서버에서 일정을 받아옴 */
     function fetchPlans(token) {
-        axios.get(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan`, {
+        axiosInstance.get(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan`, {
             headers: {Authorization: `Bearer ${token}`},
             withCredentials: true
         })
@@ -174,7 +173,7 @@ const ScheduleDetailList = ({ travelRoomId, startDate, endDate }) => {
     /** 서버에 변환한 리스트를 다시 저장 */
     function postPlans() {
         const token = localStorage.getItem("accessToken");
-        axios.post(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan`, {
+        axiosInstance.post(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan`, {
             body: retrieveSchedule(scheduleDetails)
         }, {
             headers: {Authorization: `Bearer ${token}`},
@@ -275,6 +274,7 @@ const Title = styled.h2`
 
 const ListItem = styled.div`
   display: flex;
+  justify-content: center;
   align-items: center;
   padding: 10px 20px;
   background-color: #fff;
@@ -298,8 +298,8 @@ const Position = styled.div`
     cursor: move;
 `;
 
-const Datediv = styled.div`
-    font-size: 13px;
+const ScheduleBox = styled.div`
+    font-size: 18px;
     width: 390px;
     display: flex;
     justify-content: space-between;
@@ -312,11 +312,17 @@ const Datediv = styled.div`
     color: #333;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease-in-out, border-color 0.2s ease-in-out;
-
     &:hover {
         box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.15);
         border-color: #c2c2c2;
     }
+`;
+
+const ListItemName = styled.div`
+    width: 300px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 `;
 
 const Modal = styled.div`
@@ -368,7 +374,7 @@ const SortableItem = ({id, item, customStyle: CustomStyleComponent}) => {
             {CustomStyleComponent ? (
                 <CustomStyleComponent>{item.name}</CustomStyleComponent>
             ) : (
-                <Datediv>{item.name}<Position {...listeners}>=</Position></Datediv>
+                <ScheduleBox><ListItemName>{item.name}</ListItemName><Position {...listeners}>=</Position></ScheduleBox>
             )}
         </ListItem>
     );
