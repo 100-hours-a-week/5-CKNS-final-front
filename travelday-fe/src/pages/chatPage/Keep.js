@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
-import axios from 'axios';
-import BottomNav from '../../components/shared/bottomNav.js'; 
+import BottomNav from '../../components/shared/bottomNav.js';
 import { useNavigate } from 'react-router-dom';
 import { IoSearch, IoMenuOutline } from "react-icons/io5";
-import Sidebar from '../../components/chatPage/sideBar.js';  
+import Sidebar from '../../components/chatPage/sideBar.js';
+import axiosInstance from "../../utils/axiosInstance";
 
 const linkify = (text) => {
   const urlPattern = /https?:\/\/[^\s]+/g;
@@ -105,7 +105,7 @@ const ChatPage = ({ travelRoomId, nickname }) => {
   useEffect(() => {
     const fetchChatHistory = async () => {
       try {
-        const response = await axios.get(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/chats`, {
+        const response = await axiosInstance.get(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/chats`, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',

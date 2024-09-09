@@ -117,9 +117,9 @@ const WishListPage = () => {
             </ScheduleDateWrapper>
           </TitleWrapper>
           <SectionWrapper>
-            <SectionTitle>Wishlist</SectionTitle>
+            <SectionTitle>위시리스트</SectionTitle>
             <AddButton onClick={handleAddItems} disabled={selectedItems.length === 0}>
-              Add Items
+              추가하기
             </AddButton>
           </SectionWrapper>
           <WishList>

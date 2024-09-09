@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import backIcon from '../../images/header/back.png';  
-import axios from 'axios';  
+import axiosInstance from "../../utils/axiosInstance";
 
 const WishListModal = ({ onClose, selectedPlace, travelRoomId }) => {
   const [successMessage, setSuccessMessage] = useState('');
@@ -10,12 +10,13 @@ const WishListModal = ({ onClose, selectedPlace, travelRoomId }) => {
     const token = localStorage.getItem('accessToken'); // 토큰 가져오기
 
     try {
-      const response = await axios.post(
-        `https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan/list`, 
+      const response = await axiosInstance.post(
+        `https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan/direct`,
         {
           latitude: selectedPlace.latitude,
           longitude: selectedPlace.longitude,
           name: selectedPlace.name,
+          scheduledDay: 1
         },
         {
           headers: {
@@ -41,7 +42,7 @@ const WishListModal = ({ onClose, selectedPlace, travelRoomId }) => {
     const token = localStorage.getItem('accessToken'); 
 
     try {
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/wishlist`,
         {
           latitude: selectedPlace.latitude,
