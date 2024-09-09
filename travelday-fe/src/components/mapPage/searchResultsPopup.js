@@ -50,16 +50,26 @@ const SearchResultsPopup = ({ isOpen, onClose, searchResults = [], onResultClick
             <SearchResults>
               {searchResults.map((result, index) => (
                 <SearchResultItem key={index} onClick={() => onResultClick(result)}>
-                  {result.photos && result.photos.length > 0 && (
+                  {result.photos && result.photos.length > 0 ? (
                     <ResultImage 
                       src={result.photos[0].getUrl({ maxWidth: 500, maxHeight: 500 })} 
                       alt={result.name} 
+                    />
+                    ):(
+                    <ResultImage
+                        src="https://placehold.co/500x500?text=?"
+                        style={{ maxWidth: 500, maxHeight: 500 }}
+                        alt="blank_image"
                     />
                   )}
                   <ResultDetails>
                     <ResultName>{result.name}</ResultName>
                     {result.formatted_address && <ResultAddress>{result.formatted_address}</ResultAddress>}
-                    {result.rating && <ResultRating>평점: {result.rating}</ResultRating>}
+                    {result.rating ?
+                        <ResultRating>평점: {(result.rating).toFixed(1)}</ResultRating>
+                        :
+                        <ResultRating>평점: ??</ResultRating>
+                    }
                   </ResultDetails>
                   <HeartButton onClick={(e) => { e.stopPropagation(); handleHeartClick(result); }}>
                     <img src={heartIcon} alt="위시리스트 혹은 일정에 추가" />
@@ -168,6 +178,7 @@ const ResultImage = styled.img`
 
 const ResultDetails = styled.div`
   display: flex;
+  width: 200px;
   flex-direction: column;
   align-items: flex-start;
   flex-grow: 1;
@@ -179,6 +190,10 @@ const ResultName = styled.span`
   font-size: 20px;
   text-align: left;
   font-weight: bold;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 200px;
 `;
 
 const ResultAddress = styled.div`
