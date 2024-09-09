@@ -76,10 +76,10 @@ const WishListPage = () => {
         setWishListItems(prevItems => prevItems.filter((_, i) => i !== index));
         setSelectedItems(prevSelected => prevSelected.filter(item => item !== index));
       } else {
-        console.error('Failed to delete item:', response.statusText);
+        console.error('위시리스트 가져오기 실패:', response.statusText);
       }
     } catch (error) {
-      console.error('Error deleting wishlist item:', error);
+      console.error('위시리스트를 불러오는 중 에러가 발생했습니다:', error);
     }
   };
 

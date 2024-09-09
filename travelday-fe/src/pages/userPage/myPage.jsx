@@ -6,6 +6,8 @@ import BottomNav from '../../components/shared/bottomNav.js';
 import LogoImage from '../../images/logo/logo12.png';  
 import PenIcon from '../../images/pen.png'; 
 import axiosInstance from '../../utils/axiosInstance.js';
+import axios from 'axios';
+
 
 
 const MyPage = () => {
@@ -31,7 +33,24 @@ const MyPage = () => {
 
   const fetchKakaoUserProfile = async () => {
     try {
-      const response = await axiosInstance.get('/api/user');
+      const token = localStorage.getItem('accessToken'); // 로컬 스토리지에서 토큰 가져오기
+      if (!token) {
+        throw new Error('토큰이 없습니다.');
+      }
+  
+      const response = await axiosInstance.get('/api/user', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      // const response = await axios.get('http://localhost:8080/api/user', {
+      //   headers: {
+      //     Authorization: `Bearer ${token}`,
+      //     'Content-Type': 'application/json',
+      //   },
+      // });
   
       if (response.status === 200) {
         const nickname = response.data.data.nickname; 
@@ -44,8 +63,8 @@ const MyPage = () => {
     } catch (error) {
       if (error.response) {
         // console.log('에러 응답 상태 코드:', error.response.status);
-        console.log(error.response);
-        // console.log(error.response.code);
+        // console.log(error.response.data);
+        console.log(error.response.data.code);
       } else {
         console.log('응답을 받지 못했습니다:', error.message);
       }
