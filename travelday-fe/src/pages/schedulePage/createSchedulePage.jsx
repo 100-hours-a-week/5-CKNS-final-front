@@ -50,8 +50,7 @@ const CreateSchedulePage = () => {
     const token = localStorage.getItem('accessToken');
 
     try {
-      const response = await axiosInstance.post(
-        '/api/rooms',
+      const response = await axiosInstance.post('/api/rooms',
         {
           name: title,
           startDate: startDate.replace(/-/g, '.'),
