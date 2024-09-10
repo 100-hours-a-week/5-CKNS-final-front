@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
-import axios from 'axios';
 import backIcon from '../../images/header/back.png';
 import heartIcon from '../../images/wishList/heart.png';
+import axiosInstance from "../../utils/axiosInstance";
 
 const slideUp = keyframes`
   from {
@@ -33,7 +33,7 @@ const MapSearchResultsPopup = ({ isOpen, onClose, searchResults = [], onResultCl
 
     const token = localStorage.getItem('accessToken');
     try {
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan/direct`,
         {
           name: selectedResult.name,
@@ -73,16 +73,26 @@ const MapSearchResultsPopup = ({ isOpen, onClose, searchResults = [], onResultCl
             <SearchResults>
               {searchResults.map((result, index) => (
                 <SearchResultItem key={index} onClick={() => onResultClick(result)}>
-                  {result.photos && result.photos.length > 0 && (
+                  {result.photos && result.photos.length > 0 ? (
                     <ResultImage 
                       src={result.photos[0].getUrl({ maxWidth: 500, maxHeight: 500 })} 
-                      alt={result.name} 
+                      alt={result.name}
                     />
-                  )}
+                  ):
+                  <ResultImage
+                      src="https://placehold.co/500x500?text=?"
+                      style={{ maxWidth: 500, maxHeight: 500 }}
+                      alt="blank_image"
+                  />
+                  }
                   <ResultDetails>
                     <ResultName>{result.name}</ResultName>
                     {result.formatted_address && <ResultAddress>{result.formatted_address}</ResultAddress>}
-                    {result.rating && <ResultRating>평점: {result.rating}</ResultRating>}
+                    {result.rating ?
+                        <ResultRating>평점: {(result.rating).toFixed(1)}</ResultRating>
+                        :
+                        <ResultRating>평점: ??</ResultRating>
+                    }
                   </ResultDetails>
                   <HeartButton onClick={(e) => { e.stopPropagation(); handleHeartClick(result); }}>
                     <img src={heartIcon} alt="추가" />
@@ -198,6 +208,7 @@ const ResultImage = styled.img`
 
 const ResultDetails = styled.div`
   display: flex;
+  width: 200px;
   flex-direction: column;
   align-items: flex-start;
   flex-grow: 1;
@@ -209,6 +220,10 @@ const ResultName = styled.span`
   font-size: 20px;
   text-align: left;
   font-weight: bold;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 200px;
 `;
 
 const ResultAddress = styled.div`

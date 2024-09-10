@@ -3,7 +3,7 @@ import styled, { keyframes } from 'styled-components';
 import backIcon from '../../images/header/back.png';
 import WishListModal from './wishListModal';  
 import useTravelStore from '../../store/useTravelStore';
-import axios from 'axios';
+import axiosInstance from "../../utils/axiosInstance";
 
 const slideUp = keyframes`
   from {
@@ -33,7 +33,7 @@ const WishlistPopup = ({ isOpen, onClose, selectedPlace }) => {
     const fetchTravelRooms = async () => {
       try {
         console.log('여행방 목록을 불러오는 중...');
-        const response = await axios.get('https://api.thetravelday.co.kr/api/rooms', {
+        const response = await axiosInstance.get('https://api.thetravelday.co.kr/api/rooms', {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',

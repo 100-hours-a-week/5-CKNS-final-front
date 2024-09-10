@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import axios from 'axios';
 import TrashIcon from '../../images/trash.png';
+import axiosInstance from "../../utils/axiosInstance";
 
 const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
   const [sortedSchedules, setSortedSchedules] = useState([]);
@@ -59,7 +59,7 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
     }
 
     try {
-      const response = await axios.delete(`https://api.thetravelday.co.kr/api/rooms/${selectedScheduleId}`, {
+      const response = await axiosInstance.delete(`https://api.thetravelday.co.kr/api/rooms/${selectedScheduleId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },

@@ -1,124 +1,151 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../utils/axiosInstance.js';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { GoogleMap, Marker, InfoWindow } from '@react-google-maps/api';
+import {GoogleMap, Marker, InfoWindow, MarkerF, InfoWindowF} from '@react-google-maps/api';
 import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import calendarIcon from '../../images/filter/calendar.png';
-import penIcon from '../../images/pen.png'; 
+import penIcon from '../../images/pen.png';
 import ScheduleDetailList from '../../components/schedulePage/scheduleDetailList';
 
 const ScheduleDetail = () => {
-  let { travelRoomId } = useParams();
-  const navigate = useNavigate();
-  // const location = useLocation();
+    const { travelRoomId } = useParams();
+    const navigate = useNavigate();
 
-  const [fetchedSchedule, setFetchedSchedule] = useState(null);
-  const [mapMarkers, setMapMarkers] = useState([]);
-  const [selectedMarker, setSelectedMarker] = useState(null);
-  const mapCenter = { lat: 37.5400456, lng: 126.9921017 };
+    const [fetchedSchedule, setFetchedSchedule] = useState(null);
+    const [mapMarkers, setMapMarkers] = useState([]);
+    const [selectedMarker, setSelectedMarker] = useState(null);
+    const [markersLoaded, setMarkersLoaded] = useState(false); // Control rendering of markers
 
-  useEffect(() => {
-        const token = localStorage.getItem('accessToken');
-        axiosInstance.get(`/api/rooms/${travelRoomId}`, {
-          // headers: {
-          //   Authorization: `Bearer ${token}`
-          // },
-          withCredentials: true
-        }).then(response=>{
-            if(response.data) {
-              setFetchedSchedule(response.data.data);
-            }
-          })
-            .catch((error)=>{
-              console.log(error);
+    const [mapCenter,setMapCenter] = useState({lat:37.5400456,lng:126.9921017})
+    // const mapCenter = { lat: 37.5400456, lng: 126.9921017 };
+
+    // Fetch schedule details
+
+    useEffect(() => {
+        axiosInstance.get(`/api/rooms/${travelRoomId}`, { withCredentials: true })
+            .then(response => {
+                if (response.data) {
+                    setFetchedSchedule(response.data.data);
+                }
             })
-  },[]);
+            .catch(error => {
+                console.log(error);
+            });
+    }, [travelRoomId]);
 
+    // Fetch map markers
+    useEffect(() => {
+        if(markersLoaded) {
+            return
+        }
+        axiosInstance.get(`/api/rooms/${travelRoomId}/plan`, { withCredentials: true })
+            .then(response => {
+                if (response.data) {
+                    const fetchedMarkers = response.data.data;
+                    if (JSON.stringify(fetchedMarkers) !== JSON.stringify(mapMarkers)) {
+                        // console.table(fetchedMarkers);
+                        setMapMarkers(fetchedMarkers);
+                        setMapCenter({lat:fetchedMarkers[0].latitude, lng:fetchedMarkers[0].longitude});
+                        setMarkersLoaded(true); // Markers are ready to render
+                    }
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }, [mapMarkers]);
 
-  // 이 함수들은 useEffect 외부에 정의되어야 합니다.
-  const handleAddFromWish = () => {
-    navigate(`/wishlist/${travelRoomId}`, { state: { schedule: fetchedSchedule } });
-  };
+    // Navigation functions
+    const handleAddFromWish = () => {
+        navigate(`/wishlist/${travelRoomId}`, { state: { schedule: fetchedSchedule } });
+    };
 
-  const handleAddFromMap = () => {
-    navigate(`/maplocation/${travelRoomId}`, { state: { schedule: fetchedSchedule } });
-  };
+    const handleAddFromMap = () => {
+        navigate(`/maplocation/${travelRoomId}`, { state: { schedule: fetchedSchedule } });
+    };
 
-  const handleEditClick = () => {
-    navigate(`/fixschedule/${travelRoomId}`, { state: { schedule: fetchedSchedule } });
-  };
+    const handleEditClick = () => {
+        navigate(`/fixschedule/${travelRoomId}`, { state: { schedule: fetchedSchedule } });
+    };
 
-  return (
-    <Container>
-      <Header showBackButton={true} onBackClick={() => navigate('/schedule')} />
-      <ContentWrapper>
-        {fetchedSchedule ? (
-          <>
-            <TitleWrapper>
-              <Title>{fetchedSchedule.name}</Title>
-              <IconButton onClick={handleEditClick}>
-                <EditIcon src={penIcon} alt="Edit Icon" />
-              </IconButton>
-              <ScheduleDateWrapper>
-                <Icon src={calendarIcon} alt="달력 아이콘" />
-                <ScheduleDate>{fetchedSchedule.startDate} ~ {fetchedSchedule.endDate}</ScheduleDate>
-              </ScheduleDateWrapper>
-            </TitleWrapper>
-            <ContentContainer>
-              <MapContainer>
-                <GoogleMap
-                  mapContainerStyle={containerStyle}
-                  center={mapCenter}
-                  zoom={10}
-                >
-                  {mapMarkers?.map((marker, index) => (
-                    <Marker 
-                      key={index} 
-                      position={marker} 
-                      label={marker.label} 
-                      onClick={() => setSelectedMarker(marker)} 
-                    />
-                  ))}
+    return (
+        <Container>
+            <Header showBackButton={true} onBackClick={() => navigate('/schedule')} />
+            <ContentWrapper>
+                {fetchedSchedule ? (
+                    <>
+                        <TitleWrapper>
+                            <Title>{fetchedSchedule.name}</Title>
+                            <IconButton onClick={handleEditClick}>
+                                <EditIcon src={penIcon} alt="Edit Icon" />
+                            </IconButton>
+                            <ScheduleDateWrapper>
+                                <Icon src={calendarIcon} alt="달력 아이콘" />
+                                <ScheduleDate>{fetchedSchedule.startDate} ~ {fetchedSchedule.endDate}</ScheduleDate>
+                            </ScheduleDateWrapper>
+                        </TitleWrapper>
+                        <ContentContainer>
+                            <MapContainer>
+                                <GoogleMap
+                                    mapContainerStyle={containerStyle}
+                                    center={mapCenter}
+                                    zoom={10}
+                                >
+                                    {markersLoaded && (
+                                        mapMarkers.map((marker, index) => (
+                                            // console.log(marker)
+                                            <MarkerF
+                                                key={index}
+                                                position={{ lat: marker.latitude, lng: marker.longitude }}
+                                                onClick={() => setSelectedMarker(marker)}
+                                                animation={2}
+                                            />
+                                        ))
+                                    )}
 
-                  {selectedMarker && (
-                    <InfoWindow
-                      position={selectedMarker}
-                      onCloseClick={() => setSelectedMarker(null)} // InfoWindow 닫기
-                    >
-                      <div>
-                        <h4>{selectedMarker.name}</h4> {/* 장소 이름 표시 */}
-                        <a
-                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedMarker.name)}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          Google Maps로 이동
-                        </a>
-                      </div>
-                    </InfoWindow>
-                  )}
-                </GoogleMap>
-              </MapContainer>
-              <ButtonWrapper>
-                <ActionButton onClick={handleAddFromWish}>
-                  <PlusIcon>+</PlusIcon>위시에서 장소 추가
-                </ActionButton>
-                <ActionButton onClick={handleAddFromMap}>
-                  <PlusIcon>+</PlusIcon>지도에서 장소 추가
-                </ActionButton>
-              </ButtonWrapper>
-              <ScheduleDetailList travelRoomId={travelRoomId} startDate={fetchedSchedule.startDate} endDate={fetchedSchedule.endDate} />
-            </ContentContainer>
-          </>
-        ) : (
-          <p>Loading...</p>
-        )}
-      </ContentWrapper>
-      <BottomNav />
-    </Container>
-  );
+                                    {selectedMarker && (
+                                        <InfoWindowF
+                                            position={{ lat: selectedMarker.latitude, lng: selectedMarker.longitude }}
+                                            onCloseClick={() => setSelectedMarker(null)} // InfoWindow close
+                                        >
+                                            <div>
+                                                <h4>{selectedMarker.name}</h4>
+                                                {/*<a*/}
+                                                {/*    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedMarker.name)}`}*/}
+                                                {/*    target="_blank"*/}
+                                                {/*    rel="noopener noreferrer"*/}
+                                                {/*>*/}
+                                                {/*    Google Maps로 이동*/}
+                                                {/*</a>*/}
+                                            </div>
+                                        </InfoWindowF>
+                                    )}
+                                </GoogleMap>
+                            </MapContainer>
+                            <ButtonWrapper>
+                                <ActionButton onClick={handleAddFromWish}>
+                                    <PlusIcon>+</PlusIcon>위시에서 장소 추가
+                                </ActionButton>
+                                <ActionButton onClick={handleAddFromMap}>
+                                    <PlusIcon>+</PlusIcon>지도에서 장소 추가
+                                </ActionButton>
+                            </ButtonWrapper>
+                            <ScheduleDetailList
+                                travelRoomId={travelRoomId}
+                                startDate={fetchedSchedule.startDate}
+                                endDate={fetchedSchedule.endDate}
+                            />
+                        </ContentContainer>
+                    </>
+                ) : (
+                    <p>Loading...</p>
+                )}
+            </ContentWrapper>
+            <BottomNav />
+        </Container>
+    );
 };
 
 export default ScheduleDetail;
