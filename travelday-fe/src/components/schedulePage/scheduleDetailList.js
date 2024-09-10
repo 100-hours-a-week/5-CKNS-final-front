@@ -316,6 +316,7 @@ const ScheduleBox = styled.div`
         box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.15);
         border-color: #c2c2c2;
     }
+    touch-action: none;
 `;
 
 const ListItemName = styled.div`
