@@ -7,7 +7,7 @@ import axiosInstance from '../../utils/axiosInstance.js';
 
 const CreateSchedulePage = () => {
   const [title, setTitle] = useState('');
-  const [titleError, setTitleError] = useState(''); // 헬퍼 텍스트 상태 변수
+  const [titleError, setTitleError] = useState(''); 
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
@@ -46,7 +46,6 @@ const CreateSchedulePage = () => {
   const handleTitleChange = (e) => {
     const input = e.target.value;
   
-    // 입력 중에는 공백을 트림하지 않고 그대로 유지
     if (input.length > 15) {
       setTitleError('제목은 15자 이내로 입력해주세요.');
     } else {
@@ -57,14 +56,22 @@ const CreateSchedulePage = () => {
   };
   
   const handleTitleBlur = () => {
-    // 포커스를 잃었을 때, 앞뒤 공백만 트림
     setTitle(prevTitle => prevTitle.trim());
   };
   
-  
-
   const handleCreateSchedule = async () => {
     if (!isButtonEnabled) return;
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffInDays = (end - start) / (1000 * 60 * 60 * 24); // 날짜 차이 계산
+
+    if (diffInDays > 90) {
+      alert('일정 생성은 최대 90일까지 가능합니다.');
+      return;
+    }
+
+    setIsButtonEnabled(false);
 
     const token = localStorage.getItem('accessToken');
 
@@ -86,18 +93,15 @@ const CreateSchedulePage = () => {
 
       if (response.status === 200) { 
         setShowSuccessPopup(true);
-        const interval = setInterval(() => {
-          setCountdown(prev => {
-            if (prev === 1) {
-              clearInterval(interval);
-              navigate('/schedule');
-            }
-            return prev - 1;
-          });
-        }, 1000);
+
+        // 3초 후 페이지 이동
+        setTimeout(() => {
+          navigate('/schedule');
+        }, 3000);
       }
     } catch (error) {
       console.error('일정 생성 중 오류 발생:', error);
+      setIsButtonEnabled(true);
     }
   };
 
@@ -112,7 +116,7 @@ const CreateSchedulePage = () => {
             type="text" 
             value={title} 
             onChange={handleTitleChange} 
-            onBlur={handleTitleBlur}  // 포커스를 잃었을 때 트림 적용
+            onBlur={handleTitleBlur} 
             placeholder="여행 제목을 입력하세요" 
           />
           {titleError && <HelperText>{titleError}</HelperText>}
