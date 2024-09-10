@@ -15,6 +15,8 @@ const LoginPage = () => {
 
   const accessToken = localStorage.getItem('accessToken');  
 
+ 
+  const nicknameRegex = /^[가-힣a-zA-Z0-9]+$/;
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
@@ -28,6 +30,13 @@ const LoginPage = () => {
       // 닉네임 길이 검사
       if (nickname.length > 10) {
         setNicknameError('닉네임은 10글자 이내여야 합니다.');
+        setIsButtonEnabled(false);
+        return;
+      }
+
+      // 특수문자 포함 여부 검사
+      if (!nicknameRegex.test(nickname)) {
+        setNicknameError('특수문자는 사용할 수 없습니다.');
         setIsButtonEnabled(false);
         return;
       }
@@ -139,8 +148,6 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
-
-// 스타일 컴포넌트 정의
 
 const fadeIn = keyframes`
   from {
