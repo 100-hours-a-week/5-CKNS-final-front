@@ -60,8 +60,8 @@ const MapSearchResultsPopup = ({ isOpen, onClose, searchResults = [], onResultCl
 
   return (
     <>
-      <PopupOverlay>
-        <PopupContent>
+      <PopupOverlay onClick={onClose}>
+        <PopupContent onClick={(e) => e.stopPropagation()}>
           <PopupHeader>
             <BackButton onClick={onClose}>
               <img src={backIcon} alt="뒤로가기" />
@@ -105,8 +105,8 @@ const MapSearchResultsPopup = ({ isOpen, onClose, searchResults = [], onResultCl
       </PopupOverlay>
       
       {isModalOpen && (
-        <ModalOverlay>
-          <ModalContent>
+        <ModalOverlay onClick={handleModalClose}>
+          <ModalContent onClick={(e) => e.stopPropagation()}>
             <ModalText>{selectedResult?.name}을(를) 일정에 바로 추가하시겠습니까?</ModalText>
             <ModalActions>
               <ModalButton onClick={handleAddToSchedule}>예</ModalButton>
@@ -305,4 +305,3 @@ const ModalButton = styled.button`
     background-color: #f12e5e; 
   }
 `;
- 

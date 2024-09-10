@@ -18,8 +18,8 @@ const AreaPopup = ({ isOpen, onClose, children, searchResults = [], onResultClic
   if (!isOpen) return null;
 
   return (
-    <PopupOverlay>
-      <PopupContent>
+    <PopupOverlay onClick={onClose}>
+      <PopupContent onClick={(e) => e.stopPropagation()}>
         <Header>
           <BackButton onClick={onClose}>
             <img src={backIcon} alt="뒤로가기" />

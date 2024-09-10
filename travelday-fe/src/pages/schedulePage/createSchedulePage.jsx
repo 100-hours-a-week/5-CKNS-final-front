@@ -7,6 +7,7 @@ import axiosInstance from '../../utils/axiosInstance.js';
 
 const CreateSchedulePage = () => {
   const [title, setTitle] = useState('');
+  const [titleError, setTitleError] = useState(''); 
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
@@ -25,33 +26,57 @@ const CreateSchedulePage = () => {
 
   useEffect(() => {
     validateDates();
-    if (title && startDate && endDate) {
+    if (title && startDate && endDate && !titleError) {
       setIsButtonEnabled(true);
     } else {
       setIsButtonEnabled(false);
     }
-  }, [title, startDate, endDate]);
+  }, [title, startDate, endDate, titleError]);
 
   const validateDates = () => {
     const today = new Date().toISOString().split('T')[0];
     if (startDate && startDate < today) {
-      alert('시작 날짜는 오늘 이전일 수 없습니다.');
       setStartDate(today);
     }
     if (endDate && endDate < startDate) {
-      alert('종료 날짜는 시작 날짜보다 이전일 수 없습니다.');
       setEndDate(startDate);
     }
   };
 
+  const handleTitleChange = (e) => {
+    const input = e.target.value;
+  
+    if (input.length > 15) {
+      setTitleError('제목은 15자 이내로 입력해주세요.');
+    } else {
+      setTitleError('');
+    }
+  
+    setTitle(input);
+  };
+  
+  const handleTitleBlur = () => {
+    setTitle(prevTitle => prevTitle.trim());
+  };
+  
   const handleCreateSchedule = async () => {
     if (!isButtonEnabled) return;
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffInDays = (end - start) / (1000 * 60 * 60 * 24); // 날짜 차이 계산
+
+    if (diffInDays > 90) {
+      alert('일정 생성은 최대 90일까지 가능합니다.');
+      return;
+    }
+
+    setIsButtonEnabled(false);
 
     const token = localStorage.getItem('accessToken');
 
     try {
-      const response = await axiosInstance.post(
-        '/api/rooms',
+      const response = await axiosInstance.post('/api/rooms',
         {
           name: title,
           startDate: startDate.replace(/-/g, '.'),
@@ -68,18 +93,15 @@ const CreateSchedulePage = () => {
 
       if (response.status === 200) { 
         setShowSuccessPopup(true);
-        const interval = setInterval(() => {
-          setCountdown(prev => {
-            if (prev === 1) {
-              clearInterval(interval);
-              navigate('/schedule');
-            }
-            return prev - 1;
-          });
-        }, 1000);
+
+        // 3초 후 페이지 이동
+        setTimeout(() => {
+          navigate('/schedule');
+        }, 3000);
       }
     } catch (error) {
       console.error('일정 생성 중 오류 발생:', error);
+      setIsButtonEnabled(true);
     }
   };
 
@@ -93,9 +115,11 @@ const CreateSchedulePage = () => {
           <Input 
             type="text" 
             value={title} 
-            onChange={(e) => setTitle(e.target.value)} 
+            onChange={handleTitleChange} 
+            onBlur={handleTitleBlur} 
             placeholder="여행 제목을 입력하세요" 
           />
+          {titleError && <HelperText>{titleError}</HelperText>}
         </InputField>
         <InputField>
           <Label>시작 날짜</Label>
@@ -138,7 +162,6 @@ const CreateSchedulePage = () => {
 };
 
 export default CreateSchedulePage;
-
 
 const fadeIn = keyframes`
   from {
@@ -246,6 +269,24 @@ const Input = styled.input`
   &:focus {
     border: 2px solid #f12e5e;
   }
+`;
+
+const helperFadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const HelperText = styled.p`
+  font-size: 12px;
+  color: #f12e5e;
+  margin-top: 5px;
+  animation: ${helperFadeIn} 0.3s ease-in-out;
 `;
 
 const buttonEnableAnimation = keyframes`

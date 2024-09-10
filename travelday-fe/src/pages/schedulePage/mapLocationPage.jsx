@@ -9,7 +9,6 @@ import backIcon from '../../images/header/back.png';
 import searchIcon from '../../images/search/search.png'; 
 import MapSearchResultsPopup from '../../components/mapPage/mapSearchResultsPopup.js';
 
-
 const center = {
   lat: 37.5400456,
   lng: 126.9921017
@@ -20,7 +19,7 @@ function MapLocationPage() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { schedule } = location.state
+  const { schedule } = location.state;
   const [map, setMap] = useState(null);
   const [searchInput, setSearchInput] = useState('');
   const [markers, setMarkers] = useState([]); 
@@ -29,18 +28,14 @@ function MapLocationPage() {
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [isSearchComplete, setIsSearchComplete] = useState(false);
 
-
- useEffect(() => {
-  const token = localStorage.getItem('accessToken');
-  if (!token) {
-    console.error('토큰이 없습니다. 로그인 페이지로 이동합니다.');
-    navigate('/login');
-    return;
-  }
-}, [navigate]); // 이 줄을 추가하여 useEffect 블록을 완성합니다.
-
-  
-
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      console.error('토큰이 없습니다. 로그인 페이지로 이동합니다.');
+      navigate('/login');
+      return;
+    }
+  }, [navigate]);
 
   const handleSearch = () => {
     if (map && searchInput) {
@@ -186,7 +181,6 @@ function MapLocationPage() {
 }
 
 export default React.memo(MapLocationPage);
-
 
 const containerStyle = {
   width: '390px',

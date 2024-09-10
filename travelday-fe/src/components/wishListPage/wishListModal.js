@@ -69,8 +69,8 @@ const WishListModal = ({ onClose, selectedPlace, travelRoomId }) => {
   };
 
   return (
-    <ModalOverlay>
-      <ModalContent>
+    <ModalOverlay onClick={onClose}>
+      <ModalContent onClick={(e) => e.stopPropagation()}>
         <ModalHeader>
           <BackButton onClick={onClose}>
             <img src={backIcon} alt="뒤로가기" />
@@ -184,4 +184,3 @@ const SuccessMessage = styled.p`
   text-align: center;
   margin: 20px 0;
 `;
-

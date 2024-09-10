@@ -206,7 +206,6 @@ const FlightPrice = styled.div`
   color: #007bff;
   margin-top: 10px;
 `;
-
 const ScrollButtonContainer = styled.div`
   position: absolute;
   top: 0;
@@ -221,6 +220,10 @@ const ScrollButtonContainer = styled.div`
 
   ${Wrapper}:hover & {
     opacity: 1;
+  }
+
+  @media (max-width: 768px) {  // 모바일 화면에서 숨김
+    display: none;
   }
 `;
 
@@ -238,4 +241,9 @@ const ScrollButton = styled.div`
   user-select: none;
   margin: 0 10px;
   font-size: 18px;
+
+  @media (max-width: 768px) {  // 모바일 화면에서 숨김
+    display: none;
+  }
 `;
+
