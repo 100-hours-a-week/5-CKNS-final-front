@@ -45,18 +45,23 @@ const CreateSchedulePage = () => {
 
   const handleTitleChange = (e) => {
     const input = e.target.value;
-    const regex = /^[a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ가-힣\s]*$/;
-
+  
+    // 입력 중에는 공백을 트림하지 않고 그대로 유지
     if (input.length > 15) {
       setTitleError('제목은 15자 이내로 입력해주세요.');
-    } else if (!regex.test(input)) {
-      setTitleError('특수문자는 입력할 수 없습니다.');
     } else {
       setTitleError('');
     }
-
+  
     setTitle(input);
   };
+  
+  const handleTitleBlur = () => {
+    // 포커스를 잃었을 때, 앞뒤 공백만 트림
+    setTitle(prevTitle => prevTitle.trim());
+  };
+  
+  
 
   const handleCreateSchedule = async () => {
     if (!isButtonEnabled) return;
@@ -107,6 +112,7 @@ const CreateSchedulePage = () => {
             type="text" 
             value={title} 
             onChange={handleTitleChange} 
+            onBlur={handleTitleBlur}  // 포커스를 잃었을 때 트림 적용
             placeholder="여행 제목을 입력하세요" 
           />
           {titleError && <HelperText>{titleError}</HelperText>}
