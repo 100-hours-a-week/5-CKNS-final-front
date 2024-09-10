@@ -153,7 +153,6 @@ function MapPage() {
         </MapButtonContainer>
         <BottomPadding />
         <BottomNav />
-
         <SearchResultsPopup 
           isOpen={isPopupOpen} 
           onClose={() => setIsPopupOpen(false)} 
@@ -182,7 +181,6 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   width: 390px;
-  height: 100vh;
   background-color: #fff; 
 `;
 
@@ -191,6 +189,7 @@ const Content = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
+    height: 100vh;
   box-sizing: border-box;
   text-align: center;
 `;
@@ -235,7 +234,7 @@ const SearchIcon = styled.img`
 `;
 
 const BottomPadding = styled.div`
-  height: 80px; 
+  height: 80px;
 `;
 
 const InfoWindowContent = styled.div`

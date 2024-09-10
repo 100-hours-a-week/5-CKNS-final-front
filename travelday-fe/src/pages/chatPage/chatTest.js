@@ -31,9 +31,10 @@ const linkify = (text) => {
 
 const ChatPage = () => {
   const [messages, setMessages] = useState([
-    { sender: '나', content: '안녕하세요!', timestamp: new Date() },
-    { sender: '다른 사용자', content: '안녕하세요! 반갑습니다.', timestamp: new Date() },
-    { sender: '나', content: '이 링크를 확인해 보세요 https://www.naver.com/ ', timestamp: new Date() }, 
+    { sender: '나', content: '그럼 점심먹고 근처 예쁜 카페 가는거 어때?', timestamp: new Date() },
+    { sender: '다른 사용자', content: '#인그리드', timestamp: new Date() },
+    { sender: '다른 사용자', content: '여기 바다뷰에 맛있대!', timestamp: new Date() },
+    { sender: '나', content: '너무 조앙 카페 확정~~', timestamp: new Date() }, 
   ]);
   const [newMessage, setNewMessage] = useState('');
   const [isSearchVisible, setIsSearchVisible] = useState(false);
@@ -184,7 +185,7 @@ const ChatPage = () => {
       <ChatContainer>
         <Navbar>
           <BackButton onClick={handleBackButtonClick}>뒤로</BackButton>
-          <RoomTitle>채팅방 이름</RoomTitle>
+          <RoomTitle>가을 제주도팟!</RoomTitle>
           <IconsContainer>
             <IoSearch size={22} onClick={toggleSearch} />  
             <IoMenuOutline size={22} onClick={toggleSidebar} /> 

@@ -5,7 +5,6 @@ import BottomNav from '../../components/shared/bottomNav.js';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosInstance.js';
 
-
 const CreateSchedulePage = () => {
   const [title, setTitle] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -25,12 +24,25 @@ const CreateSchedulePage = () => {
   }, [navigate]);
 
   useEffect(() => {
+    validateDates();
     if (title && startDate && endDate) {
       setIsButtonEnabled(true);
     } else {
       setIsButtonEnabled(false);
     }
   }, [title, startDate, endDate]);
+
+  const validateDates = () => {
+    const today = new Date().toISOString().split('T')[0];
+    if (startDate && startDate < today) {
+      alert('시작 날짜는 오늘 이전일 수 없습니다.');
+      setStartDate(today);
+    }
+    if (endDate && endDate < startDate) {
+      alert('종료 날짜는 시작 날짜보다 이전일 수 없습니다.');
+      setEndDate(startDate);
+    }
+  };
 
   const handleCreateSchedule = async () => {
     if (!isButtonEnabled) return;
@@ -127,7 +139,6 @@ const CreateSchedulePage = () => {
 
 export default CreateSchedulePage;
 
-// 스타일 컴포넌트 정의
 
 const fadeIn = keyframes`
   from {

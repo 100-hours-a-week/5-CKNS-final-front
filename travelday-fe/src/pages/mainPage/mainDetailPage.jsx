@@ -33,7 +33,10 @@ const airportNames = {
   ICN: '인천국제공항',
   NRT: '나리타 공항',
   KUL: '쿠알라룸푸르국제공항',
-  TAO: '칭다오자오둥국제공항'
+  TAO: '칭다오자오둥국제공항',
+  NKG: '난징 루커우 국제공항',
+  KMG: '쿤밍 창수이 국제공항',
+  CAN: '광저우 바이윈 국제공항'
 };
 
 const airlineNames = {
@@ -66,7 +69,8 @@ const airlineNames = {
     'H1': '한에어항공',
     YP: '에어프레미아',
     OD: '말린도항공',
-    TW: '티웨이항공'
+    TW: '티웨이항공',
+    VJ: '비엣젯항공'
 };
 
 const airlineUrls = {
@@ -99,7 +103,8 @@ const airlineUrls = {
     'H1': 'https://www.hahnair.com', // 한에어항공
     YP: 'https://www.airpremia.com', // 에어프레미아
     OD: 'https://www.malindoair.com/kr/ko/',
-    TW: 'https://www.twayair.com/app/main'
+    TW: 'https://www.twayair.com/app/main',
+    VJ: 'https://www.vietjetair.com/ko' //비엣젯 항공
 };
 
 const getAirportName = (iataCode) => airportNames[iataCode] || iataCode;
