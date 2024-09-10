@@ -115,8 +115,7 @@ const WishListPage = () => {
           <SectionWrapper>
             <SectionTitle>위시리스트</SectionTitle>
             <AddButton onClick={handleAddItems} disabled={selectedItems.length === 0}>
-              장소에<br/>
-              추가하기
+              장소에 추가하기
             </AddButton>
           </SectionWrapper>
           <WishList>
@@ -159,7 +158,7 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   background-color: #fafafa;
 `;
 
@@ -171,18 +170,6 @@ const ContentWrapper = styled.div`
   align-items: center;
   background-color: #fff;
   position: relative;
-`;
-
-const BackButton = styled.div`
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  cursor: pointer;
-`;
-
-const BackIcon = styled.img`
-  width: 24px;
-  height: 24px;
 `;
 
 const TitleWrapper = styled.div`
@@ -233,17 +220,17 @@ const SectionTitle = styled.h2`
 `;
 
 const WishList = styled.div`
-  width: 100%;
+  margin-bottom: 80px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 15px;
 `;
 
 const WishListItem = styled.div`
   background-color: #fff;
   width: 320px;
   padding: 15px;
+  margin-bottom: 10px;
   border-radius: 50px;
   border: 2px solid #ddd;
   cursor: pointer;
@@ -296,7 +283,7 @@ const RemoveButton = styled.button`
 `;
 
 const AddButton = styled.button`
-  width: 100px;
+  width: 130px;
   padding: 10px;
   font-size: 16px;
   background-color: #f12e5e;
