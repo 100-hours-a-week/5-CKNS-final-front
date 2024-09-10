@@ -40,7 +40,7 @@ export const requestForToken = (setTokenFound) => {
 
 const sendTokenToServer = (token) => {
   // 서버로 토큰 전송
-  fetch("/api/token/save", {
+  fetch("https://api.thetravelday.co.kr/api/fcm", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

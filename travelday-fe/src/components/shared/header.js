@@ -54,8 +54,8 @@ const Header = ({ showBackButton = false, onBackClick }) => {
   };
 
   const handleBellIconClick = () => {
-    navigate('/alarm'); 
-    // setIsAlarmOpen(!isAlarmOpen); // 알람 사이드바 열기/닫기
+    // navigate('/alarm'); 
+    setIsAlarmOpen(!isAlarmOpen); // 알람 사이드바 열기/닫기
   };
 
   return (
