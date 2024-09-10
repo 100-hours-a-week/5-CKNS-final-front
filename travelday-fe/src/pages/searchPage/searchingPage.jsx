@@ -27,14 +27,14 @@ const SearchingPage = () => {
       {selectedOption === '호텔' && <HotelSearch />}
       <BottomPadding />
       <BottomNav />
-      {/* {isOverlayVisible && (
+      {isOverlayVisible && (
         <Overlay>
           <OverlayContent>
             <Image src={InfoImage} alt="Information" />
             <Text>9/23일에 업데이트 됩니다!</Text>
           </OverlayContent>
         </Overlay>
-      )} */}
+      )}
     </Container>
   );
 };
@@ -65,35 +65,35 @@ const BottomPadding = styled.div`
   height: 80px;  /* 하단 네비게이션 바의 높이만큼 여유 공간 추가 */
 `;
 
-// const Overlay = styled.div`
-//   position: fixed; /* 화면에 고정 */
-//   top: 0; /* 화면의 최상단에서 시작 */
-//   left: 0;
-//   width: 100%;
-//   height: 100%; /* 화면 전체를 덮음 */
-//   background-color: rgba(255, 255, 255, 0.9); /* 반투명 하얀 배경 */
-//   display: flex;
-//   justify-content: center;
-//   align-items: center; /* 콘텐츠를 화면 가운데에 위치 */
-//   z-index: 888; /* 오버레이를 최상단에 표시 */
-// `;
+const Overlay = styled.div`
+  position: fixed; /* 화면에 고정 */
+  top: 0; /* 화면의 최상단에서 시작 */
+  left: 0;
+  width: 100%;
+  height: 100%; /* 화면 전체를 덮음 */
+  background-color: rgba(255, 255, 255, 0.9); /* 반투명 하얀 배경 */
+  display: flex;
+  justify-content: center;
+  align-items: center; /* 콘텐츠를 화면 가운데에 위치 */
+  z-index: 888; /* 오버레이를 최상단에 표시 */
+`;
 
-// const OverlayContent = styled.div`
-//   display: flex;
-//   flex-direction: column;
-//   align-items: center;
-//   text-align: center;
-//   color: #333; /* 텍스트 색상을 어두운 회색으로 변경 */
-// `;
+const OverlayContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: #333; /* 텍스트 색상을 어두운 회색으로 변경 */
+`;
 
-// const Image = styled.img`
-//   width: 200px; 
-//   height: auto;
-//   margin-bottom: 20px;
-// `;
+const Image = styled.img`
+  width: 200px; 
+  height: auto;
+  margin-bottom: 20px;
+`;
 
-// const Text = styled.p`
-//   font-size: 18px;
-//   color: #333;
-//   text-align: center;
-// `;
+const Text = styled.p`
+  font-size: 18px;
+  color: #333;
+  text-align: center;
+`;
