@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import axiosInstance from "../../utils/axiosInstance";
 import TrashIcon from '../../images/trash.png';
 import axiosInstance from "../../utils/axiosInstance";
 
@@ -59,7 +60,7 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
     }
 
     try {
-      const response = await axiosInstance.delete(`https://api.thetravelday.co.kr/api/rooms/${selectedScheduleId}`, {
+      const response = await axiosInstance.delete(`/api/rooms/${selectedScheduleId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },

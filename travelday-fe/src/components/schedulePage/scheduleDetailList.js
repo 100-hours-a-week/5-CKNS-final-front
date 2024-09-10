@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
+import axiosInstance from "../../utils/axiosInstance";
 import {CSS} from '@dnd-kit/utilities';
 import {DndContext, PointerSensor, useSensor, useSensors} from '@dnd-kit/core';
 import {restrictToVerticalAxis} from '@dnd-kit/modifiers';
@@ -145,7 +146,7 @@ const ScheduleDetailList = ({ travelRoomId, startDate, endDate }) => {
 
     /** 서버에서 일정을 받아옴 */
     function fetchPlans(token) {
-        axiosInstance.get(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan`, {
+        axiosInstance.get(`/api/rooms/${travelRoomId}/plan`, {
             headers: {Authorization: `Bearer ${token}`},
             withCredentials: true
         })
@@ -173,7 +174,7 @@ const ScheduleDetailList = ({ travelRoomId, startDate, endDate }) => {
     /** 서버에 변환한 리스트를 다시 저장 */
     function postPlans() {
         const token = localStorage.getItem("accessToken");
-        axiosInstance.post(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan`, {
+        axiosInstance.post(`/api/rooms/${travelRoomId}/plan`, {
             body: retrieveSchedule(scheduleDetails)
         }, {
             headers: {Authorization: `Bearer ${token}`},
