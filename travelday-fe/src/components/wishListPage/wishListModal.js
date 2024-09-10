@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import backIcon from '../../images/header/back.png';  
 import axiosInstance from "../../utils/axiosInstance";
-import axiosInstance from "../../utils/axiosInstance";
 
 const WishListModal = ({ onClose, selectedPlace, travelRoomId }) => {
   const [successMessage, setSuccessMessage] = useState('');
