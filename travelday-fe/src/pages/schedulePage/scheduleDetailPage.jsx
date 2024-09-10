@@ -78,13 +78,15 @@ const ScheduleDetail = () => {
                     <>
                         <TitleWrapper>
                             <Title>{fetchedSchedule.name}</Title>
-                            <IconButton onClick={handleEditClick}>
-                                <EditIcon src={penIcon} alt="Edit Icon" />
-                            </IconButton>
-                            <ScheduleDateWrapper>
-                                <Icon src={calendarIcon} alt="달력 아이콘" />
-                                <ScheduleDate>{fetchedSchedule.startDate} ~ {fetchedSchedule.endDate}</ScheduleDate>
-                            </ScheduleDateWrapper>
+                            <MetaWrapper>
+                                <IconButton onClick={handleEditClick}>
+                                    <EditIcon src={penIcon} alt="Edit Icon" />
+                                </IconButton>
+                                <ScheduleDateWrapper>
+                                    <Icon src={calendarIcon} alt="달력 아이콘" />
+                                    <ScheduleDate>{fetchedSchedule.startDate} ~ {fetchedSchedule.endDate}</ScheduleDate>
+                                </ScheduleDateWrapper>
+                            </MetaWrapper>
                         </TitleWrapper>
                         <ContentContainer>
                             <MapContainer>
@@ -180,6 +182,7 @@ const TitleWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+    justify-content: space-between;
   background-color: #fff;
   position: relative;
 `;
@@ -190,13 +193,17 @@ const Title = styled.h1`
   margin: 30px 0 10px 20px; 
   text-align: left;
 `;
+const MetaWrapper = styled.div`
+  display: flex;
+  width: inherit;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+`
 
 const IconButton = styled.button`
-  position: absolute;
-  top: 100px;
-  right: 20px;
   background: none;
   border: none;
+  margin-right: 20px;
   cursor: pointer;
 `;
 
