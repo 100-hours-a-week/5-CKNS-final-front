@@ -7,6 +7,7 @@ import axiosInstance from '../../utils/axiosInstance.js';
 
 const CreateSchedulePage = () => {
   const [title, setTitle] = useState('');
+  const [titleError, setTitleError] = useState(''); // 헬퍼 텍스트 상태 변수
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
@@ -25,23 +26,36 @@ const CreateSchedulePage = () => {
 
   useEffect(() => {
     validateDates();
-    if (title && startDate && endDate) {
+    if (title && startDate && endDate && !titleError) {
       setIsButtonEnabled(true);
     } else {
       setIsButtonEnabled(false);
     }
-  }, [title, startDate, endDate]);
+  }, [title, startDate, endDate, titleError]);
 
   const validateDates = () => {
     const today = new Date().toISOString().split('T')[0];
     if (startDate && startDate < today) {
-      alert('시작 날짜는 오늘 이전일 수 없습니다.');
       setStartDate(today);
     }
     if (endDate && endDate < startDate) {
-      alert('종료 날짜는 시작 날짜보다 이전일 수 없습니다.');
       setEndDate(startDate);
     }
+  };
+
+  const handleTitleChange = (e) => {
+    const input = e.target.value;
+    const regex = /^[a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ가-힣\s]*$/;
+
+    if (input.length > 15) {
+      setTitleError('제목은 15자 이내로 입력해주세요.');
+    } else if (!regex.test(input)) {
+      setTitleError('특수문자는 입력할 수 없습니다.');
+    } else {
+      setTitleError('');
+    }
+
+    setTitle(input);
   };
 
   const handleCreateSchedule = async () => {
@@ -92,9 +106,10 @@ const CreateSchedulePage = () => {
           <Input 
             type="text" 
             value={title} 
-            onChange={(e) => setTitle(e.target.value)} 
+            onChange={handleTitleChange} 
             placeholder="여행 제목을 입력하세요" 
           />
+          {titleError && <HelperText>{titleError}</HelperText>}
         </InputField>
         <InputField>
           <Label>시작 날짜</Label>
@@ -137,7 +152,6 @@ const CreateSchedulePage = () => {
 };
 
 export default CreateSchedulePage;
-
 
 const fadeIn = keyframes`
   from {
@@ -245,6 +259,24 @@ const Input = styled.input`
   &:focus {
     border: 2px solid #f12e5e;
   }
+`;
+
+const helperFadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const HelperText = styled.p`
+  font-size: 12px;
+  color: #f12e5e;
+  margin-top: 5px;
+  animation: ${helperFadeIn} 0.3s ease-in-out;
 `;
 
 const buttonEnableAnimation = keyframes`
