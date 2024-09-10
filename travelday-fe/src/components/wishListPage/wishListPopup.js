@@ -33,7 +33,7 @@ const WishlistPopup = ({ isOpen, onClose, selectedPlace }) => {
     const fetchTravelRooms = async () => {
       try {
         console.log('여행방 목록을 불러오는 중...');
-        const response = await axiosInstance.get('https://api.thetravelday.co.kr/api/rooms', {
+        const response = await axiosInstance.get('/api/rooms', {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',

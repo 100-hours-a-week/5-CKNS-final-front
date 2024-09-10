@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import backIcon from '../../images/header/back.png';  
 import axiosInstance from "../../utils/axiosInstance";
+import axiosInstance from "../../utils/axiosInstance";
 
 const WishListModal = ({ onClose, selectedPlace, travelRoomId }) => {
   const [successMessage, setSuccessMessage] = useState('');
@@ -11,7 +12,7 @@ const WishListModal = ({ onClose, selectedPlace, travelRoomId }) => {
 
     try {
       const response = await axiosInstance.post(
-        `https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan/direct`,
+        `/api/rooms/${travelRoomId}/plan/list`, 
         {
           latitude: selectedPlace.latitude,
           longitude: selectedPlace.longitude,
