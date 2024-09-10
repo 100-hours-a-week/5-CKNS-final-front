@@ -37,8 +37,8 @@ const SearchResultsPopup = ({ isOpen, onClose, searchResults = [], onResultClick
 
   return (
     <>
-      <PopupOverlay>
-        <PopupContent>
+      <PopupOverlay onClick={onClose}>
+        <PopupContent onClick={(e) => e.stopPropagation()}>
           <PopupHeader>
             <BackButton onClick={onClose}>
               <img src={backIcon} alt="뒤로가기" />
@@ -92,6 +92,7 @@ const PopupOverlay = styled.div`
   display: flex;
   justify-content: center;
   align-items: flex-end;
+  z-index: 1000;
 `;
 
 const PopupContent = styled.div`
@@ -102,6 +103,7 @@ const PopupContent = styled.div`
   border-radius: 8px 8px 0 0;
   animation: ${slideUp} 0.3s ease-out;
   box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
 `;
 
 const PopupHeader = styled.div`
@@ -211,4 +213,3 @@ const HeartButton = styled.button`
     transition: transform 200ms cubic-bezier(.2,0,.7,1);
   }
 `;
-

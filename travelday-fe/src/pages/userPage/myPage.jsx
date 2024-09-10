@@ -7,13 +7,11 @@ import LogoImage from '../../images/logo/logo12.png';
 import PenIcon from '../../images/pen.png'; 
 import axiosInstance from '../../utils/axiosInstance.js';
 
-
-
 const MyPage = () => {
   const navigate = useNavigate();
   const [nickname, setNickname] = useState('');
   const [showModal, setShowModal] = useState(false);
-  const [showConfirmModal, setShowConfirmModal] = useState(false); // 확인 모달 상태 추가
+  const [showConfirmModal, setShowConfirmModal] = useState(false); 
   const [errorMessage, setErrorMessage] = useState(''); 
   const [isLoading, setIsLoading] = useState(true); 
 
@@ -32,7 +30,7 @@ const MyPage = () => {
 
   const fetchKakaoUserProfile = async () => {
     try {
-      const token = localStorage.getItem('accessToken'); // 로컬 스토리지에서 토큰 가져오기
+      const token = localStorage.getItem('accessToken'); 
       if (!token) {
         throw new Error('토큰이 없습니다.');
       }
@@ -43,13 +41,6 @@ const MyPage = () => {
           'Content-Type': 'application/json',
         },
       });
-
-      // const response = await axios.get('http://localhost:8080/api/user', {
-      //   headers: {
-      //     Authorization: `Bearer ${token}`,
-      //     'Content-Type': 'application/json',
-      //   },
-      // });
   
       if (response.status === 200) {
         const nickname = response.data.data.nickname; 
@@ -61,8 +52,6 @@ const MyPage = () => {
       }
     } catch (error) {
       if (error.response) {
-        // console.log('에러 응답 상태 코드:', error.response.status);
-        // console.log(error.response.data);
         console.log(error.response.data.code);
       } else {
         console.log('응답을 받지 못했습니다:', error.message);
@@ -70,7 +59,6 @@ const MyPage = () => {
       setIsLoading(false); 
     }
   };
-  
   
   const handleLogout = async () => {
     try {
@@ -134,8 +122,8 @@ const MyPage = () => {
       <BottomNav />  
 
       {showConfirmModal && (
-        <ModalOverlay>
-          <ModalContainer>
+        <ModalOverlay onClick={() => setShowConfirmModal(false)}>
+          <ModalContainer onClick={(e) => e.stopPropagation()}>
             <ModalTitle>정말 탈퇴하시겠습니까?</ModalTitle>
             <ButtonGroup>
               <ConfirmButton onClick={() => {
@@ -153,8 +141,8 @@ const MyPage = () => {
       )}
 
       {showModal && (
-        <ModalOverlay>
-          <ModalContainer>
+        <ModalOverlay onClick={() => setShowModal(false)}>
+          <ModalContainer onClick={(e) => e.stopPropagation()}>
             <CloseModalButton onClick={() => setShowModal(false)}>&times;</CloseModalButton>
             <ModalTitle>여행한DAY를 떠나시려 한다니 정말 아쉽네요.</ModalTitle>
             <ModalMessage>
@@ -166,8 +154,8 @@ const MyPage = () => {
             </ModalMessage>
             <ModalButton 
               onClick={() => {
-                localStorage.removeItem('accessToken'); // 로컬스토리지에서 토큰 삭제
-                navigate('/intro'); // intro 페이지로 이동
+                localStorage.removeItem('accessToken'); 
+                navigate('/intro'); 
               }}
             >
               닫기
@@ -281,7 +269,6 @@ const DeleteButton = styled(Button)`
   }
 `;
 
-// 모달 관련 스타일
 const ModalOverlay = styled.div`
   position: fixed;
   top: 0;
@@ -375,6 +362,7 @@ const ButtonGroup = styled.div`
   width: 100%;
   gap: 20px;
 `;
+
 const ConfirmButton = styled.button`
   background: linear-gradient(135deg, #d3d3d3, #a9a9a9); 
   color: white;
@@ -399,7 +387,6 @@ const ConfirmButton = styled.button`
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1); 
   }
 `;
-
 
 const CancelButton = styled.button`
   background: linear-gradient(135deg, #007bff, #00a2ff); 

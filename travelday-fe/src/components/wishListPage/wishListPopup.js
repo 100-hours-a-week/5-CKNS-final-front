@@ -75,8 +75,8 @@ const WishlistPopup = ({ isOpen, onClose, selectedPlace }) => {
 
   return (
     <>
-      <PopupOverlay>
-        <PopupContent>
+      <PopupOverlay onClick={onClose}>
+        <PopupContent onClick={(e) => e.stopPropagation()}>
           <PopupHeader>
             <BackButton onClick={onClose}>
               <img src={backIcon} alt="뒤로가기" />
@@ -111,7 +111,6 @@ const WishlistPopup = ({ isOpen, onClose, selectedPlace }) => {
 };
 
 export default WishlistPopup;
-
 
 const PopupOverlay = styled.div`
   position: fixed;

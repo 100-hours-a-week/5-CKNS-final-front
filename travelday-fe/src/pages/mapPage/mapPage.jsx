@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { GoogleMap, Marker, InfoWindow } from '@react-google-maps/api';
-import { useNavigate } from 'react-router-dom'; // 추가
+import { useNavigate } from 'react-router-dom';
 import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import searchIcon from '../../images/search/search.png'; 
@@ -21,13 +21,13 @@ function MapPage() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [isSearchComplete, setIsSearchComplete] = useState(false);
-  const navigate = useNavigate(); // 추가
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
     if (!token) {
       console.error('토큰이 없습니다. 로그인 페이지로 이동합니다.');
-      navigate('/login'); // 로그인 페이지로 리다이렉트
+      navigate('/login');
       return;
     }
   }, [navigate]);
@@ -189,7 +189,7 @@ const Content = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
-    height: 100vh;
+  height: 100vh;
   box-sizing: border-box;
   text-align: center;
 `;
@@ -208,7 +208,7 @@ const MapButtonContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #fff;  /* 맵과 버튼을 감싸는 컨테이너의 배경색을 흰색으로 설정 */
+  background-color: #fff;
 `;
 
 const SearchInput = styled.input`

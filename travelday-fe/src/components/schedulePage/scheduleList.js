@@ -30,8 +30,6 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
         upcomingSchedules.push(schedule);
       }
     });
-    
-    
 
     const sortedUpcoming = upcomingSchedules.sort((a, b) => {
       const dateA = new Date(a.date.split(' ~ ')[0]);
@@ -133,8 +131,8 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
 
       {/* 모달 */}
       {isModalOpen && (
-        <ModalOverlay>
-          <ModalContent>
+        <ModalOverlay onClick={closeModal}>
+          <ModalContent onClick={(e) => e.stopPropagation()}>
             <ModalMessage>정말 일정을 삭제하시겠습니까?</ModalMessage>
             <ModalButtons>
               <ModalButton onClick={confirmDelete}>예</ModalButton>
