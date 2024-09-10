@@ -18,12 +18,20 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
     schedules.forEach((schedule) => {
       // 끝나는 날을 기준으로 분류
       const endDate = new Date(schedule.date.split(' ~ ')[1]);
-      if (endDate < today) {
+      
+      // 현재 날짜에서 하루 전 날짜를 계산
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      
+      // 끝나는 날이 어제이거나 어제 이전일 경우 pastSchedules에 추가
+      if (endDate <= yesterday) {
         pastSchedules.push(schedule);
       } else {
         upcomingSchedules.push(schedule);
       }
     });
+    
+    
 
     const sortedUpcoming = upcomingSchedules.sort((a, b) => {
       const dateA = new Date(a.date.split(' ~ ')[0]);
@@ -101,7 +109,10 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
           }
 
           const endDate = new Date(schedule.date.split(' ~ ')[1]);
-          const isPast = endDate < new Date();
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+
+          const isPast = endDate <= yesterday;
 
           return (
             <ScheduleItem
