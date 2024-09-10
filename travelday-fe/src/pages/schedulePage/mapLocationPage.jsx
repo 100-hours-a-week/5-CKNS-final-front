@@ -5,8 +5,7 @@ import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import calendarIcon from '../../images/filter/calendar.png'; 
-import backIcon from '../../images/header/back.png';
-import searchIcon from '../../images/search/search.png'; 
+import searchIcon from '../../images/search/search.png';
 import MapSearchResultsPopup from '../../components/mapPage/mapSearchResultsPopup.js';
 
 
@@ -108,11 +107,8 @@ function MapLocationPage() {
 
   return (
     <Container>
-      <Header />
+      <Header showBackButton={true} onBackClick={handleBackClick} />
       <ContentWrapper>
-        <BackButton onClick={handleBackClick}>
-          <BackIcon src={backIcon} alt="뒤로가기 아이콘" />
-        </BackButton>
         <TitleWrapper>
           <Title>{schedule.name || 'Map Location'}</Title>
           <ScheduleDateWrapper>
@@ -217,18 +213,6 @@ const ContentWrapper = styled.div`
   position: relative;
 `;
 
-const BackButton = styled.div`
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  cursor: pointer;
-`;
-
-const BackIcon = styled.img`
-  width: 24px;
-  height: 24px;
-`;
-
 const TitleWrapper = styled.div`
   width: 390px;
   margin-bottom: 15px;
@@ -236,13 +220,12 @@ const TitleWrapper = styled.div`
   flex-direction: column;
   align-items: flex-start;
   background-color: #fff;
-  margin-top: 60px;
 `;
 
 const Title = styled.h1`
   font-size: 20px;
   font-weight: bold;
-  margin: 10px 0 10px 20px;
+  margin: 30px 0 10px 20px;
   text-align: left;
 `;
 

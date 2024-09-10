@@ -3,7 +3,6 @@ import styled, { keyframes } from 'styled-components';
 import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import backIcon from '../../images/header/back.png'; // 뒤로가기 아이콘 추가
 import axiosInstance from '../../utils/axiosInstance.js';
 
 const FixSchedulePage = () => {
@@ -80,11 +79,8 @@ const FixSchedulePage = () => {
 
   return (
     <Container>
-      <Header />
+      <Header showBackButton={true} onBackClick={handleBackClick} />
       <ContentWrapper>
-        <BackButton onClick={handleBackClick}>
-          <BackIcon src={backIcon} alt="뒤로가기 아이콘" />
-        </BackButton>
         <Title>여행 일정 수정하기</Title>
         <InputField>
           <Label>여행 제목</Label>
@@ -150,23 +146,11 @@ const ContentWrapper = styled.div`
   position: relative; /* BackButton 위치를 위해 relative 설정 */
 `;
 
-const BackButton = styled.div`
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  cursor: pointer;
-`;
-
-const BackIcon = styled.img`
-  width: 24px;
-  height: 24px;
-`;
-
 const Title = styled.h1`
   font-size: 20px;
   font-weight: bold;
   margin-bottom: 30px;
-  margin-top: 100px;
+  margin-top: 30px;
   text-align: center;
 `;
 

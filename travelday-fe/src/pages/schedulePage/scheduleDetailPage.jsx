@@ -187,7 +187,7 @@ const TitleWrapper = styled.div`
 const Title = styled.h1`
   font-size: 20px;
   font-weight: bold;
-  margin: 100px 0 10px 20px;
+  margin: 30px 0 10px 20px; 
   text-align: left;
 `;
 
