@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { GoogleMap, Marker, InfoWindow } from '@react-google-maps/api';
+import {GoogleMap, Marker, InfoWindow, MarkerF, MarkerClustererF, InfoWindowF} from '@react-google-maps/api';
 import { useNavigate } from 'react-router-dom'; // 추가
 import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
@@ -28,7 +28,6 @@ function MapPage() {
     if (!token) {
       console.error('토큰이 없습니다. 로그인 페이지로 이동합니다.');
       navigate('/login'); // 로그인 페이지로 리다이렉트
-      return;
     }
   }, [navigate]);
 
@@ -102,7 +101,7 @@ function MapPage() {
           <SearchInput 
             type="text" 
             value={searchInput} 
-            onChange={(e) => setSearchInput(e.target.value)} 
+            onChange={(e) => setSearchInput(e.target?.value)}
             onKeyPress={handleKeyPress} 
             placeholder="장소, 주소를 입력하세요" 
           />
@@ -121,26 +120,30 @@ function MapPage() {
             onLoad={map => setMap(map)}
           >
             {markers.length > 0 ? markers.map((marker, index) => (
-              <Marker 
+              <Marker
                 key={index} 
                 position={marker.position} 
                 onClick={() => handleMarkerClick(marker)}
+                animation={2}
               />
             )) : (
-              console.log('No markers to display')  
+              console.log('No markers to display')
             )}
 
             {selectedPlace && (
               <InfoWindow
+                ariaLabel={selectedPlace.name}
                 position={selectedPlace.position}
                 onCloseClick={handleInfoWindowClose}
               >
-                <InfoWindowContent>
+                <InfoWindowContent
+                    // style = {{marginTop:"-20px"}}
+                >
                   <h3>{selectedPlace.name}</h3>
                   <p>{selectedPlace.address}</p>
                   <a 
                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedPlace.name)}`} 
-                    target="_blank" 
+                    target="_blank"
                     rel="noopener noreferrer"
                   >
                     Google Maps에서 열기
@@ -238,7 +241,14 @@ const BottomPadding = styled.div`
   height: 80px; 
 `;
 
+
+
 const InfoWindowContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  
   h3 {
     margin: 0 0 10px;
     font-size: 16px;
