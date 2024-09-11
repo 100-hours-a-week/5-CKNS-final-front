@@ -130,6 +130,7 @@ function MapPage() {
                 animation={2}
               />
             )) : (
+                ""
               // console.log('No markers to display')
             )}
 
