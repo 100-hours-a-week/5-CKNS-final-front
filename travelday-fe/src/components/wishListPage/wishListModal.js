@@ -11,7 +11,7 @@ const WishListModal = ({ onClose, selectedPlace, travelRoomId }) => {
 
     try {
       const response = await axiosInstance.post(
-        `/api/rooms/${travelRoomId}/plan/list`, 
+        `/api/rooms/${travelRoomId}/plan/direct`,
         {
           latitude: selectedPlace.latitude,
           longitude: selectedPlace.longitude,
