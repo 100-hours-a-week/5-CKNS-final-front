@@ -44,11 +44,11 @@ const FlightSearch = () => {
   const arrivalLocations = ['뉴욕', '파리', '도쿄', '런던']; // 수정된 부분
 
   useEffect(() => {
-    console.log("Selected Departure:", departure);
-    console.log("Selected Arrival:", arrival);
-    console.log("Selected Dates:", dates);
-    console.log("Adults:", adults);
-    console.log("Children:", children);
+    // console.log("Selected Departure:", departure);
+    // console.log("Selected Arrival:", arrival);
+    // console.log("Selected Dates:", dates);
+    // console.log("Adults:", adults);
+    // console.log("Children:", children);
   }, [departure, arrival, dates, adults, children]);
 
   const fetchFlights = async () => {

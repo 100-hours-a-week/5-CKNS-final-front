@@ -25,7 +25,7 @@ const SchedulePage = () => {
 
     const fetchSchedules = async () => {
       try {
-        console.log('스케줄을 불러오는 중...');
+        // console.log('스케줄을 불러오는 중...');
         const response = await axiosInstance.get('/api/rooms', {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -33,7 +33,7 @@ const SchedulePage = () => {
           },
         });
 
-        console.log('API 응답:', response.data);
+        // console.log('API 응답:', response.data);
 
         if (response.status === 200) {
           const formattedSchedules = response.data.data.map((schedule) => ({

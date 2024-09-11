@@ -32,7 +32,7 @@ const WishlistPopup = ({ isOpen, onClose, selectedPlace }) => {
 
     const fetchTravelRooms = async () => {
       try {
-        console.log('여행방 목록을 불러오는 중...');
+        // console.log('여행방 목록을 불러오는 중...');
         const response = await axiosInstance.get('/api/rooms', {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -40,7 +40,7 @@ const WishlistPopup = ({ isOpen, onClose, selectedPlace }) => {
           },
         });
 
-        console.log('여행방 API 응답:', response.data);
+        // console.log('여행방 API 응답:', response.data);
 
         if (response.status === 200) {
           const formattedRooms = response.data.data.map((room) => ({

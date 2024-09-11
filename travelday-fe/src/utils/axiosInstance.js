@@ -52,7 +52,7 @@ axiosInstance.interceptors.response.use(
             withCredentials: true, 
           }); 
           
-          console.log('새로운 액세스 토큰 왔다!');
+          // console.log('새로운 액세스 토큰 왔다!');
           const newAccessToken = response.data.accessToken;
           localStorage.setItem('accessToken', newAccessToken);
 
@@ -66,12 +66,12 @@ axiosInstance.interceptors.response.use(
           handleSessionExpiration();
         }
       } else if (errorCode === 'AU002') {
-        console.log('유효하지 않은 액세스 토큰입니다. 로그아웃 시킵니다.');
+        // console.log('유효하지 않은 액세스 토큰입니다. 로그아웃 시킵니다.');
         handleSessionExpiration();
       } else if (errorCode === 'AU003') {
-        console.log('접근 권한이 없는 액세스 토큰입니다.');
+        // console.log('접근 권한이 없는 액세스 토큰입니다.');
       } else if (errorCode === 'AU004') {
-        console.log('리프레시 토큰도 만료되었습니다.');
+        // console.log('리프레시 토큰도 만료되었습니다.');
         handleSessionExpiration();
       }
     }

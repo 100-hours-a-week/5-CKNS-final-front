@@ -24,7 +24,7 @@ function Footer() {
 
   const handleSubscribe = () => {
     if (isEmailValid) {
-      console.log(`Subscribed with email: ${email}`);
+      // console.log(`Subscribed with email: ${email}`);
       setEmail(''); // 구독 후 이메일 입력란을 초기화
       setShowModal(true); // 모달을 표시
     }

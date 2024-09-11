@@ -32,9 +32,9 @@ const FilterPopup = ({ isOpen, onClose }) => {
   };
 
   const handleSearchClick = () => {
-    console.log('검색 버튼 클릭');
-    console.log('선택된 노선:', selectedFlightType);
-    console.log('선택된 항공사:', selectedAirline);
+    // console.log('검색 버튼 클릭');
+    // console.log('선택된 노선:', selectedFlightType);
+    // console.log('선택된 항공사:', selectedAirline);
     onClose(); // 팝업 닫기
   };
 

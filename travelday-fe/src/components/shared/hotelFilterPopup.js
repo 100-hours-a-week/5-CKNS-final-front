@@ -45,9 +45,9 @@ const HotelFilterPopup = ({ isOpen, onClose }) => {
   };
 
   const handleSearchClick = () => {
-    console.log('검색 버튼 클릭');
-    console.log('선택된 호텔 평점:', selectedRating);
-    console.log('선택된 가격대:', selectedPrice);
+    // console.log('검색 버튼 클릭');
+    // console.log('선택된 호텔 평점:', selectedRating);
+    // console.log('선택된 가격대:', selectedPrice);
     onClose(); // 팝업 닫기
   };
 

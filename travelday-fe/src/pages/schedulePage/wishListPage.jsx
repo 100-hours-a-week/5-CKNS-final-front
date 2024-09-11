@@ -24,7 +24,7 @@ const WishListPage = () => {
         const accessToken = localStorage.getItem('accessToken');
 
         // 디버깅 로그 추가
-        console.log('위시리스트 가져오기 시작, 방 ID:', travelRoomId);
+        // console.log('위시리스트 가져오기 시작, 방 ID:', travelRoomId);
         
         const response = await axiosInstance.get(`/api/rooms/${travelRoomId}/wishlist`, {
           headers: {
@@ -33,7 +33,7 @@ const WishListPage = () => {
           },
         });
 
-        console.log('Wishlist fetch response:', response);
+        // console.log('Wishlist fetch response:', response);
 
         if (response.status === 200) {
           setWishListItems(response.data.data);
@@ -97,7 +97,7 @@ const WishListPage = () => {
     }, {
     })
         .then(response => {
-          console.log(response.data.data);
+          // console.log(response.data.data);
           navigate(`/schedule/${travelRoomId}`)
         })
         .catch(error => {

@@ -26,7 +26,7 @@ const WishListModal = ({ onClose, selectedPlace, travelRoomId }) => {
           withCredentials: true 
         }
       );
-      console.log('일정에 추가 성공:', response.data);
+      // console.log('일정에 추가 성공:', response.data);
       setSuccessMessage('일정에 추가되었습니다!');
       setTimeout(() => {
         setSuccessMessage('');
@@ -57,7 +57,7 @@ const WishListModal = ({ onClose, selectedPlace, travelRoomId }) => {
           withCredentials: true 
         }
       );
-      console.log('위시리스트에 추가 성공:', response.data);
+      // console.log('위시리스트에 추가 성공:', response.data);
       setSuccessMessage('위시리스트에 추가되었습니다!');
       setTimeout(() => {
         setSuccessMessage('');

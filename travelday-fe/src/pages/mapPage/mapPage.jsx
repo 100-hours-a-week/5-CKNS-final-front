@@ -44,13 +44,13 @@ function MapPage() {
   
       service.textSearch(request, (results, status) => {
         if (status === window.google.maps.places.PlacesServiceStatus.OK && results) {
-          console.log('Search results:', results);  
+          // console.log('Search results:', results);
           const newMarkers = results.map(result => ({
             position: result.geometry.location,
             name: result.name,
             address: result.formatted_address
           }));
-          console.log('New markers:', newMarkers);  
+          // console.log('New markers:', newMarkers);
           setMarkers(newMarkers);
           setPlaces(results); 
           setIsPopupOpen(true);
@@ -75,7 +75,7 @@ function MapPage() {
   };
 
   const handleMarkerClick = (marker) => {
-    console.log('Marker clicked:', marker);  
+    // console.log('Marker clicked:', marker);
     setSelectedPlace(marker);
   };
 
@@ -130,7 +130,7 @@ function MapPage() {
                 animation={2}
               />
             )) : (
-              console.log('No markers to display')
+              // console.log('No markers to display')
             )}
 
             {selectedPlace && (
