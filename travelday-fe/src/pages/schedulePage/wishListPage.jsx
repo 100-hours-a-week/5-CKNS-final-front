@@ -82,18 +82,40 @@ const WishListPage = () => {
     }
   };
 
-  const handleAddItems = () => {
-    const selectedDetails = selectedItems.map(index => wishListItems[index]);
-    navigate(`/schedule/${travelRoomId}`, {
-      state: {
-        schedule: {
-          ...schedule,
-          details: [...selectedDetails, ...(schedule.details || [])],
-        },
-        travelRoomId,
-      },
-    });
-  };
+  function postItems() {
+    const selectedWishList =  selectedItems.map((item) => {
+      return {
+        name: wishListItems[item].name,
+        latitude: wishListItems[item].latitude,
+        longitude: wishListItems[item].longitude,
+        scheduledDay : 0
+      }
+    })
+    axiosInstance.post(`/api/rooms/${travelRoomId}/plan/list`, {
+      body: selectedWishList
+    }, {
+    })
+        .then(response => {
+          console.log(response.data.data);
+          navigate(`/schedule/${travelRoomId}`)
+        })
+        .catch(error => {
+          console.error('여행방 정보 로드 중 오류 발생:', error);
+        });
+  }
+
+  // const handleAddItems = () => {
+  //   const selectedDetails = selectedItems.map(index => wishListItems[index]);
+  //   navigate(`/schedule/${travelRoomId}`, {
+  //     state: {
+  //       schedule: {
+  //         ...schedule,
+  //         details: [...selectedDetails, ...(schedule.details || [])],
+  //       },
+  //       travelRoomId,
+  //     },
+  //   });
+  // };
 
   const handleBackClick = () => {
     navigate(`/schedule/${travelRoomId}`, {
@@ -114,7 +136,7 @@ const WishListPage = () => {
           </TitleWrapper>
           <SectionWrapper>
             <SectionTitle>위시리스트</SectionTitle>
-            <AddButton onClick={handleAddItems} disabled={selectedItems.length === 0}>
+            <AddButton onClick={postItems} disabled={selectedItems.length === 0}>
               장소에 추가하기
             </AddButton>
           </SectionWrapper>
