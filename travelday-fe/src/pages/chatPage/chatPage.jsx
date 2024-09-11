@@ -50,13 +50,13 @@ const ChatPage = ({ nickname }) => {
     let retryCount = 0; // 재연결 시도 횟수를 추적
 
     const connectWebSocket = () => {
-      console.log(travelRoomId);
+      // console.log(travelRoomId);
       // WebSocket 인스턴스를 생성하여 연결
       socketRef.current = new WebSocket(`ws://localhost:8080/ws`);
 
       // WebSocket이 성공적으로 연결되었을 때 호출되는 함수
       socketRef.current.onopen = () => {
-        console.log('WebSocket 연결 성공 (코드 101)');
+        // console.log('WebSocket 연결 성공 (코드 101)');
         setIsConnected(true); // 연결 상태를 true로 설정
         retryCount = 0; // 연결에 성공하면 재시도 횟수를 초기화
 

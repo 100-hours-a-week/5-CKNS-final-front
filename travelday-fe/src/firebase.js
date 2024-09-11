@@ -23,17 +23,17 @@ export const requestForToken = (setTokenFound) => {
   return getToken(messaging, { vapidKey: process.env.REACT_APP_FIREBASE_VAPID_KEY })
     .then((currentToken) => {
       if (currentToken) {
-        console.log("FCM Token: ", currentToken);
+        // console.log("FCM Token: ", currentToken);
         setTokenFound(true);
         // 토큰을 백엔드로 전송하는 함수 호출
         sendTokenToServer(currentToken);
       } else {
-        console.log("No registration token available.");
+        // console.log("No registration token available.");
         setTokenFound(false);
       }
     })
     .catch((err) => {
-      console.log("An error occurred while retrieving token. ", err);
+      // console.log("An error occurred while retrieving token. ", err);
       setTokenFound(false);
     });
 };
@@ -48,6 +48,6 @@ const sendTokenToServer = (token) => {
     body: JSON.stringify({ token }),
   })
   .then(response => response.json())
-  .then(data => console.log("Token sent to server:", data))
+  // .then(data => console.log("Token sent to server:", data))
   .catch(error => console.error("Error sending token to server:", error));
 };

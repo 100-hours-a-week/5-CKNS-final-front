@@ -31,7 +31,7 @@ const ScheduleDetail = () => {
                 }
             })
             .catch(error => {
-                console.log(error);
+                // console.log(error);
             });
     }, [travelRoomId]);
 
@@ -53,7 +53,7 @@ const ScheduleDetail = () => {
                 }
             })
             .catch(error => {
-                console.log(error);
+                // console.log(error);
             });
     }, [mapMarkers]);
 

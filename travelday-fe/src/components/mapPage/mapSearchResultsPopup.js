@@ -49,7 +49,7 @@ const MapSearchResultsPopup = ({ isOpen, onClose, searchResults = [], onResultCl
           withCredentials: true,
         }
       );
-      console.log('일정에 추가 성공:', response.data);
+      // console.log('일정에 추가 성공:', response.data);
       setIsModalOpen(false);
     } catch (error) {
       console.error('일정에 추가 실패:', error);

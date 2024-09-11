@@ -19,10 +19,10 @@ const HotelResultPage = () => {
   const [isFilterPopupOpen, setIsFilterPopupOpen] = useState(false); 
 
   useEffect(() => {
-    console.log("선택된 위치:", location);
-    console.log("선택된 날짜:", dates);
-    console.log("어른 수:", adults);
-    console.log("어린이 수:", children);
+    // console.log("선택된 위치:", location);
+    // console.log("선택된 날짜:", dates);
+    // console.log("어른 수:", adults);
+    // console.log("어린이 수:", children);
   }, [location, dates, adults, children]);
 
   const handleDateClick = () => {
@@ -41,7 +41,7 @@ const HotelResultPage = () => {
     : "날짜 선택";
 
   const handleDateRangeChange = (selectedDates) => {
-    console.log("선택된 날짜:", selectedDates);
+    // console.log("선택된 날짜:", selectedDates);
     setLocalDates(selectedDates);  // 로컬 상태 업데이트
   };
 

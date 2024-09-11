@@ -32,10 +32,10 @@ const FixSchedulePage = () => {
     const token = localStorage.getItem('accessToken'); 
 
     // 디버깅 로그 추가
-    console.log('수정하려는 일정 ID:', travelRoomId);
-    console.log('수정하려는 제목:', title);
-    console.log('수정하려는 시작 날짜:', startDate);
-    console.log('수정하려는 종료 날짜:', endDate);
+    // console.log('수정하려는 일정 ID:', travelRoomId);
+    // console.log('수정하려는 제목:', title);
+    // console.log('수정하려는 시작 날짜:', startDate);
+    // console.log('수정하려는 종료 날짜:', endDate);
 
     try {
       const response = await axiosInstance.post(
@@ -55,11 +55,11 @@ const FixSchedulePage = () => {
       );
 
    
-      console.log('서버 응답 상태 코드:', response.status);
-      console.log('서버 응답 데이터:', response.data);
+      // console.log('서버 응답 상태 코드:', response.status);
+      // console.log('서버 응답 데이터:', response.data);
 
       if (response.status === 200) { 
-        console.log('일정 수정 완료:', response.data);
+        // console.log('일정 수정 완료:', response.data);
         navigate(`/schedule/${travelRoomId}`);
       }
     } catch (error) {

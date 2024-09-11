@@ -9,14 +9,14 @@ const OAuth2LoginSuccessPage = () => {
     const accessToken = searchParams.get('accessToken');
 
     if (!accessToken) {
-      console.log("로그인 실패");
+      // console.log("로그인 실패");
       return;
     }
 
     const storeAccessToken = () => {
       // 로그인 성공 시 accessToken을 로컬 스토리지에 저장
       localStorage.setItem('accessToken', accessToken);
-      console.log("로그인 성공");
+      // console.log("로그인 성공");
     };
 
     storeAccessToken(); 

@@ -44,7 +44,7 @@ const MyPage = () => {
   
       if (response.status === 200) {
         const nickname = response.data.data.nickname; 
-        console.log('닉네임:', nickname);
+        // console.log('닉네임:', nickname);
         setNickname(nickname);
         setIsLoading(false); 
       } else {
@@ -52,9 +52,9 @@ const MyPage = () => {
       }
     } catch (error) {
       if (error.response) {
-        console.log(error.response.data.code);
+        // console.log(error.response.data.code);
       } else {
-        console.log('응답을 받지 못했습니다:', error.message);
+        // console.log('응답을 받지 못했습니다:', error.message);
       }
       setIsLoading(false); 
     }

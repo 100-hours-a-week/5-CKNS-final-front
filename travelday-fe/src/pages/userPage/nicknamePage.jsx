@@ -53,7 +53,7 @@ const LoginPage = () => {
           }
         );
 
-        console.log('Response data:', response.data);
+        // console.log('Response data:', response.data);
 
         if (response.data.data === 'DUPLICATE') {
           setNicknameError('이미 사용 중인 닉네임입니다.');
@@ -62,7 +62,7 @@ const LoginPage = () => {
           setNicknameError('');
           setIsButtonEnabled(true);
         } else {
-          console.log('Unexpected response:', response.data);
+          // console.log('Unexpected response:', response.data);
           setNicknameError('알 수 없는 응답입니다.');
           setIsButtonEnabled(false);
         }
@@ -83,7 +83,7 @@ const LoginPage = () => {
 
   const handleSubmit = async () => {
     try {
-      console.log('닉네임 제출:', nickname);
+      // console.log('닉네임 제출:', nickname);
       const response = await axiosInstance.put(
         '/api/user/nickname',
         { nickname },

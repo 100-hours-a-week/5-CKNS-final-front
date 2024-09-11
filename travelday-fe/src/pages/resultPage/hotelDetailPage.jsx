@@ -7,7 +7,7 @@ const HotelDetailPage = () => {
   const [error, setError] = useState(null);
 
   const apiKey = process.env.REACT_APP_GOOGLE_MAP_KEY;
-  console.log("API Key:", apiKey); 
+  // console.log("API Key:", apiKey);
 
   useEffect(() => {
     const fetchHotelData = async () => {

@@ -52,7 +52,7 @@ const ChatPage = ({ travelRoomId, nickname }) => {
 
       // WebSocket이 성공적으로 연결되었을 때 호출되는 함수
       socketRef.current.onopen = () => {
-        console.log('WebSocket 연결 성공 (코드 101)');
+        // console.log('WebSocket 연결 성공 (코드 101)');
         setIsConnected(true); // 연결 상태를 true로 설정
         retryCount = 0; // 연결에 성공하면 재시도 횟수를 초기화
 

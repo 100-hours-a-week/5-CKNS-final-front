@@ -22,7 +22,7 @@ function Footer() {
 
   const handleSubscribe = () => {
     if (isEmailValid) {
-      console.log(`Subscribed with email: ${email}`);
+      // console.log(`Subscribed with email: ${email}`);
       setEmail('');
       setShowModal(true);
     }

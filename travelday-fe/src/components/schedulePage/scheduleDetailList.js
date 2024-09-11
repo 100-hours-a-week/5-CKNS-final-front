@@ -183,7 +183,7 @@ const ScheduleDetailList = ({ travelRoomId, startDate, endDate }) => {
             withCredentials: true
         })
             .then(response => {
-                console.log(response.data.data);
+                // console.log(response.data.data);
                 setIsModalOpen(true);  // 저장 후 모달 열기
                 setTimeout(() => setIsModalOpen(false), 2000);  // 2초 후에 모달 자동 닫기
             })

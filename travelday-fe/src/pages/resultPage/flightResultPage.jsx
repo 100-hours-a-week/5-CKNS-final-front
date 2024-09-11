@@ -21,11 +21,11 @@ const FlightResultPage = () => {
   const [flights, setFlights] = useState([]); 
 
   useEffect(() => {
-    console.log("출발지:", departure);
-    console.log("도착지:", arrival);
-    console.log("선택된 날짜:", dates);
-    console.log("Adults:", adults);
-    console.log("Children:", children);
+    // console.log("출발지:", departure);
+    // console.log("도착지:", arrival);
+    // console.log("선택된 날짜:", dates);
+    // console.log("Adults:", adults);
+    // console.log("Children:", children);
 
     // 페이지 로드 시 항공편 데이터 가져오기
     fetchFlights();
@@ -63,7 +63,7 @@ const FlightResultPage = () => {
     : "날짜 선택";
 
   const handleDateRangeChange = (selectedDates) => {
-    console.log("선택된 날짜:", selectedDates);
+    // console.log("선택된 날짜:", selectedDates);
     setLocalDates(selectedDates);  
   };
 
