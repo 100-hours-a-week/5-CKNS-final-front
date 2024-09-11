@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
-import axiosInstance from "../../utils/axiosInstance";
 import {CSS} from '@dnd-kit/utilities';
 import {DndContext, PointerSensor, useSensor, useSensors} from '@dnd-kit/core';
 import {restrictToVerticalAxis} from '@dnd-kit/modifiers';
