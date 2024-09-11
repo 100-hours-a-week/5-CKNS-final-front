@@ -94,6 +94,7 @@ const ScheduleDetail = () => {
                                     mapContainerStyle={containerStyle}
                                     center={mapCenter}
                                     zoom={10}
+                                    options={{streetViewControl:false,mapTypeControl:false,styles:[{featureType:"poi",stylers:[{visibility:'off'}]}]}}
                                 >
                                     {markersLoaded && (
                                         mapMarkers.map((marker, index) => (
