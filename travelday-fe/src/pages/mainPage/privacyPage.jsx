@@ -12,7 +12,7 @@ const PrivacyPage = () => {
 
   return (
     <Container>
-      <Header />
+      <Header showBackButton={true} onBackClick={() => navigate('/')} />
       <Content>
         <Title>개인정보 처리방침</Title>
         {sections.map((section, index) => (
