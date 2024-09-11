@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosInstance.js';
 import calendarIcon from '../../images/filter/calendar.png';
 
+
 const WishListPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -168,6 +169,7 @@ const WishListPage = () => {
             }
           </WishList>
         </ContentWrapper>
+        <BottomPadding />
         <BottomNav />
       </Container>
   );
@@ -175,12 +177,16 @@ const WishListPage = () => {
 
 export default WishListPage;
 
+const BottomPadding = styled.div`
+  height: 80px; 
+`;
+
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
-  height: 100%;
+  min-height: calc(100vh + 80px);
   background-color: #fafafa;
 `;
 
@@ -242,10 +248,13 @@ const SectionTitle = styled.h2`
 `;
 
 const WishList = styled.div`
-  margin-bottom: 80px;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding-bottom: 20px;
+  background-color: #fff;
+  min-height: 100vh;
 `;
 
 const WishListItem = styled.div`
