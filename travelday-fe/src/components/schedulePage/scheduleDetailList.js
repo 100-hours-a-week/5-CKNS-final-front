@@ -152,8 +152,12 @@ const ScheduleDetailList = ({ travelRoomId, startDate, endDate }) => {
                 if (response.data?.data?.length > 0) {
                     modifySchedule(response.data.data);
                 }
+                else{
+                    modifySchedule([]);
+                }
             })
             .catch(error => {
+                modifySchedule([]);
                 console.error('여행방 정보 로드 중 오류 발생:', error);
             });
     }
