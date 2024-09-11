@@ -51,9 +51,8 @@ function groupAndSort(arr, startDate,endDate) {
 
     // 밀리초를 일 단위로 변환
     const dayDifference = timeDifference / (1000 * 60 * 60 * 24);
-
     const minDay = 0
-    const maxDay = dayDifference
+    const maxDay = dayDifference + 1
 
     // Step 1: 날짜별로 그룹화
     const grouped = arr.reduce((acc, curr) => {
@@ -296,6 +295,7 @@ const Position = styled.div`
     color: #333;
     font-size: 30px;
     cursor: move;
+    touch-action: none;
 `;
 
 const ScheduleBox = styled.div`
@@ -316,7 +316,7 @@ const ScheduleBox = styled.div`
         box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.15);
         border-color: #c2c2c2;
     }
-    touch-action: none;
+    //touch-action: none;
 `;
 
 const ListItemName = styled.div`
