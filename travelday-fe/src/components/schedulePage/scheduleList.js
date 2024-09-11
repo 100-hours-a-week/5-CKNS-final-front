@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import TrashIcon from '../../images/trash.png';
-import axiosInstance from "../../utils/axiosInstance";
 
 const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
   const [sortedSchedules, setSortedSchedules] = useState([]);

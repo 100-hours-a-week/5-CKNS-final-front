@@ -5,7 +5,6 @@ import BottomNav from '../../components/shared/bottomNav.js';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosInstance.js';
 import calendarIcon from '../../images/filter/calendar.png';
-import backIcon from '../../images/header/back.png';
 
 const WishListPage = () => {
   const location = useLocation();
@@ -83,18 +82,40 @@ const WishListPage = () => {
     }
   };
 
-  const handleAddItems = () => {
-    const selectedDetails = selectedItems.map(index => wishListItems[index]);
-    navigate(`/schedule/${travelRoomId}`, {
-      state: {
-        schedule: {
-          ...schedule,
-          details: [...selectedDetails, ...(schedule.details || [])],
-        },
-        travelRoomId,
-      },
-    });
-  };
+  function postItems() {
+    const selectedWishList =  selectedItems.map((item) => {
+      return {
+        name: wishListItems[item].name,
+        latitude: wishListItems[item].latitude,
+        longitude: wishListItems[item].longitude,
+        scheduledDay : 0
+      }
+    })
+    axiosInstance.post(`/api/rooms/${travelRoomId}/plan/list`, {
+      body: selectedWishList
+    }, {
+    })
+        .then(response => {
+          console.log(response.data.data);
+          navigate(`/schedule/${travelRoomId}`)
+        })
+        .catch(error => {
+          console.error('여행방 정보 로드 중 오류 발생:', error);
+        });
+  }
+
+  // const handleAddItems = () => {
+  //   const selectedDetails = selectedItems.map(index => wishListItems[index]);
+  //   navigate(`/schedule/${travelRoomId}`, {
+  //     state: {
+  //       schedule: {
+  //         ...schedule,
+  //         details: [...selectedDetails, ...(schedule.details || [])],
+  //       },
+  //       travelRoomId,
+  //     },
+  //   });
+  // };
 
   const handleBackClick = () => {
     navigate(`/schedule/${travelRoomId}`, {
@@ -104,11 +125,8 @@ const WishListPage = () => {
 
   return (
       <Container>
-        <Header />
+        <Header showBackButton={true} onBackClick={handleBackClick} />
         <ContentWrapper>
-          <BackButton onClick={handleBackClick}>
-            <BackIcon src={backIcon} alt="Back Icon" />
-          </BackButton>
           <TitleWrapper>
             <Title>{schedule?.name || 'Wishlist'}</Title>
             <ScheduleDateWrapper>
@@ -118,8 +136,8 @@ const WishListPage = () => {
           </TitleWrapper>
           <SectionWrapper>
             <SectionTitle>위시리스트</SectionTitle>
-            <AddButton onClick={handleAddItems} disabled={selectedItems.length === 0}>
-              추가하기
+            <AddButton onClick={postItems} disabled={selectedItems.length === 0}>
+              장소에 추가하기
             </AddButton>
           </SectionWrapper>
           <WishList>
@@ -162,7 +180,7 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   background-color: #fafafa;
 `;
 
@@ -176,31 +194,18 @@ const ContentWrapper = styled.div`
   position: relative;
 `;
 
-const BackButton = styled.div`
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  cursor: pointer;
-`;
-
-const BackIcon = styled.img`
-  width: 24px;
-  height: 24px;
-`;
-
 const TitleWrapper = styled.div`
   width: 390px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   background-color: #fff;
-  margin-top: 60px;
 `;
 
 const Title = styled.h1`
   font-size: 20px;
   font-weight: bold;
-  margin: 10px 0 10px 20px;
+  margin: 30px 0 10px 20px;
   text-align: left;
 `;
 
@@ -237,17 +242,17 @@ const SectionTitle = styled.h2`
 `;
 
 const WishList = styled.div`
-  width: 100%;
+  margin-bottom: 80px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 15px;
 `;
 
 const WishListItem = styled.div`
   background-color: #fff;
   width: 320px;
   padding: 15px;
+  margin-bottom: 10px;
   border-radius: 50px;
   border: 2px solid #ddd;
   cursor: pointer;
@@ -300,7 +305,7 @@ const RemoveButton = styled.button`
 `;
 
 const AddButton = styled.button`
-  width: 100px;
+  width: 130px;
   padding: 10px;
   font-size: 16px;
   background-color: #f12e5e;

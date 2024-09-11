@@ -120,6 +120,7 @@ function MapPage() {
             center={center}
             zoom={10}
             onLoad={map => setMap(map)}
+            options={{streetViewControl:false,mapTypeControl:false,styles:[{featureType:"poi",stylers:[{visibility:'off'}]}]}}
           >
             {markers.length > 0 ? markers.map((marker, index) => (
               <Marker
