@@ -12,13 +12,20 @@ import AlarmSidebar from '../../components/shared/alarm.js';
 const Header = ({ showBackButton = false, onBackClick }) => {
   const navigate = useNavigate();
   const [isAlarmOpen, setIsAlarmOpen] = useState(false);
-  const [hasNewAlarm, setHasNewAlarm] = useState(false); // 새 알람이 있는지 확인하는 상태
+  const [hasNewAlarm, setHasNewAlarm] = useState(false); 
   const [alarms, setAlarms] = useState([]);
+  const [isDelayedTrue, setIsDelayedTrue] = useState(false); // 애니메이션 상태 추가
+
+  useEffect(() => {
+    if (showBackButton) {
+        setIsDelayedTrue(true);
+    }
+  }, [showBackButton]);
 
   useEffect(() => {
     const checkNotifications = async () => {
       const accessToken = localStorage.getItem('accessToken');
-      if (!accessToken) return; // 로그인 상태가 아니면 요청하지 않음
+      if (!accessToken) return;
 
       try {
         const response = await axiosInstance.get('/api/notification', {
@@ -30,9 +37,9 @@ const Header = ({ showBackButton = false, onBackClick }) => {
 
         if (notifications && notifications.length > 0) {
           setAlarms(notifications);
-          setHasNewAlarm(true); // 새로운 알람이 있음을 표시
+          setHasNewAlarm(true);
         } else {
-          setHasNewAlarm(false); // 새로운 알람이 없음을 표시
+          setHasNewAlarm(false);
         }
       } catch (error) {
         console.error('알림 확인 중 오류 발생:', error);
@@ -70,15 +77,15 @@ const Header = ({ showBackButton = false, onBackClick }) => {
       return;
     }
 
-    setHasNewAlarm(false); // 알람 아이콘 상태 초기화
-    setIsAlarmOpen(!isAlarmOpen); // 알람 사이드바 열기/닫기
+    setHasNewAlarm(false);
+    setIsAlarmOpen(!isAlarmOpen);
   };
 
   return (
     <HeaderContainer>
       <LeftSection>
-        <BackButton src={backIcon} alt="뒤로가기" onClick={handleBackClick} />
-        <Logo src={logoImage} alt="여행한DAY 로고" onClick={handleLogoClick} />
+        <BackButton src={backIcon} alt="뒤로가기" show={isDelayedTrue} onClick={handleBackClick} />
+        <Logo src={logoImage} alt="여행한DAY 로고" show={isDelayedTrue} onClick={handleLogoClick} />
       </LeftSection>
       <RightSection>
         <IconContainer>
@@ -120,7 +127,8 @@ const Logo = styled.img`
   width: 140px;
   height: auto;
   cursor: pointer;
-  transition: transform 0.3s ease;
+  transform: ${(props) => (props.show ? 'translateX(0px)' : 'translateX(-20px)')}; 
+  transition: transform 0.3s ease; 
   &:hover {
     content: url(${logoHoverImage}); 
   }
@@ -136,7 +144,6 @@ const BellIcon = styled.img`
   margin-top: 4px;
   margin-left: 23px;
   cursor: pointer;
-  // filter: ${(props) => (props.hasNewAlarm ? 'invert(40%) sepia(80%) saturate(7475%) hue-rotate(0deg) brightness(94%) contrast(121%)' : 'none')}; 
 `;
 
 const Badge = styled.div`
