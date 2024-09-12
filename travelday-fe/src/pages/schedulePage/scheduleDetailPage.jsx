@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../utils/axiosInstance.js';
 import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import {GoogleMap, Marker, InfoWindow, MarkerF, InfoWindowF} from '@react-google-maps/api';
+import { GoogleMap, MarkerF, InfoWindowF } from '@react-google-maps/api'; // Marker, InfoWindow 제거
 import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import calendarIcon from '../../images/filter/calendar.png';
 import penIcon from '../../images/pen.png';
 import ScheduleDetailList from '../../components/schedulePage/scheduleDetailList';
+import InviteModal from '../../components/schedulePage/inviteModal.js';
 
 const ScheduleDetail = () => {
     const { travelRoomId } = useParams();
@@ -16,12 +17,11 @@ const ScheduleDetail = () => {
     const [fetchedSchedule, setFetchedSchedule] = useState(null);
     const [mapMarkers, setMapMarkers] = useState([]);
     const [selectedMarker, setSelectedMarker] = useState(null);
-    const [markersLoaded, setMarkersLoaded] = useState(false); // Control rendering of markers
+    const [markersLoaded, setMarkersLoaded] = useState(false);
+    const [mapCenter, setMapCenter] = useState({ lat: 37.5400456, lng: 126.9921017 });
 
-    const [mapCenter,setMapCenter] = useState({lat:37.5400456,lng:126.9921017})
-    // const mapCenter = { lat: 37.5400456, lng: 126.9921017 };
-
-    // Fetch schedule details
+    const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+    const [searchInput, setSearchInput] = useState('');
 
     useEffect(() => {
         axiosInstance.get(`/api/rooms/${travelRoomId}`, { withCredentials: true })
@@ -31,33 +31,30 @@ const ScheduleDetail = () => {
                 }
             })
             .catch(error => {
-                // console.log(error);
+                console.error(error);
             });
     }, [travelRoomId]);
 
-    // Fetch map markers
     useEffect(() => {
-        if(markersLoaded) {
-            return
+        if (markersLoaded) {
+            return;
         }
         axiosInstance.get(`/api/rooms/${travelRoomId}/plan`, { withCredentials: true })
             .then(response => {
                 if (response.data) {
                     const fetchedMarkers = response.data.data;
                     if (JSON.stringify(fetchedMarkers) !== JSON.stringify(mapMarkers)) {
-                        // console.table(fetchedMarkers);
                         setMapMarkers(fetchedMarkers);
-                        setMapCenter({lat:fetchedMarkers[0].latitude, lng:fetchedMarkers[0].longitude});
-                        setMarkersLoaded(true); // Markers are ready to render
+                        setMapCenter({ lat: fetchedMarkers[0].latitude, lng: fetchedMarkers[0].longitude });
+                        setMarkersLoaded(true);
                     }
                 }
             })
             .catch(error => {
-                // console.log(error);
+                console.error(error);
             });
-    }, [mapMarkers]);
+    }, [mapMarkers, markersLoaded, travelRoomId]);
 
-    // Navigation functions
     const handleAddFromWish = () => {
         navigate(`/wishlist/${travelRoomId}`, { state: { schedule: fetchedSchedule } });
     };
@@ -68,6 +65,14 @@ const ScheduleDetail = () => {
 
     const handleEditClick = () => {
         navigate(`/fixschedule/${travelRoomId}`, { state: { schedule: fetchedSchedule } });
+    };
+
+    const handleInviteClick = () => {
+        setIsInviteModalOpen(true);
+    };
+
+    const handleInviteModalClose = () => {
+        setIsInviteModalOpen(false);
     };
 
     return (
@@ -87,6 +92,9 @@ const ScheduleDetail = () => {
                                     <ScheduleDate>{fetchedSchedule.startDate} ~ {fetchedSchedule.endDate}</ScheduleDate>
                                 </ScheduleDateWrapper>
                             </MetaWrapper>
+                            <InviteButton onClick={handleInviteClick}>
+                                    +일행 초대하기
+                            </InviteButton>
                         </TitleWrapper>
                         <ContentContainer>
                             <MapContainer>
@@ -94,11 +102,14 @@ const ScheduleDetail = () => {
                                     mapContainerStyle={containerStyle}
                                     center={mapCenter}
                                     zoom={10}
-                                    options={{streetViewControl:false,mapTypeControl:false,styles:[{featureType:"poi",stylers:[{visibility:'off'}]}]}}
+                                    options={{
+                                        streetViewControl: false,
+                                        mapTypeControl: false,
+                                        styles: [{ featureType: "poi", stylers: [{ visibility: 'off' }] }]
+                                    }}
                                 >
                                     {markersLoaded && (
                                         mapMarkers.map((marker, index) => (
-                                            // console.log(marker)
                                             <MarkerF
                                                 key={index}
                                                 position={{ lat: marker.latitude, lng: marker.longitude }}
@@ -111,17 +122,10 @@ const ScheduleDetail = () => {
                                     {selectedMarker && (
                                         <InfoWindowF
                                             position={{ lat: selectedMarker.latitude, lng: selectedMarker.longitude }}
-                                            onCloseClick={() => setSelectedMarker(null)} // InfoWindow close
+                                            onCloseClick={() => setSelectedMarker(null)}
                                         >
                                             <div>
                                                 <h4>{selectedMarker.name}</h4>
-                                                {/*<a*/}
-                                                {/*    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedMarker.name)}`}*/}
-                                                {/*    target="_blank"*/}
-                                                {/*    rel="noopener noreferrer"*/}
-                                                {/*>*/}
-                                                {/*    Google Maps로 이동*/}
-                                                {/*</a>*/}
                                             </div>
                                         </InfoWindowF>
                                     )}
@@ -147,11 +151,19 @@ const ScheduleDetail = () => {
                 )}
             </ContentWrapper>
             <BottomNav />
+            <InviteModal 
+                isOpen={isInviteModalOpen} 
+                onClose={handleInviteModalClose} 
+                searchInput={searchInput} 
+                setSearchInput={setSearchInput} 
+            />
         </Container>
     );
 };
 
 export default ScheduleDetail;
+
+
 
 const Container = styled.div`
   display: flex;
@@ -183,7 +195,7 @@ const TitleWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-    justify-content: space-between;
+  justify-content: space-between;
   background-color: #fff;
   position: relative;
 `;
@@ -194,12 +206,13 @@ const Title = styled.h1`
   margin: 30px 0 10px 20px; 
   text-align: left;
 `;
+
 const MetaWrapper = styled.div`
   display: flex;
   width: inherit;
   flex-direction: row-reverse;
   justify-content: space-between;
-`
+`;
 
 const IconButton = styled.button`
   background: none;
@@ -211,6 +224,26 @@ const IconButton = styled.button`
 const EditIcon = styled.img`
   width: 20px;
   height: 20px;
+`;
+
+const InviteButton = styled.button`
+  background-color: #ffffff;
+  border: 1.5px solid #ccc;  
+  font-size: 14px;
+  color: #000;
+  cursor: pointer;
+  margin-left: 20px;
+  margin-top: 15px;
+  padding: 10px 20px;  
+  border-radius: 25px; 
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;  
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.15);
+
+  &:hover {
+    background-color: #5bbab5;  
+    color: #ffffff;  
+    border-color: #5bbab5;  
+  }
 `;
 
 const ScheduleDateWrapper = styled.div`
@@ -291,3 +324,4 @@ const PlusIcon = styled.span`
     transform: scale(1.2);
   }
 `;
+

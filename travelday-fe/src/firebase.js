@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getMessaging, getToken } from "firebase/messaging";
-
+import axiosInstance from "./utils/axiosInstance";
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_KEY,
@@ -14,40 +14,41 @@ const firebaseConfig = {
 // Firebase 초기화
 const app = initializeApp(firebaseConfig);
 
-
 // FCM 초기화
 const messaging = getMessaging(app);
-
 
 export const requestForToken = (setTokenFound) => {
   return getToken(messaging, { vapidKey: process.env.REACT_APP_FIREBASE_VAPID_KEY })
     .then((currentToken) => {
       if (currentToken) {
-        // console.log("FCM Token: ", currentToken);
-        setTokenFound(true);
-        // 토큰을 백엔드로 전송하는 함수 호출
+        // FCM 토큰을 백엔드로 전송하는 함수 호출
         sendTokenToServer(currentToken);
+        setTokenFound(true);
       } else {
-        // console.log("No registration token available.");
         setTokenFound(false);
       }
     })
     .catch((err) => {
-      // console.log("An error occurred while retrieving token. ", err);
+      console.error("An error occurred while retrieving token. ", err);
       setTokenFound(false);
     });
 };
 
-const sendTokenToServer = (token) => {
-  // 서버로 토큰 전송
-  fetch("https://api.thetravelday.co.kr/api/fcm", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ token }),
-  })
-  .then(response => response.json())
-  // .then(data => console.log("Token sent to server:", data))
-  .catch(error => console.error("Error sending token to server:", error));
+const sendTokenToServer = async (fcmToken) => {
+  try {
+    const token = localStorage.getItem('accessToken'); // 로컬스토리지에서 액세스 토큰 가져옴
+
+    const response = await axiosInstance.post('/api/fcm', 
+      { fcmToken }, // 요청 바디
+      {
+        headers: {
+          Authorization: `Bearer ${token}` // 헤더에 액세스 토큰 추가
+        }
+      }
+    );
+
+    console.log("Token sent to server:", response.data);
+  } catch (error) {
+    console.error("Error sending token to server:", error);
+  }
 };
