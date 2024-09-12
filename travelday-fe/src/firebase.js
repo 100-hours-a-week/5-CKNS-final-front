@@ -23,26 +23,26 @@ export const requestForToken = (setTokenFound) => {
       if (currentToken) {
         // FCM 토큰을 백엔드로 전송하는 함수 호출
         sendTokenToServer(currentToken);
-        setTokenFound(true);
+        setTokenFound && setTokenFound(true); // setTokenFound가 전달된 경우에만 호출
       } else {
-        setTokenFound(false);
+        setTokenFound && setTokenFound(false);
       }
     })
     .catch((err) => {
       console.error("An error occurred while retrieving token. ", err);
-      setTokenFound(false);
+      setTokenFound && setTokenFound(false);
     });
 };
 
 const sendTokenToServer = async (fcmToken) => {
   try {
-    const token = localStorage.getItem('accessToken'); // 로컬스토리지에서 액세스 토큰 가져옴
+    const token = localStorage.getItem('accessToken'); 
 
     const response = await axiosInstance.post('/api/fcm', 
       { fcmToken }, // 요청 바디
       {
         headers: {
-          Authorization: `Bearer ${token}` // 헤더에 액세스 토큰 추가
+          Authorization: `Bearer ${token}`
         }
       }
     );

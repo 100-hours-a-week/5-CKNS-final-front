@@ -52,18 +52,22 @@ const AlarmSidebar = ({ isOpen, onClose, alarms }) => {
           </CloseButton>
         </SidebarHeader>
         <AlarmList>
-          {alarms.map((alarm, index) => (
-            <AlarmItem 
-              key={index} 
-              onClick={() => handleAlarmClick(alarm.roomId, alarm.roomName)}
-            >
-              <AlarmMessage>
-                당신을 기다리고 있어요! <br />
-                <HighlightedText>{alarm.inviter}</HighlightedText>님이 <HighlightedText>{alarm.roomName}</HighlightedText>에 초대했습니다.
-              </AlarmMessage>
-              <InviteTime>{getTimeDifference(alarm.invitedAt)}</InviteTime>
-            </AlarmItem>
-          ))}
+          {alarms.length === 0 ? (
+            <NoAlarmsMessage>알림이 없습니다!</NoAlarmsMessage>
+          ) : (
+            alarms.map((alarm, index) => (
+              <AlarmItem 
+                key={index} 
+                onClick={() => handleAlarmClick(alarm.roomId, alarm.roomName)}
+              >
+                <AlarmMessage>
+                  당신을 기다리고 있어요! <br />
+                  <HighlightedText>{alarm.inviter}</HighlightedText>님이 <HighlightedText>{alarm.roomName}</HighlightedText>에 초대했습니다.
+                </AlarmMessage>
+                <InviteTime>{getTimeDifference(alarm.invitedAt)}</InviteTime>
+              </AlarmItem>
+            ))
+          )}
         </AlarmList>
       </SidebarContainer>
 
@@ -131,6 +135,13 @@ const Title = styled.h2`
 
 const AlarmList = styled.div`
   padding: 20px;
+`;
+
+const NoAlarmsMessage = styled.div`
+  font-size: 16px;
+  color: #6c757d;
+  text-align: center;
+  padding: 50px 0;
 `;
 
 const AlarmItem = styled.div`

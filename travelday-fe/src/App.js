@@ -28,7 +28,7 @@ import ChatListPage from './pages/chatPage/chatListPage';
 import './App.css';
 import './i18n';
 
-import { requestForToken } from './firebase'; 
+
 
 const libraries = ['places'];
 
@@ -40,9 +40,9 @@ function App() {
 
   const [isTokenFound, setTokenFound] = useState(false);
 
-  useEffect(() => {
-    requestForToken(setTokenFound); // FCM 토큰 요청
-  }, []);
+  // useEffect(() => {
+  //   requestForToken(setTokenFound); // FCM 토큰 요청
+  // }, []);
 
   if (!isLoaded) {
     return null;
