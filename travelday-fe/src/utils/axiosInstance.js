@@ -15,7 +15,8 @@ function handleSessionExpiration() {
 
 // Axios 인스턴스 생성
 const axiosInstance = axios.create({
-  baseURL: 'https://api.thetravelday.co.kr', // 백엔드 API의 기본 URL
+//   baseURL: 'https://api.thetravelday.co.kr', // 백엔드 API의 기본 URL
+  baseURL:'http://localhost:8080',
   withCredentials: true, // 쿠키를 포함한 CORS 요청을 위해 true로 설정
 });
 

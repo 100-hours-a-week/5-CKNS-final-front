@@ -8,6 +8,7 @@ const InviteModal = ({ isOpen, onClose, searchInput, setSearchInput }) => {
     const [filteredResults, setFilteredResults] = useState([]);
     const [errorMessage, setErrorMessage] = useState(''); 
     const [successMessage, setSuccessMessage] = useState('');
+    const [showConfirmation, setShowConfirmation] = useState(false);
 
     useEffect(() => {
         if (!isOpen) {
@@ -15,6 +16,7 @@ const InviteModal = ({ isOpen, onClose, searchInput, setSearchInput }) => {
             setSearchInput('');
             setErrorMessage(''); 
             setSuccessMessage('');
+            setShowConfirmation(false);
         }
     }, [isOpen, setSearchInput]);
 
@@ -25,12 +27,15 @@ const InviteModal = ({ isOpen, onClose, searchInput, setSearchInput }) => {
                 params: { keyword: searchInput },
                 headers: {
                     Authorization: `Bearer ${token}`
-                }
+                },
+                withCredentials: true,
             });
-            if (response.data.results.length > 0) {
-                setFilteredResults(response.data.results);
+
+            if (response.data && Array.isArray(response.data.data) && response.data.data.length > 0) {
+                setFilteredResults(response.data.data);
                 setErrorMessage(''); 
             } else {
+                console.log(response);
                 setFilteredResults([]);
                 setErrorMessage('검색 결과가 없습니다.');
             }
@@ -49,16 +54,38 @@ const InviteModal = ({ isOpen, onClose, searchInput, setSearchInput }) => {
     const handleInvite = async (userId) => {
         try {
             const token = localStorage.getItem('accessToken'); 
-            const response = await axiosInstance.post(`/api/rooms/${travelRoomId}/invitation`, { userId }, {
+            const response = await axiosInstance.post(`/api/rooms/${travelRoomId}/invitation`, 
+            { invitee: userId }, 
+            {
                 headers: {
                     Authorization: `Bearer ${token}`
-                }
+                },
+                withCredentials: true,
             });
-            setSuccessMessage(response.data); 
+    
+            setSuccessMessage(response.data.message || '초대가 성공적으로 완료되었습니다.'); 
+            
+            // 2초 후 예/아니오 확인 메시지를 보여줌
+            setTimeout(() => {
+                setSuccessMessage('');
+                setShowConfirmation(true);
+            }, 2000);
+    
         } catch (error) {
             console.error('초대 중 오류가 발생했습니다:', error);
             setErrorMessage('초대 중 오류가 발생했습니다.');
         }
+    };
+
+    const handleConfirmYes = () => {
+        setSearchInput(''); // 검색창 비우기
+        setFilteredResults([]);
+        setShowConfirmation(false); // 예/아니오 확인 메시지 숨김
+    };
+
+    const handleConfirmNo = () => {
+        setShowConfirmation(false); // 예/아니오 확인 메시지 숨김
+        onClose(); // 모달 닫기
     };
 
     if (!isOpen) return null;
@@ -74,12 +101,21 @@ const InviteModal = ({ isOpen, onClose, searchInput, setSearchInput }) => {
                     onChange={(e) => setSearchInput(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="일행을 추가해 보세요 (최대 15명)"
+                    disabled={showConfirmation} 
                 />
                 <SearchResults>
                     {errorMessage ? (
                         <ErrorMessage>{errorMessage}</ErrorMessage>
                     ) : successMessage ? (
-                        <SuccessMessage>{successMessage}</SuccessMessage>
+                        <SuccessMessage>{successMessage}</SuccessMessage> 
+                    ) : showConfirmation ? (
+                        <Confirmation>
+                            <p>일행을 더 초대하시겠습니까?</p>
+                            <ButtonGroup>
+                                <ConfirmButton onClick={handleConfirmYes}>예</ConfirmButton>
+                                <ConfirmButton onClick={handleConfirmNo}>아니오</ConfirmButton>
+                            </ButtonGroup>
+                        </Confirmation>
                     ) : (
                         filteredResults.map((result, index) => (
                             <ResultItem key={index}>
@@ -152,6 +188,10 @@ const SearchInput = styled.input`
     &:focus {
         outline: none;
     }
+
+    &:disabled {
+        background-color: #f0f0f0;
+    }
 `;
 
 const SearchResults = styled.div`
@@ -192,5 +232,42 @@ const SuccessMessage = styled.p`
     color: green;
     margin-top: 20px;
     text-align: center;
-    font-weight: bold;
 `;
+
+const Confirmation = styled.div`
+    margin-top: 20px;
+    text-align: center;
+`;
+
+const ButtonGroup = styled.div`
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 10px;
+`;
+
+const ConfirmButton = styled.button`
+    padding: 10px 20px;
+    width: 90px;
+    border: none;
+    border-radius: 25px;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+
+    &:hover {
+        background-color: #0056b3;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    &:active {
+        background-color: #004494;
+        transform: translateY(0);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+`;
+

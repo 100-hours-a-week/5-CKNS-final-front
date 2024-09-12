@@ -56,12 +56,16 @@ const ChatPage = ({ nickname }) => {
 
       // WebSocket이 성공적으로 연결되었을 때 호출되는 함수
       socketRef.current.onopen = () => {
-        // console.log('WebSocket 연결 성공 (코드 101)');
+        console.log('WebSocket 연결 성공 (코드 101)');
         setIsConnected(true); // 연결 상태를 true로 설정
         retryCount = 0; // 연결에 성공하면 재시도 횟수를 초기화
 
         // 구독 메시지 전송
-        socketRef.current.send(JSON.stringify({ type: 'SUBSCRIBE', roomId: travelRoomId }));
+        socketRef.current.send(JSON.stringify({
+          type: 'SUBSCRIBE',
+          destination: `/sub/${travelRoomId}/chat`
+        }));
+        
       };
 
       // WebSocket을 통해 메시지를 수신할 때 호출되는 함수

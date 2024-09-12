@@ -24,30 +24,43 @@ const Header = ({ showBackButton = false, onBackClick }) => {
 
   useEffect(() => {
     const checkNotifications = async () => {
-      const accessToken = localStorage.getItem('accessToken');
-      if (!accessToken) return;
+        console.log('checkNotifications 함수 시작'); 
 
-      try {
-        const response = await axiosInstance.get('/api/notification', {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        const notifications = response.data.notifications;
-
-        if (notifications && notifications.length > 0) {
-          setAlarms(notifications);
-          setHasNewAlarm(true);
-        } else {
-          setHasNewAlarm(false);
+        const accessToken = localStorage.getItem('accessToken');
+        if (!accessToken) {
+            console.log('AccessToken이 없습니다. 알람 조회를 중단합니다.');
+            return;
         }
-      } catch (error) {
-        console.error('알림 확인 중 오류 발생:', error);
-      }
+
+        try {
+            console.log('알람 조회 API 호출 시작');
+            const response = await axiosInstance.get('/api/notification', {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
+
+            // response.data에 알림 데이터가 직접 들어있다고 가정
+            const notification = response.data.data; 
+
+            if (notification) {
+                setAlarms([notification]); // 알람을 배열로 설정
+                setHasNewAlarm(true);
+                console.log('알람 조회 성공! 알람 내용:', notification);
+                console.log( notification.data);
+            } else {
+                setHasNewAlarm(false);
+                console.log('알람이 없습니다.');
+            }
+        } catch (error) {
+            console.error('알림 확인 중 오류 발생:', error);
+        }
     };
 
-    checkNotifications();
-  }, []);
+    checkNotifications(); // 함수 호출
+}, []);
+
+
 
   const handleBackClick = () => {
     if (onBackClick) {

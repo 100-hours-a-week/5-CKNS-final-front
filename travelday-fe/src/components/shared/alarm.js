@@ -8,15 +8,16 @@ const AlarmSidebar = ({ isOpen, onClose, alarms }) => {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleAlarmClick = (roomId, roomName) => {
-    setSelectedRoom({ roomId, roomName });
+  const handleAlarmClick = (travelRoomId, content) => {
+    console.log('콘텐츠 조회:',content);
+    setSelectedRoom({ travelRoomId, content });
     setIsModalOpen(true);
   };
 
   const handleAccept = () => {
     setIsModalOpen(false);
     onClose();
-    navigate(`/rooms/${selectedRoom.roomId}`);
+    navigate(`/schedule/${selectedRoom.travelRoomId}`);
   };
 
   const handleDecline = () => {
@@ -25,10 +26,12 @@ const AlarmSidebar = ({ isOpen, onClose, alarms }) => {
   };
 
   const getTimeDifference = (time) => {
+   
+    const correctedTime = `20${time.slice(0, 2)}-${time.slice(3, 5)}-${time.slice(6, 8)}T${time.slice(9)}`;
     const now = new Date();
-    const alarmTime = new Date(time);
+    const alarmTime = new Date(correctedTime);
     const differenceInMinutes = Math.floor((now - alarmTime) / 1000 / 60);
-
+  
     if (differenceInMinutes < 1) {
       return "방금 전";
     } else if (differenceInMinutes < 60) {
@@ -41,6 +44,7 @@ const AlarmSidebar = ({ isOpen, onClose, alarms }) => {
       return `${differenceInDays}일 전`;
     }
   };
+  
 
   return (
     <>
@@ -52,23 +56,22 @@ const AlarmSidebar = ({ isOpen, onClose, alarms }) => {
           </CloseButton>
         </SidebarHeader>
         <AlarmList>
-          {alarms.length === 0 ? (
-            <NoAlarmsMessage>알림이 없습니다!</NoAlarmsMessage>
-          ) : (
-            alarms.map((alarm, index) => (
-              <AlarmItem 
-                key={index} 
-                onClick={() => handleAlarmClick(alarm.roomId, alarm.roomName)}
-              >
-                <AlarmMessage>
-                  당신을 기다리고 있어요! <br />
-                  <HighlightedText>{alarm.inviter}</HighlightedText>님이 <HighlightedText>{alarm.roomName}</HighlightedText>에 초대했습니다.
-                </AlarmMessage>
-                <InviteTime>{getTimeDifference(alarm.invitedAt)}</InviteTime>
-              </AlarmItem>
-            ))
-          )}
-        </AlarmList>
+        {alarms.length === 0 ? (
+          <NoAlarmsMessage>알림이 없습니다!</NoAlarmsMessage>
+        ) : (
+          alarms.map((alarm, index) => (
+            <AlarmItem 
+              key={index} 
+              onClick={() => handleAlarmClick(alarm.travelRoomId, alarm.content)} // travelRoomId를 전달
+            >
+              <AlarmMessage>
+                {alarm.content}
+              </AlarmMessage>
+              <InviteTime>{getTimeDifference(alarm.notificationTime)}</InviteTime>
+            </AlarmItem>
+          ))
+        )}
+      </AlarmList>
       </SidebarContainer>
 
       {isModalOpen && (
@@ -77,7 +80,12 @@ const AlarmSidebar = ({ isOpen, onClose, alarms }) => {
             <CloseModalButton onClick={() => setIsModalOpen(false)}>
               <IoClose size={24} />
             </CloseModalButton>
-            <ModalTitle>{`${selectedRoom.roomName} 초대를 수락하시겠습니까?`}</ModalTitle>
+            <ModalTitle>
+            {`${selectedRoom.content}`}
+            <br />
+            <br />
+            {`초대를 수락하시겠습니까?`}
+          </ModalTitle>
             <ModalButtons>
               <ModalButton onClick={handleAccept}>수락</ModalButton>
               <ModalButton onClick={handleDecline} decline>거절</ModalButton>
@@ -166,18 +174,12 @@ const AlarmMessage = styled.div`
   line-height: 1.5;
 `;
 
-const HighlightedText = styled.span`
-  color: #007bff;
-  font-weight: 500;
-`;
-
 const InviteTime = styled.div`
   font-size: 14px;
   color: #6c757d;
   margin-top: 5px;
 `;
 
-// 모달 관련 스타일
 const ModalOverlay = styled.div`
   position: fixed;
   top: 0;
@@ -193,11 +195,13 @@ const ModalOverlay = styled.div`
 
 const ModalContainer = styled.div`
   background-color: white;
-  padding: 20px;
+  padding: 30px;
   border-radius: 10px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   text-align: center;
+  max-width: 330px; 
 `;
+
 
 const CloseModalButton = styled.button`
   position: absolute;
@@ -221,9 +225,9 @@ const ModalTitle = styled.h2`
 `;
 
 const ModalButtons = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const ModalButton = styled.button`
