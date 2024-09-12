@@ -40,9 +40,6 @@ function App() {
 
   const [isTokenFound, setTokenFound] = useState(false);
 
-  // useEffect(() => {
-  //   requestForToken(setTokenFound); // FCM 토큰 요청
-  // }, []);
 
   if (!isLoaded) {
     return null;

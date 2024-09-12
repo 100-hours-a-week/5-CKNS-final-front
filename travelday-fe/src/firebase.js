@@ -47,8 +47,8 @@ const sendTokenToServer = async (fcmToken) => {
       }
     );
 
-    console.log("Token sent to server:", response.data);
+    console.log("서버로 토큰 전달 완료:", response.data);
   } catch (error) {
-    console.error("Error sending token to server:", error);
+    console.error("토큰 전달시 에러 발생:", error);
   }
 };

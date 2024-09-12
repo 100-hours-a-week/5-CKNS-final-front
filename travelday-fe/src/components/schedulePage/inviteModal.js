@@ -22,7 +22,7 @@ const InviteModal = ({ isOpen, onClose, searchInput, setSearchInput }) => {
         try {
             const token = localStorage.getItem('accessToken');
             const response = await axiosInstance.get(`/api/user/search`, {
-                params: { value: searchInput },
+                params: { keyword: searchInput },
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
