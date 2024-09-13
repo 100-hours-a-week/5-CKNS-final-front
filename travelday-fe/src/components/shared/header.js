@@ -47,7 +47,6 @@ const Header = ({ showBackButton = false, onBackClick }) => {
                 setAlarms([notification]); // 알람을 배열로 설정
                 setHasNewAlarm(true);
                 console.log('알람 조회 성공! 알람 내용:', notification);
-                console.log( notification.data);
             } else {
                 setHasNewAlarm(false);
                 console.log('알람이 없습니다.');

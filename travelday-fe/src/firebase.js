@@ -11,10 +11,8 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_FIREBASE_APPID
 };
 
-// Firebase 초기화
 const app = initializeApp(firebaseConfig);
 
-// FCM 초기화
 const messaging = getMessaging(app);
 
 export const requestForToken = (setTokenFound) => {

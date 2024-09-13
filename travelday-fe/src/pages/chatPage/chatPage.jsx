@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useParams } from 'react-router-dom'; // useParams 훅을 import
+import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import axiosInstance from '../../utils/axiosInstance.js';
 import BottomNav from '../../components/shared/bottomNav.js'; 
 import { useNavigate } from 'react-router-dom';
 import { IoSearch, IoMenuOutline } from "react-icons/io5";
 import Sidebar from '../../components/chatPage/sideBar.js';  
+import { Stomp } from '@stomp/stompjs';
 
 const linkify = (text) => {
   const urlPattern = /https?:\/\/[^\s]+/g;
@@ -40,7 +41,7 @@ const ChatPage = ({ nickname }) => {
   const navigate = useNavigate();
   const messageEndRef = useRef(null);
   const messageListRef = useRef(null);
-  const socketRef = useRef(null); // WebSocket 인스턴스를 저장할 Ref
+  const stompClientRef = useRef(null); // STOMP 클라이언트를 저장할 Ref
 
   const token = localStorage.getItem('accessToken');
   const MAX_RETRY_COUNT = 10; // 최대 재연결 시도 횟수
@@ -49,127 +50,127 @@ const ChatPage = ({ nickname }) => {
   useEffect(() => {
     let retryCount = 0; // 재연결 시도 횟수를 추적
 
-    const connectWebSocket = () => {
-      // console.log(travelRoomId);
-      // WebSocket 인스턴스를 생성하여 연결
-      socketRef.current = new WebSocket(`ws://localhost:8080/ws`);
+    const connectStompClient = () => {
+      console.log('STOMP 클라이언트 연결 시도 중...'); // 디버깅: STOMP 연결 시도 로그
 
-      // WebSocket이 성공적으로 연결되었을 때 호출되는 함수
-      socketRef.current.onopen = () => {
-        console.log('WebSocket 연결 성공 (코드 101)');
-        setIsConnected(true); // 연결 상태를 true로 설정
-        retryCount = 0; // 연결에 성공하면 재시도 횟수를 초기화
+      // STOMP 클라이언트 인스턴스를 생성하여 연결
+      const socket = new WebSocket('ws://localhost:8080/ws');
+      const stompClient = Stomp.over(socket);
 
-        // 구독 메시지 전송
-        socketRef.current.send(JSON.stringify({
-          type: 'SUBSCRIBE',
-          destination: `/sub/${travelRoomId}/chat`
-        }));
-        
-      };
+      // STOMP 클라이언트 연결 설정
+      stompClient.connect({}, () => {
+        console.log('STOMP 연결 성공'); // 디버깅: STOMP 연결 성공 로그
+        setIsConnected(true);
+        retryCount = 0;
 
-      // WebSocket을 통해 메시지를 수신할 때 호출되는 함수
-      socketRef.current.onmessage = (event) => {
-        const message = JSON.parse(event.data); // 수신된 메시지를 JSON으로 파싱
-        setMessages((prevMessages) => [...prevMessages, message]); // 수신된 메시지를 상태에 추가
-      };
+        // 채팅방 구독
+        console.log(`채팅방 구독 시도 중: /sub/chat/rooms/${travelRoomId}`); // 디버깅: 구독 시도 로그
+        stompClient.subscribe(`/chat/rooms/${travelRoomId}`, (message) => {
+          console.log('메시지 수신:', message.body); // 디버깅: 수신된 메시지 로그
+          const parsedMessage = JSON.parse(message.body);
+          setMessages((prevMessages) => [...prevMessages, parsedMessage]);
+        }, (error) => {
+          console.error('구독 실패:', error); // 디버깅: 구독 실패 로그
+        });
 
-      // WebSocket에서 오류가 발생했을 때 호출되는 함수
-      socketRef.current.onerror = (error) => {
-        console.error('WebSocket 에러 (코드 1001):', error);
-      };
+        stompClientRef.current = stompClient; // STOMP 클라이언트를 ref에 저장
+      }, (error) => {
+        console.error('STOMP 연결 에러:', error); // 디버깅: STOMP 연결 오류 로그
+        setIsConnected(false);
 
-      // WebSocket 연결이 닫혔을 때 호출되는 함수
-      socketRef.current.onclose = (event) => {
-        if (event.code === 1000) {
-          console.warn('WebSocket 연결 정상 종료 (코드 1000):', event);
-        } else if (event.code === 1001) {
-          console.error('WebSocket 서버 에러로 연결 종료 (코드 1001):', event);
-        }
-        setIsConnected(false); // 연결 상태를 false로 설정
-
-        // 비정상적인 종료 시 재연결 시도
+        // 재연결 시도
         if (retryCount < MAX_RETRY_COUNT) {
+          console.log(`STOMP 재연결 시도 중... (${retryCount + 1}번째 시도)`); // 디버깅: 재연결 시도 로그
           setTimeout(() => {
-            retryCount++; // 재연결 시도 횟수 증가
-            connectWebSocket(); // 재연결 시도
+            retryCount++;
+            connectStompClient(); // 재연결 시도
           }, RETRY_DELAY * retryCount); // 점진적 딜레이를 적용하여 재연결 시도
         } else {
-          console.error('WebSocket 재연결 실패: 최대 재시도 횟수 초과');
+          console.error('STOMP 재연결 실패: 최대 재시도 횟수 초과'); // 디버깅: 최대 재시도 횟수 초과 로그
         }
-      };
+      });
     };
 
-    connectWebSocket(); // WebSocket 연결 시도
+    connectStompClient(); // STOMP 클라이언트 연결 시도
 
-    // 컴포넌트가 언마운트될 때 WebSocket 연결을 해제하는 함수
     return () => {
-      if (socketRef.current) {
-        socketRef.current.close(); // WebSocket 연결 해제
+      if (stompClientRef.current) {
+        console.log('STOMP 연결 해제 중...'); // 디버깅: STOMP 연결 해제 로그
+        stompClientRef.current.disconnect(); // 컴포넌트 언마운트 시 STOMP 연결 해제
       }
     };
-  }, [travelRoomId]); // travelRoomId가 변경될 때마다 WebSocket 연결을 재설정
+  }, [travelRoomId]); // travelRoomId가 변경될 때마다 STOMP 연결을 재설정
 
   useEffect(() => {
     const fetchChatHistory = async () => {
       try {
-        const response = await axiosInstance.get(`http://localhost:8080/api/rooms/${travelRoomId}/chats`, {
-          headers: {
+        const response = await axiosInstance.get(`/api/chat/rooms/${travelRoomId}`, {
+          headers: { 
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
           withCredentials: true,
         });
-  
-        // API 응답의 data 속성에서 메시지 데이터를 추출
+
+        console.log('채팅 내역 불러오기 성공'); // 디버깅: 채팅 내역 불러오기 성공 로그
         const messages = response.data.data.map(msg => ({
           ...msg,
-          content: msg.message,  // message를 content로 변환
-          timestamp: msg.createdAt ? new Date(msg.createdAt).toISOString() : null, // createdAt을 ISO string으로 변환, null이면 그대로 유지
-          sender: msg.senderNickname // senderNickname을 sender로 매핑
+          content: msg.message,
+          timestamp: msg.createdAt ? new Date(msg.createdAt).toISOString() : null,
+          sender: msg.senderNickname
         }));
   
-        setMessages(messages); // 변환된 메시지 데이터를 상태에 저장
+        setMessages(messages);
       } catch (error) {
-        console.error('채팅 내역을 불러오지 못했습니다:', error);
+        console.error('채팅 내역을 불러오지 못했습니다:', error); // 디버깅: 채팅 내역 불러오기 실패 로그
       }
     };
   
-    fetchChatHistory(); // 컴포넌트 마운트 시 채팅 내역을 불러옴
-  }, [travelRoomId, token]); // travelRoomId 또는 token이 변경될 때마다 채팅 내역을 다시 불러옴
+    fetchChatHistory();
+  }, [travelRoomId, token]);
+
+const handleSendMessage = async (e) => {
+  e.preventDefault();
   
-
-  const handleSendMessage = async (e) => {
-    e.preventDefault();
-    if (newMessage.trim() !== '' && !isSending) {
-      setIsSending(true); // 메시지 전송 상태를 true로 설정
-      const messageData = {
-        sender: nickname, // sender를 nickname으로 설정
-        content: newMessage,
-        timestamp: new Date().toISOString(),
-      };
-
-      try {
-        // WebSocket을 통해 메시지 전송
-        if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-          // 메시지를 지정된 경로로 전송
-          socketRef.current.send(JSON.stringify({
-            type: 'SEND',
-            destination: `/pub/${travelRoomId}/chat/send`,
-            message: messageData,
-          }));
-        } else {
-          console.error('WebSocket이 열려있지 않습니다.');
-        }
-
-        setNewMessage(''); // 메시지 입력 필드를 초기화
-      } catch (error) {
-        console.error('메시지 전송 실패:', error);
-      } finally {
-        setIsSending(false); // 메시지 전송 완료 후 상태를 false로 설정
+  // 새로운 메시지가 공백이 아니고, 전송 중 상태가 아닌 경우에만 실행
+  if (newMessage.trim() !== '' && !isSending) {
+    console.log('메시지 전송 시작:', newMessage); // 디버깅: 전송하려는 메시지 로그
+    setIsSending(true);
+    
+    try {
+      const token = localStorage.getItem('accessToken'); // 로컬 스토리지에서 액세스 토큰 가져오기
+      if (!token) {
+        console.error('액세스 토큰이 없습니다. 메시지를 전송할 수 없습니다.'); // 디버깅: 토큰이 없을 경우 로그
+        setIsSending(false);
+        return;
       }
+
+      // STOMP 클라이언트 연결 상태 확인
+      if (stompClientRef.current && stompClientRef.current.connected) {
+        console.log('STOMP 클라이언트가 연결되어 있습니다. 메시지를 전송합니다:', newMessage); // 디버깅: 전송하려는 데이터 로그
+        stompClientRef.current.send(
+          `/pub/chat/rooms/${travelRoomId}`, 
+          { Authorization: `Bearer ${token}` }, // 헤더에 액세스 토큰 추가
+          newMessage // JSON 대신 플레인 텍스트 메시지 전송
+        );
+        console.log('메시지 전송 완료'); // 디버깅: 메시지 전송 완료 로그
+      } else {
+        console.error('STOMP 클라이언트가 연결되어 있지 않습니다.'); // 디버깅: STOMP 클라이언트 연결 오류 로그
+      }
+
+      setNewMessage(''); // 메시지 입력 필드를 초기화
+      console.log('메시지 입력 필드 초기화 완료'); // 디버깅: 메시지 필드 초기화 로그
+    } catch (error) {
+      console.error('메시지 전송 실패:', error); // 디버깅: 메시지 전송 실패 로그
+    } finally {
+      setIsSending(false);
+      console.log('메시지 전송 상태 초기화 (isSending: false)'); // 디버깅: 전송 상태 초기화 로그
     }
-  };
+  } else {
+    console.log('메시지를 전송할 수 없습니다. 메시지가 비어 있거나, 이미 전송 중입니다.'); // 디버깅: 전송 불가 로그
+  }
+};
+
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
@@ -379,6 +380,9 @@ const ChatPage = ({ nickname }) => {
 };
 
 export default ChatPage;
+
+
+
 
 const Container = styled.div`
   display: flex;
