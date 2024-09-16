@@ -6,9 +6,12 @@ import BottomNav from '../../components/shared/bottomNav.js';
 import { useNavigate } from 'react-router-dom';
 import { IoSearch, IoMenuOutline } from "react-icons/io5";
 import Sidebar from '../../components/chatPage/sideBar.js';  
+import SockJS from 'sockjs-client';
 import { Stomp } from '@stomp/stompjs';
 
 const linkify = (text) => {
+  if (!text) return ''; // text가 undefined, null 또는 빈 문자열이면 빈 문자열 반환
+
   const urlPattern = /https?:\/\/[^\s]+/g;
   return text.split(urlPattern).map((part, index) => {
     const match = text.match(urlPattern);
@@ -38,13 +41,11 @@ const ChatPage = ({ nickname }) => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [isConnected, setIsConnected] = useState(true); // WebSocket 연결 상태를 관리하는 상태 변수
   const [isSending, setIsSending] = useState(false); // 메시지 전송 중 상태를 관리하는 상태 변수
-  const [sessionId, setSessionId] = useState(null); // 세션 ID를 저장하는 상태 변수
   const navigate = useNavigate();
   const messageEndRef = useRef(null);
   const messageListRef = useRef(null);
   const stompClientRef = useRef(null); // STOMP 클라이언트를 저장할 Ref
 
-  const token = localStorage.getItem('accessToken');
   const MAX_RETRY_COUNT = 3; // 최대 재연결 시도 횟수
   const RETRY_DELAY = 5000; // 재연결 시도 간격
 
@@ -54,36 +55,36 @@ const ChatPage = ({ nickname }) => {
     const connectStompClient = () => {
       console.log('STOMP 클라이언트 연결 시도 중...'); // 디버깅: STOMP 연결 시도 로그
 
-      // STOMP 클라이언트 인스턴스를 생성하여 연결
-      const socket = new WebSocket('ws://localhost:8080/ws');
+      // SockJS를 사용하여 WebSocket 연결 설정
+      const socket = new SockJS('http://localhost:8080/ws');
       const stompClient = Stomp.over(socket);
 
       // STOMP 클라이언트 연결 설정
-      stompClient.connect({ Authorization: `Bearer ${token}` }, (frame) => {
+      stompClient.connect({ Authorization: `Bearer ${localStorage.getItem('accessToken')}` }, (frame) => {
         console.log('STOMP 연결 성공', frame); // 디버깅: STOMP 연결 성공 로그
         setIsConnected(true);
         retryCount = 0;
-
-        // 서버로부터 세션 ID 가져오기
-        const headers = frame.headers;
-        const sessionId = headers['session-id'];
-        if (sessionId) {
-          console.log('세션 ID 수신:', sessionId); // 디버깅: 세션 ID 수신 로그
-          setSessionId(sessionId);
-        } else {
-          console.error('세션 ID를 수신하지 못했습니다.'); // 디버깅: 세션 ID 수신 실패 로그
-        }
 
         // 채팅방 구독
         console.log(`채팅방 구독 시도 중: /sub/chat/rooms/${travelRoomId}`); // 디버깅: 구독 시도 로그
         stompClient.subscribe(`/sub/chat/rooms/${travelRoomId}`, (message) => {
           console.log('메시지 수신:', message.body); // 디버깅: 수신된 메시지 로그
           const parsedMessage = JSON.parse(message.body);
-          setMessages((prevMessages) => [...prevMessages, parsedMessage]);
+
+          // 메시지 데이터의 구조가 올바른지 확인하고, 누락된 값에 대해 기본값 설정
+          const messageToAdd = {
+            id: parsedMessage.id !== undefined ? parsedMessage.id : new Date().getTime(), // null 또는 undefined인 경우 임시 ID 할당
+            travelRoomId: parsedMessage.travelRoomId || travelRoomId,
+            senderId: parsedMessage.senderId || 'Unknown',
+            message: parsedMessage.message || '',
+            createdAt: parsedMessage.createdAt ? new Date(parsedMessage.createdAt).toISOString() : new Date().toISOString(),
+            sender: parsedMessage.senderNickname || 'Unknown'
+          };
+
+          setMessages((prevMessages) => [...prevMessages, messageToAdd]);
         }, (error) => {
           console.error('구독 실패:', error); // 디버깅: 구독 실패 로그
         });
-        
 
         stompClientRef.current = stompClient; // STOMP 클라이언트를 ref에 저장
       }, (error) => {
@@ -111,20 +112,20 @@ const ChatPage = ({ nickname }) => {
         stompClientRef.current.disconnect(); // 컴포넌트 언마운트 시 STOMP 연결 해제
       }
     };
-  }, [travelRoomId, token]); // travelRoomId와 token이 변경될 때마다 STOMP 연결을 재설정
+  }, [travelRoomId]); // travelRoomId가 변경될 때마다 STOMP 연결을 재설정
 
   useEffect(() => {
     const fetchChatHistory = async () => {
       try {
         const response = await axiosInstance.get(`/api/chat/rooms/${travelRoomId}`, {
           headers: { 
-            Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
           withCredentials: true,
         });
 
         console.log('채팅 내역 불러오기 성공'); // 디버깅: 채팅 내역 불러오기 성공 로그
+        console.log(response.data.data);
         const messages = response.data.data.map(msg => ({
           ...msg,
           content: msg.message,
@@ -139,53 +140,42 @@ const ChatPage = ({ nickname }) => {
     };
   
     fetchChatHistory();
-  }, [travelRoomId, token]);
+  }, [travelRoomId]);
 
-const handleSendMessage = async (e) => {
-  e.preventDefault();
+  const handleSendMessage = async (e) => {
+    e.preventDefault();
   
-  // 새로운 메시지가 공백이 아니고, 전송 중 상태가 아닌 경우에만 실행
-  if (newMessage.trim() !== '' && !isSending) {
-    console.log('메시지 전송 시작:', newMessage); // 디버깅: 전송하려는 메시지 로그
-    setIsSending(true);
-    
-    try {
-      const token = localStorage.getItem('accessToken'); // 로컬 스토리지에서 액세스 토큰 가져오기
-      if (!token) {
-        console.error('액세스 토큰이 없습니다. 메시지를 전송할 수 없습니다.'); // 디버깅: 토큰이 없을 경우 로그
+    // 새로운 메시지가 공백이 아니고, 전송 중 상태가 아닌 경우에만 실행
+    if (newMessage.trim() !== '' && !isSending) {
+      console.log('메시지 전송 시작:', newMessage); // 디버깅: 전송하려는 메시지 로그
+      setIsSending(true);
+
+      try {
+        // STOMP 클라이언트 연결 상태 확인
+        if (stompClientRef.current && stompClientRef.current.connected) {
+          console.log('STOMP 클라이언트가 연결되어 있습니다. 메시지를 전송합니다:', newMessage); // 디버깅: 전송하려는 데이터 로그
+          stompClientRef.current.send(
+            `/pub/chat/rooms/${travelRoomId}`, 
+            {}, 
+            newMessage // JSON 대신 플레인 텍스트 메시지 전송
+          );
+          console.log('메시지 전송 완료'); // 디버깅: 메시지 전송 완료 로그
+        } else {
+          console.error('STOMP 클라이언트가 연결되어 있지 않습니다.'); // 디버깅: STOMP 클라이언트 연결 오류 로그
+        }
+
+        setNewMessage(''); // 메시지 입력 필드를 초기화
+        console.log('메시지 입력 필드 초기화 완료'); // 디버깅: 메시지 필드 초기화 로그
+      } catch (error) {
+        console.error('메시지 전송 실패:', error); // 디버깅: 메시지 전송 실패 로그
+      } finally {
         setIsSending(false);
-        return;
+        console.log('메시지 전송 상태 초기화 (isSending: false)'); // 디버깅: 전송 상태 초기화 로그
       }
-
-      // STOMP 클라이언트 연결 상태 확인
-      if (stompClientRef.current && stompClientRef.current.connected && sessionId) {
-        console.log('STOMP 클라이언트가 연결되어 있습니다. 메시지를 전송합니다:', newMessage); // 디버깅: 전송하려는 데이터 로그
-        stompClientRef.current.send(
-          `/pub/chat/rooms/${travelRoomId}`, 
-          { 
-            Authorization: `Bearer ${token}`,
-            'Session-Id': sessionId // 헤더에 세션 ID 추가
-          }, 
-          newMessage // JSON 대신 플레인 텍스트 메시지 전송
-        );
-        console.log('메시지 전송 완료'); // 디버깅: 메시지 전송 완료 로그
-      } else {
-        console.error('STOMP 클라이언트가 연결되어 있지 않거나 세션 ID가 없습니다.'); // 디버깅: STOMP 클라이언트 연결 오류 로그
-      }
-
-      setNewMessage(''); // 메시지 입력 필드를 초기화
-      console.log('메시지 입력 필드 초기화 완료'); // 디버깅: 메시지 필드 초기화 로그
-    } catch (error) {
-      console.error('메시지 전송 실패:', error); // 디버깅: 메시지 전송 실패 로그
-    } finally {
-      setIsSending(false);
-      console.log('메시지 전송 상태 초기화 (isSending: false)'); // 디버깅: 전송 상태 초기화 로그
+    } else {
+      console.log('메시지를 전송할 수 없습니다. 메시지가 비어 있거나, 이미 전송 중입니다.'); // 디버깅: 전송 불가 로그
     }
-  } else {
-    console.log('메시지를 전송할 수 없습니다. 메시지가 비어 있거나, 이미 전송 중입니다.'); // 디버깅: 전송 불가 로그
-  }
-};
-
+  };
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
@@ -395,8 +385,6 @@ const handleSendMessage = async (e) => {
 };
 
 export default ChatPage;
-
-
 
 
 const Container = styled.div`
