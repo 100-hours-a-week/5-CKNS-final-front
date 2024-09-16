@@ -9,6 +9,7 @@ import Image3 from '../../images/main/list1/DPS.png';
 import Image4 from '../../images/main/list1/NRT.png';
 import Image5 from '../../images/main/list1/CNX.png';
 import Image6 from '../../images/main/list1/TPE.png';
+import axiosInstance from "../../utils/axiosInstance";
 
 const IATACodeToCity = {
   'PQC': '푸꾸옥',
@@ -51,7 +52,7 @@ const NewFlightList = () => {
   useEffect(() => {
     const fetchFlights = async () => {
       try {
-        const response = await axios.get('https://api.thetravelday.co.kr/api/flights/lowestPrice/list');
+        const response = await axiosInstance.get('/api/flights/lowestPrice/list');
         if (response.status === 200) {
           const imageMap = {
             'PQC': Image1,

@@ -34,7 +34,7 @@ const MapSearchResultsPopup = ({ isOpen, onClose, searchResults = [], onResultCl
     const token = localStorage.getItem('accessToken');
     try {
       const response = await axiosInstance.post(
-        `https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/plan/direct`,
+        `/api/rooms/${travelRoomId}/plan/direct`,
         {
           name: selectedResult.name,
           latitude: selectedResult.geometry.location.lat(),
