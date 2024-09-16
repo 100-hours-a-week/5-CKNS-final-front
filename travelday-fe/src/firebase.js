@@ -38,9 +38,10 @@ export const requestForToken = (setTokenFound) => {
     });
 };
 
+const baseURL = process.env.REACT_APP_GENERATED_SERVER_URL;
 const sendTokenToServer = (token) => {
   // 서버로 토큰 전송
-  fetch("https://api.thetravelday.co.kr/api/fcm", {
+  fetch(baseURL + "api/fcm", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
