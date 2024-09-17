@@ -49,6 +49,7 @@ const WishlistPopup = ({ isOpen, onClose, selectedPlace }) => {
             startDate: room.startDate,
             endDate: room.endDate,
           }));
+          console.table(response.data.data);
           setTravelRooms(formattedRooms);
         } else {
           console.error('여행방 로딩 실패:', response.statusText);
@@ -171,6 +172,7 @@ const RoomList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
+  margin-bottom: 80px;
 `;
 
 const RoomListItem = styled.div`
