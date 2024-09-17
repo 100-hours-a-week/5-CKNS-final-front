@@ -105,7 +105,7 @@ const ChatPage = ({ travelRoomId, nickname }) => {
   useEffect(() => {
     const fetchChatHistory = async () => {
       try {
-        const response = await axiosInstance.get(`https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/chats`, {
+        const response = await axiosInstance.get(`/api/rooms/${travelRoomId}/chats`, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
