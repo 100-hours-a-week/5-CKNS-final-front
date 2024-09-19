@@ -10,7 +10,7 @@ import SockJS from 'sockjs-client';
 import { Stomp } from '@stomp/stompjs';
 
 const linkify = (text) => {
-  if (!text) return ''; // text가 undefined, null 또는 빈 문자열이면 빈 문자열 반환
+  if (!text) return '';
 
   const urlPattern = /https?:\/\/[^\s]+/g;
   return text.split(urlPattern).map((part, index) => {
@@ -29,163 +29,184 @@ const linkify = (text) => {
   });
 };
 
-const ChatPage = ({ nickname }) => {  
-  const { travelRoomId } = useParams(); // URL에서 travelRoomId를 추출
+const ChatPage = () => {  
+  const { travelRoomId } = useParams(); // URL에서 travelRoomId 추출
 
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
+  const [nickname, setNickname] = useState(''); // 닉네임 상태 추가
+  const [isLoading, setIsLoading] = useState(true); // 로딩 상태 추가
   const [currentSearchIndex, setCurrentSearchIndex] = useState(0);
+  const [searchResults, setSearchResults] = useState([]);
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
-  const [isConnected, setIsConnected] = useState(true); // WebSocket 연결 상태를 관리하는 상태 변수
-  const [isSending, setIsSending] = useState(false); // 메시지 전송 중 상태를 관리하는 상태 변수
+  const [isConnected, setIsConnected] = useState(true); // WebSocket 연결 상태 관리
+  const [isSending, setIsSending] = useState(false); // 메시지 전송 중 상태 관리
   const navigate = useNavigate();
   const messageEndRef = useRef(null);
   const messageListRef = useRef(null);
-  const stompClientRef = useRef(null); // STOMP 클라이언트를 저장할 Ref
+  const stompClientRef = useRef(null); // STOMP 클라이언트 저장할 Ref
+
+  useEffect(() => {
+    // console.log("Messages 상태가 업데이트되었습니다:", messages);
+  }, [messages]);
 
   const MAX_RETRY_COUNT = 3; // 최대 재연결 시도 횟수
   const RETRY_DELAY = 5000; // 재연결 시도 간격
 
+  const fetchKakaoUserProfile = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        throw new Error('토큰이 없습니다.');
+      }
+
+      const response = await axiosInstance.get('/api/user', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.status === 200) {
+        const fetchedNickname = response.data.data.nickname;
+        setNickname(fetchedNickname); // 닉네임 설정
+        setIsLoading(false);
+      } else {
+        throw new Error('사용자 정보 요청 실패');
+      }
+    } catch (error) {
+      // console.log('응답을 받지 못했습니다:', error.message);
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    let retryCount = 0; // 재연결 시도 횟수를 추적
+    fetchKakaoUserProfile(); // 컴포넌트가 마운트될 때 프로필 정보를 불러옴
+  }, []);
 
+  useEffect(() => {
+    if (isLoading) return; // 닉네임이 로드되기 전에는 STOMP 연결을 하지 않음
+
+    let retryCount = 0;
     const connectStompClient = () => {
-      console.log('STOMP 클라이언트 연결 시도 중...'); // 디버깅: STOMP 연결 시도 로그
-
-      // SockJS를 사용하여 WebSocket 연결 설정
+      // console.log('STOMP 클라이언트 연결 시도 중...');
       const socket = new SockJS('http://localhost:8080/ws');
       const stompClient = Stomp.over(socket);
 
-      // STOMP 클라이언트 연결 설정
       stompClient.connect({ Authorization: `Bearer ${localStorage.getItem('accessToken')}` }, (frame) => {
-        console.log('STOMP 연결 성공', frame); // 디버깅: STOMP 연결 성공 로그
+        // console.log('STOMP 연결 성공', frame);
         setIsConnected(true);
         retryCount = 0;
 
-        // 채팅방 구독
-        console.log(`채팅방 구독 시도 중: /sub/chat/rooms/${travelRoomId}`); // 디버깅: 구독 시도 로그
         stompClient.subscribe(`/sub/chat/rooms/${travelRoomId}`, (message) => {
-          console.log('메시지 수신:', message.body); // 디버깅: 수신된 메시지 로그
-          const parsedMessage = JSON.parse(message.body);
-
-          // 메시지 데이터의 구조가 올바른지 확인하고, 누락된 값에 대해 기본값 설정
-          const messageToAdd = {
-            id: parsedMessage.id !== undefined ? parsedMessage.id : new Date().getTime(), // null 또는 undefined인 경우 임시 ID 할당
-            travelRoomId: parsedMessage.travelRoomId || travelRoomId,
-            senderId: parsedMessage.senderId || 'Unknown',
-            message: parsedMessage.message || '',
-            createdAt: parsedMessage.createdAt ? new Date(parsedMessage.createdAt).toISOString() : new Date().toISOString(),
-            sender: parsedMessage.senderNickname || 'Unknown'
-          };
-
-          setMessages((prevMessages) => [...prevMessages, messageToAdd]);
-        }, (error) => {
-          console.error('구독 실패:', error); // 디버깅: 구독 실패 로그
+          // console.log("수신된 메시지:", message.body); // 수신된 메시지 원본 확인
+        
+          if (message.body) {
+            const parsedMessage = JSON.parse(message.body);
+            // console.log("파싱된 메시지:", parsedMessage); // 파싱된 메시지 확인
+        
+            const messageToAdd = {
+              id: parsedMessage.id || new Date().getTime(),
+              travelRoomId: parsedMessage.travelRoomId || travelRoomId,
+              senderId: parsedMessage.senderId || 'Unknown',
+              message: parsedMessage.message || '', // 여기서 message 필드로 변경
+              timestamp: parsedMessage.createdAt ? new Date(parsedMessage.createdAt).toISOString() : new Date().toISOString(), // timestamp로 변경
+              sender: parsedMessage.senderNickname || 'Unknown'
+            };
+        
+            // console.log("추가할 메시지:", messageToAdd); // 추가할 메시지 확인
+            setMessages((prevMessages) => [...prevMessages, messageToAdd]);
+          } else {
+            console.error("메시지 본문이 없습니다.");
+          }
         });
 
-        stompClientRef.current = stompClient; // STOMP 클라이언트를 ref에 저장
+        stompClientRef.current = stompClient;
       }, (error) => {
-        console.error('STOMP 연결 에러:', error); // 디버깅: STOMP 연결 오류 로그
+        console.error('STOMP 연결 에러:', error);
         setIsConnected(false);
 
-        // 재연결 시도
         if (retryCount < MAX_RETRY_COUNT) {
-          console.log(`STOMP 재연결 시도 중... (${retryCount + 1}번째 시도)`); // 디버깅: 재연결 시도 로그
           setTimeout(() => {
             retryCount++;
-            connectStompClient(); // 재연결 시도
-          }, RETRY_DELAY * retryCount); // 점진적 딜레이를 적용하여 재연결 시도
+            connectStompClient();
+          }, RETRY_DELAY * retryCount);
         } else {
-          console.error('STOMP 재연결 실패: 최대 재시도 횟수 초과'); // 디버깅: 최대 재시도 횟수 초과 로그
+          console.error('STOMP 재연결 실패: 최대 재시도 횟수 초과');
         }
       });
     };
 
-    connectStompClient(); // STOMP 클라이언트 연결 시도
+    connectStompClient();
 
     return () => {
       if (stompClientRef.current) {
-        console.log('STOMP 연결 해제 중...'); // 디버깅: STOMP 연결 해제 로그
-        stompClientRef.current.disconnect(); // 컴포넌트 언마운트 시 STOMP 연결 해제
+        stompClientRef.current.disconnect();
       }
     };
-  }, [travelRoomId]); // travelRoomId가 변경될 때마다 STOMP 연결을 재설정
+  }, [travelRoomId, isLoading]);
 
   useEffect(() => {
     const fetchChatHistory = async () => {
       try {
         const response = await axiosInstance.get(`/api/chat/rooms/${travelRoomId}`, {
-          headers: { 
+          headers: {
             'Content-Type': 'application/json',
           },
           withCredentials: true,
         });
 
-        console.log('채팅 내역 불러오기 성공'); // 디버깅: 채팅 내역 불러오기 성공 로그
-        console.log(response.data.data);
         const messages = response.data.data.map(msg => ({
           ...msg,
           content: msg.message,
           timestamp: msg.createdAt ? new Date(msg.createdAt).toISOString() : null,
           sender: msg.senderNickname
         }));
-  
+
         setMessages(messages);
       } catch (error) {
-        console.error('채팅 내역을 불러오지 못했습니다:', error); // 디버깅: 채팅 내역 불러오기 실패 로그
+        console.error('채팅 내역을 불러오지 못했습니다:', error);
       }
     };
-  
+
     fetchChatHistory();
   }, [travelRoomId]);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
-  
-    // 새로운 메시지가 공백이 아니고, 전송 중 상태가 아닌 경우에만 실행
+
     if (newMessage.trim() !== '' && !isSending) {
-      console.log('메시지 전송 시작:', newMessage); // 디버깅: 전송하려는 메시지 로그
       setIsSending(true);
 
+      // STOMP를 통해서만 메시지를 보냄
       try {
-        // STOMP 클라이언트 연결 상태 확인
         if (stompClientRef.current && stompClientRef.current.connected) {
-          console.log('STOMP 클라이언트가 연결되어 있습니다. 메시지를 전송합니다:', newMessage); // 디버깅: 전송하려는 데이터 로그
-          stompClientRef.current.send(
-            `/pub/chat/rooms/${travelRoomId}`, 
-            {}, 
-            newMessage // JSON 대신 플레인 텍스트 메시지 전송
-          );
-          console.log('메시지 전송 완료'); // 디버깅: 메시지 전송 완료 로그
+          // STOMP를 통해 메시지를 전송
+          stompClientRef.current.send(`/pub/chat/rooms/${travelRoomId}`, {}, newMessage);
+          // console.log('pub 성공');
         } else {
-          console.error('STOMP 클라이언트가 연결되어 있지 않습니다.'); // 디버깅: STOMP 클라이언트 연결 오류 로그
+          console.error('STOMP 클라이언트가 연결되어 있지 않습니다.');
         }
-
-        setNewMessage(''); // 메시지 입력 필드를 초기화
-        console.log('메시지 입력 필드 초기화 완료'); // 디버깅: 메시지 필드 초기화 로그
       } catch (error) {
-        console.error('메시지 전송 실패:', error); // 디버깅: 메시지 전송 실패 로그
+        console.error('메시지 전송 실패:', error);
       } finally {
         setIsSending(false);
-        console.log('메시지 전송 상태 초기화 (isSending: false)'); // 디버깅: 전송 상태 초기화 로그
+        setNewMessage(''); // 입력 필드 초기화
       }
-    } else {
-      console.log('메시지를 전송할 수 없습니다. 메시지가 비어 있거나, 이미 전송 중입니다.'); // 디버깅: 전송 불가 로그
     }
   };
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
-      handleSendMessage(e); // 엔터 키를 누르면 메시지 전송
+      handleSendMessage(e);
     }
   };
-
+  
   const handleSearchKeyPress = (e) => {
     if (e.key === 'Enter') {
-      handleSearch(); // 엔터 키를 누르면 검색 수행
+      handleSearch();
     }
   };
 
@@ -193,7 +214,7 @@ const ChatPage = ({ nickname }) => {
     const hours = date.getHours();
     const minutes = date.getMinutes();
     const ampm = hours >= 12 ? '오후' : '오전';
-    const formattedHours = hours % 12 || 12; 
+    const formattedHours = hours % 12 || 12;
     const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
     return `${ampm} ${formattedHours}시 ${formattedMinutes}분`;
   };
@@ -223,7 +244,7 @@ const ChatPage = ({ nickname }) => {
     return currentDate === previousDate;
   };
 
-  const handleBackButtonClick = () => { 
+  const handleBackButtonClick = () => {
     navigate(-1); // 뒤로 가기 버튼 클릭 시 이전 페이지로 이동
   };
 
@@ -239,7 +260,7 @@ const ChatPage = ({ nickname }) => {
     if (searchTerm.trim() === '') return;
 
     const results = messages.reduce((acc, message, index) => {
-      if (message.content.includes(searchTerm)) {
+      if (message.message.includes(searchTerm)) {
         acc.push(index);
       }
       return acc;
@@ -302,8 +323,8 @@ const ChatPage = ({ nickname }) => {
           <BackButton onClick={handleBackButtonClick}>뒤로</BackButton>
           <RoomTitle>채팅방 이름</RoomTitle>
           <IconsContainer>
-            <IoSearch size={22} onClick={toggleSearch} />  
-            <IoMenuOutline size={22} onClick={toggleSidebar} /> 
+            <IoSearch size={22} onClick={toggleSearch} />
+            <IoMenuOutline size={22} onClick={toggleSidebar} />
           </IconsContainer>
         </Navbar>
 
@@ -311,8 +332,8 @@ const ChatPage = ({ nickname }) => {
 
         {isSearchVisible && (
           <SearchContainer>
-            <SearchInput 
-              placeholder="메시지 검색하기" 
+            <SearchInput
+              placeholder="메시지 검색하기"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyPress={handleSearchKeyPress}
@@ -333,24 +354,29 @@ const ChatPage = ({ nickname }) => {
             const showTimestamp = !isSameSenderAndTime(message, nextMessage);
             const showDate = !isSameDay(message, previousMessage) || index === 0;
 
+            const isOwnMessage = message.sender === nickname;
+
             const isHighlighted = searchResults.includes(index);
             const isActiveResult = isHighlighted && index === searchResults[currentSearchIndex];
+
+            // 메시지 내용 확인
+            // console.log(`렌더링할 메시지 (index: ${index}):`, message.message);
 
             return (
               <React.Fragment key={index}>
                 {showDate && (
                   <DateSeparator>{formatDate(new Date(message.timestamp))}</DateSeparator>
                 )}
-                <MessageItem isOwnMessage={message.sender === nickname} isActiveResult={isActiveResult}>
+                <MessageItem isOwnMessage={isOwnMessage} isActiveResult={isActiveResult}>
                   {showSender && (
                     <MessageSender>{message.sender}</MessageSender>
                   )}
-                  <MessageWrapper isOwnMessage={message.sender === nickname}>
-                    <MessageContent isOwnMessage={message.sender === nickname}>
-                      {linkify(message.content)}
+                  <MessageWrapper isOwnMessage={isOwnMessage}>
+                    <MessageContent isOwnMessage={isOwnMessage}>
+                      {linkify(message.message)} {/* linkify 함수 적용 */}
                     </MessageContent>
                     {showTimestamp && (
-                      <MessageTimestamp isOwnMessage={message.sender === nickname}>
+                      <MessageTimestamp isOwnMessage={isOwnMessage}>
                         {formatTime(new Date(message.timestamp))}
                       </MessageTimestamp>
                     )}
@@ -362,14 +388,15 @@ const ChatPage = ({ nickname }) => {
           <div ref={messageEndRef} />
         </MessageList>
 
+
         <MessageInputContainer>
-          <MessageInput 
-            type="text" 
-            placeholder="메시지를 입력하세요..." 
+          <MessageInput
+            type="text"
+            placeholder="메시지를 입력하세요..."
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            onKeyPress={handleKeyPress} 
-            disabled={!isConnected || isSending} // 연결이 끊겼거나 전송 중일 때 입력 비활성화
+            onKeyPress={handleKeyPress}
+            disabled={!isConnected || isSending}
           />
           <SendButton onClick={handleSendMessage} disabled={!isConnected || isSending}>
             {isSending ? '전송 중...' : '전송'}
@@ -379,7 +406,7 @@ const ChatPage = ({ nickname }) => {
 
       <Sidebar isSidebarVisible={isSidebarVisible} toggleSidebar={toggleSidebar} />
 
-      <BottomNav /> 
+      <BottomNav />
     </Container>
   );
 };
