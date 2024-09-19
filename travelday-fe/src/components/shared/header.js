@@ -14,7 +14,7 @@ const Header = ({ showBackButton = false, onBackClick }) => {
   const [isAlarmOpen, setIsAlarmOpen] = useState(false);
   const [hasNewAlarm, setHasNewAlarm] = useState(false); 
   const [alarms, setAlarms] = useState([]);
-  const [isDelayedTrue, setIsDelayedTrue] = useState(false); // 애니메이션 상태 추가
+  const [isDelayedTrue, setIsDelayedTrue] = useState(false); 
 
   useEffect(() => {
     if (showBackButton) {
@@ -40,8 +40,7 @@ const Header = ({ showBackButton = false, onBackClick }) => {
                 },
             });
 
-            // response.data에 알림 데이터가 직접 들어있다고 가정
-            const notification = response.data.data; 
+            const notification = response.data.data;
 
             if (notification) {
                 setAlarms([notification]); // 알람을 배열로 설정

@@ -2,36 +2,72 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { IoClose } from 'react-icons/io5';
+import axiosInstance from '../../utils/axiosInstance'
 
 const AlarmSidebar = ({ isOpen, onClose, alarms }) => {
   const navigate = useNavigate();
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleAlarmClick = (travelRoomId, content) => {
-    console.log('콘텐츠 조회:',content);
-    setSelectedRoom({ travelRoomId, content });
+  const handleAlarmClick = (travelRoomId, content, notificationId) => {
+    console.log(notificationId);
+    setSelectedRoom({ travelRoomId, content, notificationId }); 
     setIsModalOpen(true);
   };
 
-  const handleAccept = () => {
-    setIsModalOpen(false);
-    onClose();
-    navigate(`/schedule/${selectedRoom.travelRoomId}`);
+  const handleAccept = async () => {
+    try {
+      const accessToken = localStorage.getItem('accessToken');
+      const response = await axiosInstance.put(
+        `/api/rooms/${selectedRoom.travelRoomId}/invitation/${selectedRoom.notificationId}`,
+        {"status": "Y"},
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          withCredentials: true, 
+        }
+      );
+      if (response.status === 200) {
+        console.log('초대 수락 성공');
+        setIsModalOpen(false);
+        onClose();
+        navigate(`/schedule/${selectedRoom.travelRoomId}`);
+      }
+    } catch (error) {
+      console.error('초대 수락 실패:', error);
+    }
   };
 
-  const handleDecline = () => {
-    setIsModalOpen(false);
-    setSelectedRoom(null);
+  const handleDecline = async () => {
+    try {
+      const accessToken = localStorage.getItem('accessToken');
+      const response = await axiosInstance.put(
+        `/api/rooms/${selectedRoom.travelRoomId}/invitation/${selectedRoom.notificationId}`,
+        { "status": "N" },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          withCredentials: true, // 쿠키도 같이 전송
+        }
+      );
+      if (response.status === 200) {
+        console.log('초대 거절 성공');
+        setIsModalOpen(false);
+        setSelectedRoom(null);
+      }
+    } catch (error) {
+      console.error('초대 거절 실패:', error);
+    }
   };
 
   const getTimeDifference = (time) => {
-   
     const correctedTime = `20${time.slice(0, 2)}-${time.slice(3, 5)}-${time.slice(6, 8)}T${time.slice(9)}`;
     const now = new Date();
     const alarmTime = new Date(correctedTime);
     const differenceInMinutes = Math.floor((now - alarmTime) / 1000 / 60);
-  
+
     if (differenceInMinutes < 1) {
       return "방금 전";
     } else if (differenceInMinutes < 60) {
@@ -44,7 +80,6 @@ const AlarmSidebar = ({ isOpen, onClose, alarms }) => {
       return `${differenceInDays}일 전`;
     }
   };
-  
 
   return (
     <>
@@ -56,22 +91,22 @@ const AlarmSidebar = ({ isOpen, onClose, alarms }) => {
           </CloseButton>
         </SidebarHeader>
         <AlarmList>
-        {alarms.length === 0 ? (
-          <NoAlarmsMessage>알림이 없습니다!</NoAlarmsMessage>
-        ) : (
-          alarms.map((alarm, index) => (
-            <AlarmItem 
-              key={index} 
-              onClick={() => handleAlarmClick(alarm.travelRoomId, alarm.content)} // travelRoomId를 전달
-            >
-              <AlarmMessage>
-                {alarm.content}
-              </AlarmMessage>
-              <InviteTime>{getTimeDifference(alarm.notificationTime)}</InviteTime>
-            </AlarmItem>
-          ))
-        )}
-      </AlarmList>
+          {alarms.length === 0 ? (
+            <NoAlarmsMessage>알림이 없습니다!</NoAlarmsMessage>
+          ) : (
+            alarms.map((alarm, index) => (
+              <AlarmItem 
+                key={index} 
+                onClick={() => handleAlarmClick(alarm.travelRoomId, alarm.content, alarm.notificationId)} 
+              >
+                <AlarmMessage>
+                  {alarm.content}
+                </AlarmMessage>
+                <InviteTime>{getTimeDifference(alarm.notificationTime)}</InviteTime>
+              </AlarmItem>
+            ))
+          )}
+        </AlarmList>
       </SidebarContainer>
 
       {isModalOpen && (
@@ -81,11 +116,11 @@ const AlarmSidebar = ({ isOpen, onClose, alarms }) => {
               <IoClose size={24} />
             </CloseModalButton>
             <ModalTitle>
-            {`${selectedRoom.content}`}
-            <br />
-            <br />
-            {`초대를 수락하시겠습니까?`}
-          </ModalTitle>
+              {`${selectedRoom.content}`}
+              <br />
+              <br />
+              {`초대를 수락하시겠습니까?`}
+            </ModalTitle>
             <ModalButtons>
               <ModalButton onClick={handleAccept}>수락</ModalButton>
               <ModalButton onClick={handleDecline} decline>거절</ModalButton>
@@ -98,6 +133,7 @@ const AlarmSidebar = ({ isOpen, onClose, alarms }) => {
 };
 
 export default AlarmSidebar;
+
 
 const SidebarContainer = styled.div`
   position: fixed;
