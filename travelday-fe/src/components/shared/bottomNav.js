@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 import homeIcon from '../../images/footer/home.png';
 import airplaneIcon from '../../images/footer/airplane.png';
 import scheduleIcon from '../../images/footer/schedule.png';
+import chatIcon from '../../images/footer/chat.png';
 import mapIcon from '../../images/footer/map.png';
 
 const BottomNav = () => {
@@ -14,6 +15,10 @@ const BottomNav = () => {
           <NavItem href="/" isActive={location.pathname === '/'}>
               <NavIcon src={homeIcon} alt="메인" />
               <NavText isActive={location.pathname === '/'}>메인</NavText>
+          </NavItem>
+          <NavItem href="/chatList" isActive={location.pathname === '/chatList'}>
+              <NavIcon src={chatIcon} alt="채팅" />
+              <NavText isActive={location.pathname === '/chatList'}>채팅</NavText>
           </NavItem>
           <NavItem href="/schedule" isActive={location.pathname === '/schedule'}>
             <NavIcon src={scheduleIcon} alt="일정" />
