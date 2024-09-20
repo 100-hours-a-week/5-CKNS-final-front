@@ -134,7 +134,7 @@ const SearchContainer = styled.div`
 `;
 
 const SearchInput = styled.input`
-  width: 332px;
+  width: 312px;
   padding: 12px;
   border: 2px solid #d0e2ff; 
   border-radius: 25px; 
@@ -151,6 +151,9 @@ const SearchInput = styled.input`
 const ChatList = styled.div`
   flex: 1;
   background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: 15px; 
   overflow-y: auto;
 
@@ -161,6 +164,7 @@ const ChatList = styled.div`
 
 const ChatRoomItem = styled.div`
   display: flex;
+  width: 316px;
   flex-direction: column;
   padding: 18px 10px;
   margin-bottom: 10px; 

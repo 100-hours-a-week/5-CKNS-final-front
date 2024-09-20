@@ -60,10 +60,10 @@ const NavItem = styled.a`
   text-decoration: none;
   color: ${({ isActive }) => (isActive ? '#007bff' : '#000')};
   transition: transform 0.2s, color 0.2s;
-  width: 60px; /* Increase the width for a larger clickable area */
-  height: 60px; /* Increase the height for a larger clickable area */
-  padding: 10px; /* Add padding to create a larger clickable area */
-  box-sizing: border-box; /* Ensure padding does not affect size */
+  width: 60px; 
+  height: 60px; 
+  padding: 10px; 
+  box-sizing: border-box; 
   &:active {
     transform: scale(1.1);
   }
