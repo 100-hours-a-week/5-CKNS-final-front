@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../utils/axiosInstance.js';
 import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { GoogleMap, MarkerF, InfoWindowF } from '@react-google-maps/api'; // Marker, InfoWindow 제거
+import { GoogleMap, MarkerF, InfoWindowF } from '@react-google-maps/api'; 
 import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import calendarIcon from '../../images/filter/calendar.png';

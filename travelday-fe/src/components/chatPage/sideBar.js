@@ -1,28 +1,95 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { IoClose } from 'react-icons/io5';
+import InviteModal from '../../components/schedulePage/inviteModal.js';
+import axiosInstance from '../../utils/axiosInstance'; 
 
 const Sidebar = ({ isSidebarVisible, toggleSidebar }) => {
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [searchInput, setSearchInput] = useState('');
+
+  // 초대 모달 열기
+  const handleInviteClick = () => {
+    setIsInviteModalOpen(true);
+  };
+
+  // 초대 모달 닫기
+  const handleInviteModalClose = () => {
+    setIsInviteModalOpen(false);
+  };
+
+  // 방 나가기 로직
+  const handleLeaveRoom = async () => {
+    const travelRoomId = window.location.pathname.split('/').pop(); // URL에서 ID 추출
+    const accessToken = localStorage.getItem('accessToken'); // 로컬스토리지에서 토큰 가져오기
+
+    try {
+      const response = await axiosInstance.delete(`/api/rooms/${travelRoomId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.status === 200) {
+        window.alert('채팅방을 나갔습니다!'); // 성공 시 알림
+      } else {
+        console.error('방 나가기를 실패했습니다:', response.statusText);
+      }
+    } catch (error) {
+      console.error('방 나가기를 실패했습니다:', error);
+      window.alert('채팅방 나가기를 실패했습니다. 다시 시도해 주세요.');
+    }
+  };
+
   return (
-    <SidebarContainer isSidebarVisible={isSidebarVisible}>
-      <Header>
-        <SidebarTitle>채팅방 설정</SidebarTitle>
-        <CloseButton onClick={toggleSidebar}>
-          <IoClose size={24} />
-        </CloseButton>
-      </Header>
-      <SidebarContent>
-        <Section>
-          <SectionTitle>대화상대</SectionTitle>
-          <InviteButton>대화상대 초대</InviteButton>
-        </Section>
-      </SidebarContent>
-      <ExitButton onClick={toggleSidebar}>나가기</ExitButton>
-    </SidebarContainer>
+    <>
+      <SidebarContainer isSidebarVisible={isSidebarVisible}>
+        <Header>
+          <SidebarTitle>채팅방 설정</SidebarTitle>
+          <CloseButton onClick={toggleSidebar}>
+            <IoClose size={24} />
+          </CloseButton>
+        </Header>
+        <SidebarContent>
+          <Section>
+            <SectionTitle>대화상대</SectionTitle>
+            <InviteButton onClick={handleInviteClick}>
+              대화상대 초대
+            </InviteButton>
+          </Section>
+        </SidebarContent>
+        <ExitButton onClick={handleLeaveRoom}>나가기</ExitButton> 
+      </SidebarContainer>
+
+      {isInviteModalOpen && (
+        <InviteModalOverlay>
+          <InviteModal 
+            isOpen={isInviteModalOpen} 
+            onClose={handleInviteModalClose} 
+            searchInput={searchInput} 
+            setSearchInput={setSearchInput} 
+          />
+        </InviteModalOverlay>
+      )}
+    </>
   );
 };
 
 export default Sidebar;
+
+// 스타일 코드들
+const InviteModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);  // 배경 어둡게
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1200;  // 사이드바보다 위에 표시되도록 z-index 설정
+`;
 
 const slideIn = keyframes`
   from {
@@ -58,7 +125,7 @@ const SidebarContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  
+
   &:hover {
     box-shadow: -4px 0 20px rgba(0,0,0,0.25); 
   }
@@ -154,4 +221,3 @@ const ExitButton = styled.button`
     transform: translateY(0);
   }
 `;
-

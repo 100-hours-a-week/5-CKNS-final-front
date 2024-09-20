@@ -308,8 +308,10 @@ const ChatPage = () => {
   const handleCancelSearch = () => {
     setIsSearchVisible(false); // 검색 창 닫기
     setSearchTerm(''); // 검색어 초기화
+    setSearchResults([]); // 검색 결과 초기화
+    setCurrentSearchIndex(0); // 검색 인덱스 초기화
   };
-
+  
   useEffect(() => {
     if (messageEndRef.current) {
       messageEndRef.current.scrollIntoView({ behavior: 'smooth' }); // 새 메시지가 수신되면 스크롤을 맨 아래로 이동
@@ -321,7 +323,7 @@ const ChatPage = () => {
       <ChatContainer>
         <Navbar>
           <BackButton onClick={handleBackButtonClick}>뒤로</BackButton>
-          <RoomTitle>채팅방 이름</RoomTitle>
+          <RoomTitle> </RoomTitle>
           <IconsContainer>
             <IoSearch size={22} onClick={toggleSearch} />
             <IoMenuOutline size={22} onClick={toggleSidebar} />
@@ -357,7 +359,8 @@ const ChatPage = () => {
             const isOwnMessage = message.sender === nickname;
 
             const isHighlighted = searchResults.includes(index);
-            const isActiveResult = isHighlighted && index === searchResults[currentSearchIndex];
+
+            const isActiveResult = isHighlighted && index === searchResults[currentSearchIndex] && searchResults.length > 0;
 
             // 메시지 내용 확인
             // console.log(`렌더링할 메시지 (index: ${index}):`, message.message);
@@ -521,7 +524,7 @@ const MessageItem = styled.div`
   flex-direction: column;
   align-items: ${(props) => (props.isOwnMessage ? 'flex-end' : 'flex-start')};
   margin-bottom: 15px;
-  border-radius: 8px;
+  border-radius: 0px;
   background-color: ${(props) => (props.isActiveResult ? '#eee' : 'transparent')};
 `;
 
@@ -629,7 +632,6 @@ const DateSeparator = styled.div`
 
 const SearchContainer = styled.div`
   display: flex;
-  justify-content: center;
   align-items: center;
   padding: 10px  0px ;
   background-color: #e8f0fe;
@@ -641,8 +643,9 @@ const SearchContainer = styled.div`
 `;
 
 const SearchInput = styled.input`
-  width: 70%;
+  width: 200px;
   padding: 10px;
+  margin-left: 10px;
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 1rem;
@@ -650,7 +653,6 @@ const SearchInput = styled.input`
 
 const SearchControls = styled.div`
   display: flex;
-  gap: 5px;
 `;
 
 const SearchButton = styled.button`
@@ -658,9 +660,10 @@ const SearchButton = styled.button`
   background-color: #007bff;
   color: #fff;
   border: none;
+  margin-left: 5px;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size:13px;
 
   &:hover {
     background-color: #0069d9;
@@ -668,15 +671,17 @@ const SearchButton = styled.button`
 `;
 
 const CancelButton = styled.button`
-  padding: 10px;
+  padding: 5px 10px;
   margin-left: 10px;
   background-color: #007bff;
   color: #fff;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  font-weight: bold;
+  margin-right: 10px;
+
   transition: all 0.3s ease;
+  font-size:13px;
 
   &:hover {
     background-color: #0069d9;

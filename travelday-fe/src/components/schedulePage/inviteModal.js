@@ -23,17 +23,17 @@ const InviteModal = ({ isOpen, onClose, searchInput, setSearchInput }) => {
     const handleSearch = async () => {
         try {
             const token = localStorage.getItem('accessToken');
-            const response = await axiosInstance.get(`/api/user/search`, {
+            const response = await axiosInstance.get(`/api/rooms/${travelRoomId}/user/search`, {
                 params: { keyword: searchInput },
                 headers: {
                     Authorization: `Bearer ${token}`
                 },
                 withCredentials: true,
             });
-
+    
             if (response.data && Array.isArray(response.data.data) && response.data.data.length > 0) {
                 setFilteredResults(response.data.data);
-                setErrorMessage(''); 
+                setErrorMessage('');
             } else {
                 console.log(response);
                 setFilteredResults([]);

@@ -208,13 +208,16 @@ const AlarmMessage = styled.div`
   color: #000;
   white-space: pre-wrap;
   line-height: 1.5;
+  text-align: left;
 `;
 
 const InviteTime = styled.div`
   font-size: 14px;
   color: #6c757d;
-  margin-top: 5px;
+  margin-top: 10px;
+  text-align: left; 
 `;
+
 
 const ModalOverlay = styled.div`
   position: fixed;
