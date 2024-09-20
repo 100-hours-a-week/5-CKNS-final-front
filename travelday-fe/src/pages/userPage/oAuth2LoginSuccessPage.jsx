@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { requestForToken } from '../../firebase'; // FCM 토큰 요청 함수
+import { requestForToken } from '../../firebase';
 
 const OAuth2LoginSuccessPage = () => {
   const navigate = useNavigate();

@@ -164,9 +164,9 @@ const ChatRoomItem = styled.div`
   flex-direction: column;
   padding: 18px 10px;
   margin-bottom: 10px; 
-  border-radius: 12px; 
+  border-radius: 8px; 
   background-color: #ffffff;
-  border: 1px solid #e0e0e0;
+  border: 2px solid #f2f2f2;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.3s ease, color 0.3s ease;
 
@@ -174,7 +174,7 @@ const ChatRoomItem = styled.div`
     background-color: #dff1ff; 
     border: 2px solid #89c5ff;
     color: #4a90e2; 
-    transform: translateY(-3px); 
+    transform: scale(1.05);  
   }
 `;
 
@@ -184,7 +184,7 @@ const RoomHeader = styled.div`
 `;
 
 const RoomName = styled.span`
-  font-size: 18px;
+  font-size: 15px;
   font-weight: bold;
   color: #333;
 `;

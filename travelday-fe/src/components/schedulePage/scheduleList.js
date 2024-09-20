@@ -76,7 +76,7 @@ const ScheduleList = ({ schedules, onItemClick, onDeleteClick }) => {
       }
     } catch (error) {
       console.error('Error deleting schedule:', error);
-      window.alert('삭제에 실패했습니다. 다시 시도해 주세요.');
+      window.alert('삭제를 실패했습니다. 다시 시도해 주세요.');
     }
   };
 

@@ -15,9 +15,16 @@ const app = initializeApp(firebaseConfig);
 
 const messaging = getMessaging(app);
 
+let tokenRequestInProgress = false; // 중복 호출 방지를 위한 플래그
+
 export const requestForToken = (setTokenFound) => {
+  if (tokenRequestInProgress) return; // 이미 요청이 진행 중이면 함수 종료
+
+  tokenRequestInProgress = true; // 토큰 요청이 시작되면 플래그를 true로 설정
+
   return getToken(messaging, { vapidKey: process.env.REACT_APP_FIREBASE_VAPID_KEY })
     .then((currentToken) => {
+      tokenRequestInProgress = false; // 요청이 완료되면 플래그를 false로 설정
       if (currentToken) {
         // FCM 토큰을 백엔드로 전송하는 함수 호출
         sendTokenToServer(currentToken);
@@ -27,6 +34,7 @@ export const requestForToken = (setTokenFound) => {
       }
     })
     .catch((err) => {
+      tokenRequestInProgress = false; // 요청이 실패해도 플래그를 false로 설정
       console.error("An error occurred while retrieving token. ", err);
       setTokenFound && setTokenFound(false);
     });
