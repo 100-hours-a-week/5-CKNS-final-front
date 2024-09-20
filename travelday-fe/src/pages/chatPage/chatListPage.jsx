@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import BottomNav from '../../components/shared/bottomNav.js'; 
 import Header from '../../components/shared/header.js'; 
 import { useNavigate } from 'react-router-dom';
-import axiosInstance from '../../utils/axiosInstance'; // axiosInstance 사용 가정
+import axiosInstance from '../../utils/axiosInstance';
 
 const ChatListPage = () => {
   const [chatRooms, setChatRooms] = useState([]);

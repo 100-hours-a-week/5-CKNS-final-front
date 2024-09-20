@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { IoClose } from 'react-icons/io5';
 import InviteModal from '../../components/schedulePage/inviteModal.js';
-import axiosInstance from '../../utils/axiosInstance'; 
+import axiosInstance from '../../utils/axiosInstance';
+import humanIcon from '../../images/chat/human.png'; 
 
 const Sidebar = ({ isSidebarVisible, toggleSidebar }) => {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [searchInput, setSearchInput] = useState('');
+  const [roomUsers, setRoomUsers] = useState([]); // 방에 속한 사용자 리스트 상태
 
   // 초대 모달 열기
   const handleInviteClick = () => {
@@ -41,6 +43,33 @@ const Sidebar = ({ isSidebarVisible, toggleSidebar }) => {
     }
   };
 
+  // 방에 속한 사용자 리스트 불러오기
+  const fetchRoomUsers = async () => {
+    const travelRoomId = window.location.pathname.split('/').pop(); 
+    const accessToken = localStorage.getItem('accessToken'); 
+
+    try {
+      const response = await axiosInstance.get(`/api/rooms/${travelRoomId}/user`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.status === 200) {
+        setRoomUsers(response.data.data); // 사용자 리스트 설정
+      } else {
+        console.error('사용자 리스트 불러오기 실패:', response.statusText);
+      }
+    } catch (error) {
+      console.error('사용자 리스트 불러오기 오류:', error);
+    }
+  };
+
+  // 컴포넌트가 렌더링될 때 사용자 리스트 불러오기
+  useEffect(() => {
+    fetchRoomUsers();
+  }, []);
+
   return (
     <>
       <SidebarContainer isSidebarVisible={isSidebarVisible}>
@@ -53,9 +82,23 @@ const Sidebar = ({ isSidebarVisible, toggleSidebar }) => {
         <SidebarContent>
           <Section>
             <SectionTitle>대화상대</SectionTitle>
-            <InviteButton onClick={handleInviteClick}>
-              대화상대 초대
-            </InviteButton>
+            <InviteButton onClick={handleInviteClick}>대화상대 초대</InviteButton>
+
+            {/* 채팅방 사용자 리스트 */}
+            <UserList>
+            {roomUsers.length > 0 ? (
+              roomUsers.map((user) => (
+                <UserItem key={user.userId}>
+                  <ProfileImageWrapper>
+                    <ProfileImage src={humanIcon} alt="User profile" /> 
+                  </ProfileImageWrapper>
+                  {user.nickname}
+                </UserItem>
+              ))
+            ) : (
+              <NoUsersMessage>대화 상대가 없습니다.</NoUsersMessage>
+            )}
+          </UserList>
           </Section>
         </SidebarContent>
         <ExitButton onClick={handleLeaveRoom}>나가기</ExitButton> 
@@ -63,11 +106,11 @@ const Sidebar = ({ isSidebarVisible, toggleSidebar }) => {
 
       {isInviteModalOpen && (
         <InviteModalOverlay>
-          <InviteModal 
-            isOpen={isInviteModalOpen} 
-            onClose={handleInviteModalClose} 
-            searchInput={searchInput} 
-            setSearchInput={setSearchInput} 
+          <InviteModal
+            isOpen={isInviteModalOpen}
+            onClose={handleInviteModalClose}
+            searchInput={searchInput}
+            setSearchInput={setSearchInput}
           />
         </InviteModalOverlay>
       )}
@@ -84,11 +127,11 @@ const InviteModalOverlay = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);  // 배경 어둡게
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1200;  // 사이드바보다 위에 표시되도록 z-index 설정
+  z-index: 1200;
 `;
 
 const slideIn = keyframes`
@@ -196,6 +239,47 @@ const InviteButton = styled.button`
   &:active {
     transform: translateY(0);
   }
+`;
+
+const UserList = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: 20px 0 0 0;
+`;
+
+const UserItem = styled.li`
+  display: flex;
+  align-items: center; 
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  color: #2c3e50;
+`;
+
+const ProfileImageWrapper = styled.div`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%; 
+  background-color: #f1f3f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 10px;
+`;
+
+const ProfileImage = styled.img`
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+`;
+
+const NoUsersMessage = styled.div`
+  font-size: 14px;
+  color: #7f8c8d;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 5px;
 `;
 
 const ExitButton = styled.button`
