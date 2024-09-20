@@ -1,18 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import BottomNav from '../../components/shared/bottomNav.js'; 
 import Header from '../../components/shared/header.js'; 
 import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../../utils/axiosInstance'; // axiosInstance 사용 가정
 
 const ChatListPage = () => {
-  const [chatRooms, setChatRooms] = useState([
-    { id: 1, name: '곤듀들의 일본여행', lastMessage: '마지막 메시지입니다#1', timestamp: new Date(), participants: 5 },
-    { id: 2, name: '제주도 덩어리즈', lastMessage: '마지막 메시지입니다#2', timestamp: new Date(Date.now() - 86400000), participants: 3 },
-    { id: 3, name: '스껄', lastMessage: '마지막 메세지입니다#3', timestamp: new Date(Date.now() - 2 * 86400000), participants: 8 },
-  ]);
-  
+  const [chatRooms, setChatRooms] = useState([]);
   const [searchTerm, setSearchTerm] = useState(''); 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchChatRooms(); // 컴포넌트가 렌더링될 때 채팅방을 불러옴
+  }, []);
+
+  const fetchChatRooms = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await axiosInstance.get('/api/rooms', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.status === 200) {
+        const formattedChatRooms = response.data.data.map((room) => ({
+          id: room.id,
+          name: room.name,
+          participants: room.memberCount,
+          lastMessage: '', // 마지막 메시지는 일단 빈 값으로 설정
+          timestamp: new Date(), // 타임스탬프는 현재 시간으로 임시 설정
+        }));
+        setChatRooms(formattedChatRooms); // 채팅방 상태 업데이트
+      } else {
+        console.error('채팅방 로딩 실패:', response.statusText);
+      }
+    } catch (error) {
+      console.error('채팅방 불러오기 중 오류 발생:', error);
+    }
+  };
 
   const handleChatRoomClick = (roomId) => {
     navigate(`/chat/${roomId}`);
@@ -27,7 +54,7 @@ const ChatListPage = () => {
       const hours = date.getHours();
       const minutes = date.getMinutes();
       const ampm = hours >= 12 ? '오후' : '오전';
-      const formattedHours = hours % 12 || 12; 
+      const formattedHours = hours % 12 || 12;
       const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
       return `${ampm} ${formattedHours}시 ${formattedMinutes}분`;
     } else if (diffInDays === 1) {
@@ -84,6 +111,7 @@ const ChatListPage = () => {
 };
 
 export default ChatListPage;
+
 
 const Container = styled.div`
   display: flex;

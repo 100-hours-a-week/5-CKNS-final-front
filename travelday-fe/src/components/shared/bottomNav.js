@@ -16,13 +16,13 @@ const BottomNav = () => {
               <NavIcon src={homeIcon} alt="메인" />
               <NavText isActive={location.pathname === '/'}>메인</NavText>
           </NavItem>
-          <NavItem href="/chatList" isActive={location.pathname === '/chatList'}>
-              <NavIcon src={chatIcon} alt="채팅" />
-              <NavText isActive={location.pathname === '/chatList'}>채팅</NavText>
-          </NavItem>
           <NavItem href="/schedule" isActive={location.pathname === '/schedule'}>
             <NavIcon src={scheduleIcon} alt="일정" />
             <NavText isActive={location.pathname === '/schedule'}>일정</NavText>
+          </NavItem>
+          <NavItem href="/chatList" isActive={location.pathname === '/chatList'}>
+              <NavIcon src={chatIcon} alt="채팅" />
+              <NavText isActive={location.pathname === '/chatList'}>채팅</NavText>
           </NavItem>
           <NavItem href="/map" isActive={location.pathname === '/map'}>
             <NavIcon src={mapIcon} alt="지도" />
