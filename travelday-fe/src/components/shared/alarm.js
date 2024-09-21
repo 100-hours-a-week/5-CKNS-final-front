@@ -2,16 +2,16 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { IoClose } from 'react-icons/io5';
-import axiosInstance from '../../utils/axiosInstance'
+import axiosInstance from '../../utils/axiosInstance';
 
-const AlarmSidebar = ({ isOpen, onClose, alarms }) => {
+const AlarmSidebar = ({ isOpen, onClose, alarms = [] }) => {
   const navigate = useNavigate();
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleAlarmClick = (travelRoomId, content, notificationId) => {
-    console.log(notificationId);
-    setSelectedRoom({ travelRoomId, content, notificationId }); 
+    // console.log('notificationId:',notificationId);
+    setSelectedRoom({ travelRoomId, content, notificationId });
     setIsModalOpen(true);
   };
 
@@ -20,12 +20,12 @@ const AlarmSidebar = ({ isOpen, onClose, alarms }) => {
       const accessToken = localStorage.getItem('accessToken');
       const response = await axiosInstance.put(
         `/api/rooms/${selectedRoom.travelRoomId}/invitation/${selectedRoom.notificationId}`,
-        {"status": "Y"},
+        { status: 'Y' },
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
-          withCredentials: true, 
+          withCredentials: true,
         }
       );
       if (response.status === 200) {
@@ -44,12 +44,12 @@ const AlarmSidebar = ({ isOpen, onClose, alarms }) => {
       const accessToken = localStorage.getItem('accessToken');
       const response = await axiosInstance.put(
         `/api/rooms/${selectedRoom.travelRoomId}/invitation/${selectedRoom.notificationId}`,
-        { "status": "N" },
+        { status: 'N' },
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
-          withCredentials: true, // 쿠키도 같이 전송
+          withCredentials: true,
         }
       );
       if (response.status === 200) {
@@ -63,23 +63,53 @@ const AlarmSidebar = ({ isOpen, onClose, alarms }) => {
   };
 
   const getTimeDifference = (time) => {
-    const correctedTime = `20${time.slice(0, 2)}-${time.slice(3, 5)}-${time.slice(6, 8)}T${time.slice(9)}`;
+    if (!time) {
+      // console.log('시간 정보가 없음');
+      return '시간 정보 없음';
+    }
+  
+    // "24-09-21 12:47:58" 형식의 문자열을 Date 객체로 변환
+    // console.log('Original time:', time);  // 원본 time 출력
+  
+    // 먼저 브라우저가 인식할 수 있는 형식으로 변환
+    const [datePart, timePart] = time.split(' ');
+    const [year, month, day] = datePart.split('-');
+    // 'YYYY-MM-DDTHH:mm:ss' 형식으로 변환
+    const correctedTime = `20${year}-${month}-${day}T${timePart}`;
+    // console.log('Corrected time:', correctedTime);  // 수정된 시간 출력
+  
     const now = new Date();
     const alarmTime = new Date(correctedTime);
+  
+    // alarmTime이 유효한지 확인
+    if (isNaN(alarmTime)) {
+      // console.log('유효하지 않은 시간 형식:', correctedTime);
+      return '유효하지 않은 시간';
+    }
+  
+    // console.log('Current time:', now);  // 현재 시간 출력
+    // console.log('Alarm time:', alarmTime);  // 알림 시간 출력
+  
     const differenceInMinutes = Math.floor((now - alarmTime) / 1000 / 60);
-
+    // console.log('Difference in minutes:', differenceInMinutes);  // 시간 차이(분) 출력
+  
     if (differenceInMinutes < 1) {
-      return "방금 전";
+      return '방금 전';
     } else if (differenceInMinutes < 60) {
       return `${differenceInMinutes}분 전`;
     } else if (differenceInMinutes < 1440) {
       const differenceInHours = Math.floor(differenceInMinutes / 60);
+      // console.log('Difference in hours:', differenceInHours);  // 시간 차이(시간) 출력
       return `${differenceInHours}시간 전`;
     } else {
       const differenceInDays = Math.floor(differenceInMinutes / 1440);
+      // console.log('Difference in days:', differenceInDays);  // 시간 차이(일) 출력
       return `${differenceInDays}일 전`;
     }
   };
+  
+  
+  
 
   return (
     <>
@@ -90,23 +120,23 @@ const AlarmSidebar = ({ isOpen, onClose, alarms }) => {
             <IoClose size={24} />
           </CloseButton>
         </SidebarHeader>
-        <AlarmList>
-          {alarms.length === 0 ? (
-            <NoAlarmsMessage>알림이 없습니다!</NoAlarmsMessage>
-          ) : (
-            alarms.map((alarm, index) => (
-              <AlarmItem 
-                key={index} 
-                onClick={() => handleAlarmClick(alarm.travelRoomId, alarm.content, alarm.notificationId)} 
+
+        {/* alarms 배열이 비어있거나 null일 때 */}
+        {alarms && alarms.length > 0 ? (
+          <AlarmList>
+            {alarms.map((alarm, index) => (
+              <AlarmItem
+                key={index}
+                onClick={() => handleAlarmClick(alarm.travelRoomId, alarm.content, alarm.notificationId)}
               >
-                <AlarmMessage>
-                  {alarm.content}
-                </AlarmMessage>
+                <AlarmMessage>{alarm.content}</AlarmMessage>
                 <InviteTime>{getTimeDifference(alarm.notificationTime)}</InviteTime>
               </AlarmItem>
-            ))
-          )}
-        </AlarmList>
+            ))}
+          </AlarmList>
+        ) : (
+          <NoAlarmsMessage>새로운 알림이 없습니다!</NoAlarmsMessage>
+        )}
       </SidebarContainer>
 
       {isModalOpen && (
@@ -123,7 +153,9 @@ const AlarmSidebar = ({ isOpen, onClose, alarms }) => {
             </ModalTitle>
             <ModalButtons>
               <ModalButton onClick={handleAccept}>수락</ModalButton>
-              <ModalButton onClick={handleDecline} decline>거절</ModalButton>
+              <ModalButton onClick={handleDecline} decline>
+                거절
+              </ModalButton>
             </ModalButtons>
           </ModalContainer>
         </ModalOverlay>
@@ -218,7 +250,6 @@ const InviteTime = styled.div`
   text-align: left; 
 `;
 
-
 const ModalOverlay = styled.div`
   position: fixed;
   top: 0;
@@ -233,6 +264,7 @@ const ModalOverlay = styled.div`
 `;
 
 const ModalContainer = styled.div`
+  position:relative;
   background-color: white;
   padding: 30px;
   border-radius: 10px;
@@ -240,7 +272,6 @@ const ModalContainer = styled.div`
   text-align: center;
   max-width: 330px; 
 `;
-
 
 const CloseModalButton = styled.button`
   position: absolute;

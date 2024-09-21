@@ -33,26 +33,29 @@ const Header = ({ showBackButton = false, onBackClick }) => {
         }
 
         try {
-            console.log('알람 조회 API 호출 시작');
-            const response = await axiosInstance.get('/api/notification', {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            });
-
-            const notification = response.data.data;
-
-            if (notification) {
-                setAlarms([notification]); // 알람을 배열로 설정
-                setHasNewAlarm(true);
-                console.log('알람 조회 성공! 알람 내용:', notification);
-            } else {
-                setHasNewAlarm(false);
-                console.log('알람이 없습니다.');
-            }
-        } catch (error) {
-            console.error('알림 확인 중 오류 발생:', error);
-        }
+          console.log('알람 조회 API 호출 시작');
+          const response = await axiosInstance.get('/api/notification', {
+              headers: {
+                  Authorization: `Bearer ${accessToken}`,
+              },
+          });
+      
+          const notification = response.data.data;
+      
+          if (Array.isArray(notification)) {
+              // 알림이 배열인 경우 그대로 사용
+              setAlarms(notification);
+          } else {
+              setHasNewAlarm(false);
+              // console.log('알람이 없습니다.');
+          }
+      
+          setHasNewAlarm(true);
+          console.log('알람 조회 성공! 알람 내용:', notification);
+      } catch (error) {
+          console.error('알림 확인 중 오류 발생:', error);
+      }
+      
     };
 
     checkNotifications(); // 함수 호출
@@ -99,10 +102,10 @@ const Header = ({ showBackButton = false, onBackClick }) => {
         <Logo src={logoImage} alt="여행한DAY 로고" show={isDelayedTrue} onClick={handleLogoClick} />
       </LeftSection>
       <RightSection>
-        <IconContainer>
-          <BellIcon src={bellIcon} alt="알람 아이콘" onClick={handleBellIconClick} hasNewAlarm={hasNewAlarm}/>
-          {hasNewAlarm && <Badge />}
-        </IconContainer>
+      <IconContainer>
+        <BellIcon src={bellIcon} alt="알람 아이콘" onClick={handleBellIconClick} hasNewAlarm={hasNewAlarm} />
+        {hasNewAlarm && alarms.length > 0 && <Badge />} 
+      </IconContainer>
         <Icon src={userIcon} alt="유저 아이콘" onClick={handleUserIconClick} />
       </RightSection>
 

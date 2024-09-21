@@ -24,6 +24,7 @@ import PrivacyPage from './pages/mainPage/privacyPage';
 import ChatPage from './pages/chatPage/chatPage';
 import ChatTest from './pages/chatPage/chatTest';
 import ChatListPage from './pages/chatPage/chatListPage';
+import ExpenseSettlement from './components/schedulePage/settlement';
 
 import './App.css';
 import './i18n';
@@ -38,7 +39,7 @@ function App() {
     libraries,
   });
 
-  const [isTokenFound, setTokenFound] = useState(false);
+  // const [isTokenFound, setTokenFound] = useState(false);
 
 
   if (!isLoaded) {
@@ -91,6 +92,7 @@ function MainRouter() {
       <Route path="/chat/:travelRoomId" element={<ChatPage />} />
       <Route path="/chat/test" element={<ChatTest />} />
       <Route path="/chatList" element={<ChatListPage />} />
+      <Route path="/settlement" element={<ExpenseSettlement />} />
     </Routes>
   );
 }

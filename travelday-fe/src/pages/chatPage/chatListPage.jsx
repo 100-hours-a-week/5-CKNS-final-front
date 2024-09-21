@@ -11,27 +11,48 @@ const ChatListPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchChatRooms(); // 컴포넌트가 렌더링될 때 채팅방을 불러옴
+    fetchChatRooms(); 
   }, []);
 
   const fetchChatRooms = async () => {
     try {
       const token = localStorage.getItem('accessToken');
+      
+      // 1. 채팅방 목록 불러오기
       const response = await axiosInstance.get('/api/rooms', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
-
+  
       if (response.status === 200) {
-        const formattedChatRooms = response.data.data.map((room) => ({
-          id: room.id,
-          name: room.name,
-          participants: room.memberCount,
-          lastMessage: '', // 마지막 메시지는 일단 빈 값으로 설정
-          timestamp: new Date(), // 타임스탬프는 현재 시간으로 임시 설정
-        }));
+        const rooms = response.data.data;
+  
+        // 2. 마지막 메시지 불러오기
+        const lastMessagesResponse = await axiosInstance.get('/api/chat/rooms/last', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        const lastMessages = lastMessagesResponse.data.data;
+        console.log(lastMessages);
+  
+        // 3. 채팅방 목록에 마지막 메시지 추가
+        const formattedChatRooms = rooms.map((room) => {
+        const lastMessageData = lastMessages.find(msg => msg.travelRoomId === room.id);
+  
+          return {
+            id: room.id,
+            name: room.name,
+            participants: room.memberCount,
+            lastMessage: lastMessageData ? lastMessageData.message : '채팅이 아직 시작되지 않았습니다', // 해당 채팅방의 마지막 메시지
+            timestamp: lastMessageData ? new Date(lastMessageData.createdAt) : '', // 마지막 메시지 타임스탬프
+          };
+        });
+  
         setChatRooms(formattedChatRooms); // 채팅방 상태 업데이트
       } else {
         console.error('채팅방 로딩 실패:', response.statusText);
@@ -40,6 +61,8 @@ const ChatListPage = () => {
       console.error('채팅방 불러오기 중 오류 발생:', error);
     }
   };
+  
+  
 
   const handleChatRoomClick = (roomId) => {
     navigate(`/chat/${roomId}`);
@@ -95,7 +118,7 @@ const ChatListPage = () => {
                 </RoomHeader>
                 <MessageContainer>
                   <LastMessage>{room.lastMessage}</LastMessage>
-                  <Timestamp>{formatTime(new Date(room.timestamp))}</Timestamp>
+                  {room.timestamp && <Timestamp>{formatTime(new Date(room.timestamp))}</Timestamp>} 
                 </MessageContainer>
               </ChatRoomItem>
             ))

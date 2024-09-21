@@ -22,7 +22,7 @@ export const requestForToken = (setTokenFound) => {
 
   tokenRequestInProgress = true; // 토큰 요청이 시작되면 플래그를 true로 설정
 
-  return getToken(messaging, { vapidKey: process.env.REACT_APP_FIREBASE_VAPID_KEY })
+  return getToken(messaging, { vapidKey: process.env.REACT_APP_FIREBASE__KEY })
     .then((currentToken) => {
       tokenRequestInProgress = false; // 요청이 완료되면 플래그를 false로 설정
       if (currentToken) {
