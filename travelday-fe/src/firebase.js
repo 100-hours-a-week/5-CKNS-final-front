@@ -40,6 +40,7 @@ export const requestForToken = (setTokenFound) => {
     });
 };
 
+
 const sendTokenToServer = async (fcmToken) => {
   try {
     const token = localStorage.getItem('accessToken'); 
@@ -57,4 +58,5 @@ const sendTokenToServer = async (fcmToken) => {
   } catch (error) {
     console.error("토큰 전달시 에러 발생:", error);
   }
+
 };

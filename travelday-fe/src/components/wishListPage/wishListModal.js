@@ -43,7 +43,7 @@ const WishListModal = ({ onClose, selectedPlace, travelRoomId }) => {
 
     try {
       const response = await axiosInstance.post(
-        `https://api.thetravelday.co.kr/api/rooms/${travelRoomId}/wishlist`,
+        `/api/rooms/${travelRoomId}/wishlist`,
         {
           latitude: selectedPlace.latitude,
           longitude: selectedPlace.longitude,

@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import Header from '../../components/shared/header.js';  
-import BottomNav from '../../components/shared/bottomNav.js'; 
-
+import BottomNav from '../../components/shared/bottomNav.js';
+import {useNavigate} from "react-router-dom";
+// import Navigate fr
 const PrivacyPage = () => {
+  const navigate = useNavigate();
 
   // 페이지 접근 시 스크롤을 최상단으로 이동시키기 위한 useEffect 훅
   useEffect(() => {
@@ -12,7 +14,7 @@ const PrivacyPage = () => {
 
   return (
     <Container>
-      <Header />
+      <Header showBackButton={true} onBackClick={() => navigate('/')} />
       <Content>
         <Title>개인정보 처리방침</Title>
         {sections.map((section, index) => (

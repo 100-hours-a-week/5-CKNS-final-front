@@ -10,6 +10,7 @@ import TakeoffIcon from '../../images/filter/takeoff.png';
 import PriceIcon from '../../images/filter/price.png';
 import ScheduleIcon from '../../images/footer/schedule.png';
 import PplIcon from '../../images/main/detail/ppl.png';
+import axiosInstance from "../../utils/axiosInstance";
 
 const airportNames = {
   PQC: '푸꾸옥 국제공항',
@@ -145,7 +146,7 @@ const MainDetailPage = () => {
   const [flight, setFlight] = useState(null);
 
   useEffect(() => {
-    axios.get(`https://api.thetravelday.co.kr/api/flights/lowestPrice/list`)
+    axiosInstance.get(`/api/flights/lowestPrice/list`)
       .then(response => {
         const filteredFlight = response.data.data.find(flight => {
           const destinationCode = flight.itineraries[0]?.segments[flight.itineraries[0].segments.length - 1]?.arrival.iataCode;
