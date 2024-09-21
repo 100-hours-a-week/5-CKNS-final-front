@@ -17,6 +17,19 @@ const ExpenseSettlement = () => {
     setSettling(true);
   };
 
+  // 금액 변경 시 실시간 유효성 검사
+  const handleAmountChange = (e) => {
+    const value = e.target.value;
+    setNewRoundAmount(value);
+
+    // 0 이하일 경우 에러 메시지 설정
+    if (value <= 0) {
+      setErrorMessage('0원 이하의 금액은 입력할 수 없습니다.');
+    } else {
+      setErrorMessage('');
+    }
+  };
+
   // 1차, 2차 정산 추가
   const addRound = () => {
     if (newRoundAmount <= 0) {
@@ -63,7 +76,7 @@ const ExpenseSettlement = () => {
   };
 
   // 유저 금액 수정 시 재조정 로직
-  const handleAmountChange = (index, value) => {
+  const handlePeopleAmountChange = (index, value) => {
     const updatedPeople = [...people];
     const newAmount = parseFloat(value);
 
@@ -86,105 +99,112 @@ const ExpenseSettlement = () => {
     setPeople(updatedPeople);
   };
 
-  // 차수 추가 버튼 비활성화 조건
-  const isAddRoundDisabled = !newRoundName || newRoundAmount <= 0;
 
-  return (
-    <Container>
-      {!settling ? (
-        <>
-          <NoDataText>정산 내역이 없습니다!</NoDataText>
-          <MainButton onClick={startSettlement}>정산 시작하기</MainButton>
-        </>
-      ) : (
-        <>
-          <TotalAmount>총 정산 금액: {totalAmount.toLocaleString()}원</TotalAmount>
+  // 차수 추가 버튼 비활성화 조건 (수정 모드일 때 비활성화)
+  const isAddRoundDisabled = !newRoundName || newRoundAmount <= 0 || isEditingRound !== null;
 
-          {!showPeople && (
-            <>
-              <InputContainer>
-                <StyledInput
-                  type="text"
-                  placeholder="정산 내역 이름"
-                  value={newRoundName}
-                  onChange={(e) => setNewRoundName(e.target.value)}
-                />
-                <StyledInput
-                  type="number"
-                  placeholder="금액"
-                  value={newRoundAmount}
-                  onChange={(e) => setNewRoundAmount(e.target.value)}
-                />
-                <MainButton onClick={addRound} disabled={isAddRoundDisabled}>차수 추가</MainButton>
-                {errorMessage && <HelperText>{errorMessage}</HelperText>}
-              </InputContainer>
+return (
+  <Container>
+    {!settling ? (
+      <>
+        <NoDataText>정산 내역이 없습니다!</NoDataText>
+        <MainButton onClick={startSettlement}>정산 시작하기</MainButton>
+      </>
+    ) : (
+      <>
+        <TotalAmount>총 정산 금액: {totalAmount.toLocaleString()}원</TotalAmount>
 
-              <RoundList>
-                {rounds.map((round, index) => (
-                  <RoundItem key={index}>
-                    {isEditingRound === index ? (
-                      <>
-                        <StyledInput
-                          type="text"
-                          value={newRoundName}
-                          onChange={(e) => setNewRoundName(e.target.value)}
-                          placeholder="정산 내역 이름"
-                        />
-                        <StyledInput
-                          type="number"
-                          value={newRoundAmount}
-                          onChange={(e) => setNewRoundAmount(e.target.value)}
-                          placeholder="금액"
-                        />
-                        <Button onClick={() => saveRoundEdit(index)}>저장</Button>
-                      </>
-                    ) : (
-                      <>
-                        <RoundDetails>{round.name}: {round.amount.toLocaleString()}원</RoundDetails>
-                        <ButtonGroup>
-                          <Button onClick={() => {
-                            setIsEditingRound(index);
-                            setNewRoundName(round.name);
-                            setNewRoundAmount(round.amount);
-                          }}>
-                            수정
-                          </Button>
-                          <DeleteButton onClick={() => deleteRound(index)}>삭제</DeleteButton>
-                        </ButtonGroup>
-                      </>
-                    )}
-                  </RoundItem>
-                ))}
-              </RoundList>
+        {!showPeople && (
+          <>
+            <InputContainer>
+              <StyledInput
+                type="text"
+                placeholder="정산 내역 이름"
+                value={isEditingRound !== null ? '' : newRoundName}  // 수정 모드일 때 빈 값
+                onChange={(e) => setNewRoundName(e.target.value)}
+                disabled={isEditingRound !== null}  // 수정 모드일 때 비활성화
+              />
+             <StyledInput
+                type="number"
+                placeholder="금액"
+                value={isEditingRound !== null ? '' : (newRoundAmount || '')}  // 수정 모드일 때 빈 값, 아니면 금액 표시
+                onChange={handleAmountChange}
+                disabled={isEditingRound !== null}  // 수정 모드일 때 비활성화
+              />
 
-              <MainButton onClick={allocateAmounts}>정산하기</MainButton>
-            </>
-          )}
+              <MainButton onClick={addRound} disabled={isAddRoundDisabled}>
+                차수 추가
+              </MainButton>
+              {errorMessage && <HelperText>{errorMessage}</HelperText>}
+            </InputContainer>
+            <RoundList>
+              {rounds.map((round, index) => (
+                <RoundItem key={index}>
+                  {isEditingRound === index ? (
+                    <>
+                      <StyledInput
+                        type="text"
+                        value={newRoundName}
+                        onChange={(e) => setNewRoundName(e.target.value)}
+                        placeholder="정산 내역 이름"
+                      />
+                      <StyledInput
+                        type="number"
+                        placeholder="금액"
+                        value={isEditingRound !== null ? '' : (newRoundAmount || '')}  // 수정 모드일 때 빈 값, 아니면 금액 표시
+                        onChange={handleAmountChange}
+                        disabled={isEditingRound !== null}  // 수정 모드일 때 비활성화
+                      />
+                      <Button onClick={() => saveRoundEdit(index)}>저장</Button>
+                    </>
+                  ) : (
+                    <>
+                      <RoundDetails>{round.name}: {round.amount.toLocaleString()}원</RoundDetails>
+                      <ButtonGroup>
+                        <Button onClick={() => {
+                          setIsEditingRound(index);
+                          setNewRoundName(round.name);
+                          setNewRoundAmount(round.amount);
+                        }}>
+                          수정
+                        </Button>
+                        <DeleteButton onClick={() => deleteRound(index)}>삭제</DeleteButton>
+                      </ButtonGroup>
+                    </>
+                  )}
+                </RoundItem>
+              ))}
+            </RoundList>
 
-          {showPeople && (
-            <>
-              <PeopleList>
-                {people.map((person, index) => (
-                  <PeopleItem key={index}>
-                    {person.name}: 
-                    <StyledInput
-                      type="number"
-                      value={person.amount}
-                      onChange={(e) => handleAmountChange(index, e.target.value)}
-                    /> 원
-                  </PeopleItem>
-                ))}
-              </PeopleList>
-              <MainButton onClick={() => alert('정산 완료 알림이 전송되었습니다!')}>완료</MainButton>
-            </>
-          )}
-        </>
-      )}
-    </Container>
-  );
+            <MainButton onClick={allocateAmounts}>정산하기</MainButton>
+          </>
+        )}
+
+        {showPeople && (
+          <>
+            <PeopleList>
+              {people.map((person, index) => (
+                <PeopleItem key={index}>
+                  {person.name}: 
+                  <StyledInput
+                    type="number"
+                    value={person.amount}
+                    onChange={(e) => handlePeopleAmountChange(index, e.target.value)}
+                  /> 원
+                </PeopleItem>
+              ))}
+            </PeopleList>
+            <MainButton onClick={() => alert('정산 완료 알림이 전송되었습니다!')}>완료</MainButton>
+          </>
+        )}
+      </>
+    )}
+  </Container>
+);
+
 };
 
-
+// 스타일링
 const Container = styled.div`
   width: 390px;
   padding: 20px;
