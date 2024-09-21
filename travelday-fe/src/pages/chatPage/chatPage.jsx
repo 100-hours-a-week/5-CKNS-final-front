@@ -1,13 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useParams } from 'react-router-dom'; // useParams 훅을 import
+import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import axiosInstance from '../../utils/axiosInstance.js';
 import BottomNav from '../../components/shared/bottomNav.js'; 
 import { useNavigate } from 'react-router-dom';
 import { IoSearch, IoMenuOutline } from "react-icons/io5";
 import Sidebar from '../../components/chatPage/sideBar.js';  
+import SockJS from 'sockjs-client';
+import { Stomp } from '@stomp/stompjs';
 
 const linkify = (text) => {
+  if (!text) return '';
+
   const urlPattern = /https?:\/\/[^\s]+/g;
   return text.split(urlPattern).map((part, index) => {
     const match = text.match(urlPattern);
@@ -25,157 +29,184 @@ const linkify = (text) => {
   });
 };
 
-const ChatPage = ({ nickname }) => {  
-  const { travelRoomId } = useParams(); // URL에서 travelRoomId를 추출
+const ChatPage = () => {  
+  const { travelRoomId } = useParams(); // URL에서 travelRoomId 추출
 
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
+  const [nickname, setNickname] = useState(''); // 닉네임 상태 추가
+  const [isLoading, setIsLoading] = useState(true); // 로딩 상태 추가
   const [currentSearchIndex, setCurrentSearchIndex] = useState(0);
+  const [searchResults, setSearchResults] = useState([]);
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
-  const [isConnected, setIsConnected] = useState(true); // WebSocket 연결 상태를 관리하는 상태 변수
-  const [isSending, setIsSending] = useState(false); // 메시지 전송 중 상태를 관리하는 상태 변수
+  const [isConnected, setIsConnected] = useState(true); // WebSocket 연결 상태 관리
+  const [isSending, setIsSending] = useState(false); // 메시지 전송 중 상태 관리
   const navigate = useNavigate();
   const messageEndRef = useRef(null);
   const messageListRef = useRef(null);
-  const socketRef = useRef(null); // WebSocket 인스턴스를 저장할 Ref
-
-  const token = localStorage.getItem('accessToken');
-  const MAX_RETRY_COUNT = 10; // 최대 재연결 시도 횟수
-  const RETRY_DELAY = 5000; // 재연결 시도 간격
+  const stompClientRef = useRef(null); // STOMP 클라이언트 저장할 Ref
 
   useEffect(() => {
-    let retryCount = 0; // 재연결 시도 횟수를 추적
+    // console.log("Messages 상태가 업데이트되었습니다:", messages);
+  }, [messages]);
 
-    const connectWebSocket = () => {
-      // console.log(travelRoomId);
-      // WebSocket 인스턴스를 생성하여 연결
-      socketRef.current = new WebSocket(`ws://localhost:8080/ws`);
+  const MAX_RETRY_COUNT = 3; // 최대 재연결 시도 횟수
+  const RETRY_DELAY = 5000; // 재연결 시도 간격
 
-      // WebSocket이 성공적으로 연결되었을 때 호출되는 함수
-      socketRef.current.onopen = () => {
-        // console.log('WebSocket 연결 성공 (코드 101)');
-        setIsConnected(true); // 연결 상태를 true로 설정
-        retryCount = 0; // 연결에 성공하면 재시도 횟수를 초기화
+  const fetchKakaoUserProfile = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        throw new Error('토큰이 없습니다.');
+      }
 
-        // 구독 메시지 전송
-        socketRef.current.send(JSON.stringify({ type: 'SUBSCRIBE', roomId: travelRoomId }));
-      };
+      const response = await axiosInstance.get('/api/user', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
 
-      // WebSocket을 통해 메시지를 수신할 때 호출되는 함수
-      socketRef.current.onmessage = (event) => {
-        const message = JSON.parse(event.data); // 수신된 메시지를 JSON으로 파싱
-        setMessages((prevMessages) => [...prevMessages, message]); // 수신된 메시지를 상태에 추가
-      };
+      if (response.status === 200) {
+        const fetchedNickname = response.data.data.nickname;
+        setNickname(fetchedNickname); // 닉네임 설정
+        setIsLoading(false);
+      } else {
+        throw new Error('사용자 정보 요청 실패');
+      }
+    } catch (error) {
+      // console.log('응답을 받지 못했습니다:', error.message);
+      setIsLoading(false);
+    }
+  };
 
-      // WebSocket에서 오류가 발생했을 때 호출되는 함수
-      socketRef.current.onerror = (error) => {
-        console.error('WebSocket 에러 (코드 1001):', error);
-      };
+  useEffect(() => {
+    fetchKakaoUserProfile(); // 컴포넌트가 마운트될 때 프로필 정보를 불러옴
+  }, []);
 
-      // WebSocket 연결이 닫혔을 때 호출되는 함수
-      socketRef.current.onclose = (event) => {
-        if (event.code === 1000) {
-          console.warn('WebSocket 연결 정상 종료 (코드 1000):', event);
-        } else if (event.code === 1001) {
-          console.error('WebSocket 서버 에러로 연결 종료 (코드 1001):', event);
-        }
-        setIsConnected(false); // 연결 상태를 false로 설정
+  useEffect(() => {
+    if (isLoading) return; // 닉네임이 로드되기 전에는 STOMP 연결을 하지 않음
 
-        // 비정상적인 종료 시 재연결 시도
+    let retryCount = 0;
+    const connectStompClient = () => {
+      // console.log('STOMP 클라이언트 연결 시도 중...');
+      const socket = new SockJS('http://localhost:8080/ws');
+      const stompClient = Stomp.over(socket);
+
+      stompClient.connect({ Authorization: `Bearer ${localStorage.getItem('accessToken')}` }, (frame) => {
+        // console.log('STOMP 연결 성공', frame);
+        setIsConnected(true);
+        retryCount = 0;
+
+        stompClient.subscribe(`/sub/chat/rooms/${travelRoomId}`, (message) => {
+          // console.log("수신된 메시지:", message.body); // 수신된 메시지 원본 확인
+        
+          if (message.body) {
+            const parsedMessage = JSON.parse(message.body);
+            // console.log("파싱된 메시지:", parsedMessage); // 파싱된 메시지 확인
+        
+            const messageToAdd = {
+              id: parsedMessage.id || new Date().getTime(),
+              travelRoomId: parsedMessage.travelRoomId || travelRoomId,
+              senderId: parsedMessage.senderId || 'Unknown',
+              message: parsedMessage.message || '', // 여기서 message 필드로 변경
+              timestamp: parsedMessage.createdAt ? new Date(parsedMessage.createdAt).toISOString() : new Date().toISOString(), // timestamp로 변경
+              sender: parsedMessage.senderNickname || 'Unknown'
+            };
+        
+            // console.log("추가할 메시지:", messageToAdd); // 추가할 메시지 확인
+            setMessages((prevMessages) => [...prevMessages, messageToAdd]);
+          } else {
+            console.error("메시지 본문이 없습니다.");
+          }
+        });
+
+        stompClientRef.current = stompClient;
+      }, (error) => {
+        console.error('STOMP 연결 에러:', error);
+        setIsConnected(false);
+
         if (retryCount < MAX_RETRY_COUNT) {
           setTimeout(() => {
-            retryCount++; // 재연결 시도 횟수 증가
-            connectWebSocket(); // 재연결 시도
-          }, RETRY_DELAY * retryCount); // 점진적 딜레이를 적용하여 재연결 시도
+            retryCount++;
+            connectStompClient();
+          }, RETRY_DELAY * retryCount);
         } else {
-          console.error('WebSocket 재연결 실패: 최대 재시도 횟수 초과');
+          console.error('STOMP 재연결 실패: 최대 재시도 횟수 초과');
         }
-      };
+      });
     };
 
-    connectWebSocket(); // WebSocket 연결 시도
+    connectStompClient();
 
-    // 컴포넌트가 언마운트될 때 WebSocket 연결을 해제하는 함수
     return () => {
-      if (socketRef.current) {
-        socketRef.current.close(); // WebSocket 연결 해제
+      if (stompClientRef.current) {
+        stompClientRef.current.disconnect();
       }
     };
-  }, [travelRoomId]); // travelRoomId가 변경될 때마다 WebSocket 연결을 재설정
+  }, [travelRoomId, isLoading]);
 
   useEffect(() => {
     const fetchChatHistory = async () => {
       try {
-        const response = await axiosInstance.get(`http://localhost:8080/api/rooms/${travelRoomId}/chats`, {
+        const response = await axiosInstance.get(`/api/chat/rooms/${travelRoomId}`, {
           headers: {
-            Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
           withCredentials: true,
         });
-  
-        // API 응답의 data 속성에서 메시지 데이터를 추출
+
         const messages = response.data.data.map(msg => ({
           ...msg,
-          content: msg.message,  // message를 content로 변환
-          timestamp: msg.createdAt ? new Date(msg.createdAt).toISOString() : null, // createdAt을 ISO string으로 변환, null이면 그대로 유지
-          sender: msg.senderNickname // senderNickname을 sender로 매핑
+          content: msg.message,
+          timestamp: msg.createdAt ? new Date(msg.createdAt).toISOString() : null,
+          sender: msg.senderNickname
         }));
-  
-        setMessages(messages); // 변환된 메시지 데이터를 상태에 저장
+
+        setMessages(messages);
       } catch (error) {
         console.error('채팅 내역을 불러오지 못했습니다:', error);
       }
     };
-  
-    fetchChatHistory(); // 컴포넌트 마운트 시 채팅 내역을 불러옴
-  }, [travelRoomId, token]); // travelRoomId 또는 token이 변경될 때마다 채팅 내역을 다시 불러옴
-  
+
+    fetchChatHistory();
+  }, [travelRoomId]);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
+
     if (newMessage.trim() !== '' && !isSending) {
-      setIsSending(true); // 메시지 전송 상태를 true로 설정
-      const messageData = {
-        sender: nickname, // sender를 nickname으로 설정
-        content: newMessage,
-        timestamp: new Date().toISOString(),
-      };
+      setIsSending(true);
 
+      // STOMP를 통해서만 메시지를 보냄
       try {
-        // WebSocket을 통해 메시지 전송
-        if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-          // 메시지를 지정된 경로로 전송
-          socketRef.current.send(JSON.stringify({
-            type: 'SEND',
-            destination: `/pub/${travelRoomId}/chat/send`,
-            message: messageData,
-          }));
+        if (stompClientRef.current && stompClientRef.current.connected) {
+          // STOMP를 통해 메시지를 전송
+          stompClientRef.current.send(`/pub/chat/rooms/${travelRoomId}`, {}, newMessage);
+          // console.log('pub 성공');
         } else {
-          console.error('WebSocket이 열려있지 않습니다.');
+          console.error('STOMP 클라이언트가 연결되어 있지 않습니다.');
         }
-
-        setNewMessage(''); // 메시지 입력 필드를 초기화
       } catch (error) {
         console.error('메시지 전송 실패:', error);
       } finally {
-        setIsSending(false); // 메시지 전송 완료 후 상태를 false로 설정
+        setIsSending(false);
+        setNewMessage(''); // 입력 필드 초기화
       }
     }
   };
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
-      handleSendMessage(e); // 엔터 키를 누르면 메시지 전송
+      handleSendMessage(e);
     }
   };
-
+  
   const handleSearchKeyPress = (e) => {
     if (e.key === 'Enter') {
-      handleSearch(); // 엔터 키를 누르면 검색 수행
+      handleSearch();
     }
   };
 
@@ -183,7 +214,7 @@ const ChatPage = ({ nickname }) => {
     const hours = date.getHours();
     const minutes = date.getMinutes();
     const ampm = hours >= 12 ? '오후' : '오전';
-    const formattedHours = hours % 12 || 12; 
+    const formattedHours = hours % 12 || 12;
     const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
     return `${ampm} ${formattedHours}시 ${formattedMinutes}분`;
   };
@@ -213,7 +244,7 @@ const ChatPage = ({ nickname }) => {
     return currentDate === previousDate;
   };
 
-  const handleBackButtonClick = () => { 
+  const handleBackButtonClick = () => {
     navigate(-1); // 뒤로 가기 버튼 클릭 시 이전 페이지로 이동
   };
 
@@ -229,7 +260,7 @@ const ChatPage = ({ nickname }) => {
     if (searchTerm.trim() === '') return;
 
     const results = messages.reduce((acc, message, index) => {
-      if (message.content.includes(searchTerm)) {
+      if (message.message.includes(searchTerm)) {
         acc.push(index);
       }
       return acc;
@@ -277,8 +308,10 @@ const ChatPage = ({ nickname }) => {
   const handleCancelSearch = () => {
     setIsSearchVisible(false); // 검색 창 닫기
     setSearchTerm(''); // 검색어 초기화
+    setSearchResults([]); // 검색 결과 초기화
+    setCurrentSearchIndex(0); // 검색 인덱스 초기화
   };
-
+  
   useEffect(() => {
     if (messageEndRef.current) {
       messageEndRef.current.scrollIntoView({ behavior: 'smooth' }); // 새 메시지가 수신되면 스크롤을 맨 아래로 이동
@@ -290,10 +323,10 @@ const ChatPage = ({ nickname }) => {
       <ChatContainer>
         <Navbar>
           <BackButton onClick={handleBackButtonClick}>뒤로</BackButton>
-          <RoomTitle>채팅방 이름</RoomTitle>
+          <RoomTitle> </RoomTitle>
           <IconsContainer>
-            <IoSearch size={22} onClick={toggleSearch} />  
-            <IoMenuOutline size={22} onClick={toggleSidebar} /> 
+            <IoSearch size={22} onClick={toggleSearch} />
+            <IoMenuOutline size={22} onClick={toggleSidebar} />
           </IconsContainer>
         </Navbar>
 
@@ -301,8 +334,8 @@ const ChatPage = ({ nickname }) => {
 
         {isSearchVisible && (
           <SearchContainer>
-            <SearchInput 
-              placeholder="메시지 검색하기" 
+            <SearchInput
+              placeholder="메시지 검색하기"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyPress={handleSearchKeyPress}
@@ -323,24 +356,30 @@ const ChatPage = ({ nickname }) => {
             const showTimestamp = !isSameSenderAndTime(message, nextMessage);
             const showDate = !isSameDay(message, previousMessage) || index === 0;
 
+            const isOwnMessage = message.sender === nickname;
+
             const isHighlighted = searchResults.includes(index);
-            const isActiveResult = isHighlighted && index === searchResults[currentSearchIndex];
+
+            const isActiveResult = isHighlighted && index === searchResults[currentSearchIndex] && searchResults.length > 0;
+
+            // 메시지 내용 확인
+            // console.log(`렌더링할 메시지 (index: ${index}):`, message.message);
 
             return (
               <React.Fragment key={index}>
                 {showDate && (
                   <DateSeparator>{formatDate(new Date(message.timestamp))}</DateSeparator>
                 )}
-                <MessageItem isOwnMessage={message.sender === nickname} isActiveResult={isActiveResult}>
+                <MessageItem isOwnMessage={isOwnMessage} isActiveResult={isActiveResult}>
                   {showSender && (
                     <MessageSender>{message.sender}</MessageSender>
                   )}
-                  <MessageWrapper isOwnMessage={message.sender === nickname}>
-                    <MessageContent isOwnMessage={message.sender === nickname}>
-                      {linkify(message.content)}
+                  <MessageWrapper isOwnMessage={isOwnMessage}>
+                    <MessageContent isOwnMessage={isOwnMessage}>
+                      {linkify(message.message)} {/* linkify 함수 적용 */}
                     </MessageContent>
                     {showTimestamp && (
-                      <MessageTimestamp isOwnMessage={message.sender === nickname}>
+                      <MessageTimestamp isOwnMessage={isOwnMessage}>
                         {formatTime(new Date(message.timestamp))}
                       </MessageTimestamp>
                     )}
@@ -352,14 +391,15 @@ const ChatPage = ({ nickname }) => {
           <div ref={messageEndRef} />
         </MessageList>
 
+
         <MessageInputContainer>
-          <MessageInput 
-            type="text" 
-            placeholder="메시지를 입력하세요..." 
+          <MessageInput
+            type="text"
+            placeholder="메시지를 입력하세요..."
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            onKeyPress={handleKeyPress} 
-            disabled={!isConnected || isSending} // 연결이 끊겼거나 전송 중일 때 입력 비활성화
+            onKeyPress={handleKeyPress}
+            disabled={!isConnected || isSending}
           />
           <SendButton onClick={handleSendMessage} disabled={!isConnected || isSending}>
             {isSending ? '전송 중...' : '전송'}
@@ -369,12 +409,13 @@ const ChatPage = ({ nickname }) => {
 
       <Sidebar isSidebarVisible={isSidebarVisible} toggleSidebar={toggleSidebar} />
 
-      <BottomNav /> 
+      <BottomNav />
     </Container>
   );
 };
 
 export default ChatPage;
+
 
 const Container = styled.div`
   display: flex;
@@ -483,7 +524,7 @@ const MessageItem = styled.div`
   flex-direction: column;
   align-items: ${(props) => (props.isOwnMessage ? 'flex-end' : 'flex-start')};
   margin-bottom: 15px;
-  border-radius: 8px;
+  border-radius: 0px;
   background-color: ${(props) => (props.isActiveResult ? '#eee' : 'transparent')};
 `;
 
@@ -591,7 +632,6 @@ const DateSeparator = styled.div`
 
 const SearchContainer = styled.div`
   display: flex;
-  justify-content: center;
   align-items: center;
   padding: 10px  0px ;
   background-color: #e8f0fe;
@@ -603,8 +643,9 @@ const SearchContainer = styled.div`
 `;
 
 const SearchInput = styled.input`
-  width: 70%;
+  width: 200px;
   padding: 10px;
+  margin-left: 10px;
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 1rem;
@@ -612,7 +653,6 @@ const SearchInput = styled.input`
 
 const SearchControls = styled.div`
   display: flex;
-  gap: 5px;
 `;
 
 const SearchButton = styled.button`
@@ -620,9 +660,10 @@ const SearchButton = styled.button`
   background-color: #007bff;
   color: #fff;
   border: none;
+  margin-left: 5px;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size:13px;
 
   &:hover {
     background-color: #0069d9;
@@ -630,15 +671,17 @@ const SearchButton = styled.button`
 `;
 
 const CancelButton = styled.button`
-  padding: 10px;
+  padding: 5px 10px;
   margin-left: 10px;
   background-color: #007bff;
   color: #fff;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  font-weight: bold;
+  margin-right: 10px;
+
   transition: all 0.3s ease;
+  font-size:13px;
 
   &:hover {
     background-color: #0069d9;

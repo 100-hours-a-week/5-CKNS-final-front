@@ -1,18 +1,68 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import BottomNav from '../../components/shared/bottomNav.js'; 
 import Header from '../../components/shared/header.js'; 
 import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../../utils/axiosInstance';
 
 const ChatListPage = () => {
-  const [chatRooms, setChatRooms] = useState([
-    { id: 1, name: '곤듀들의 일본여행', lastMessage: '마지막 메시지입니다#1', timestamp: new Date(), participants: 5 },
-    { id: 2, name: '제주도 덩어리즈', lastMessage: '마지막 메시지입니다#2', timestamp: new Date(Date.now() - 86400000), participants: 3 },
-    { id: 3, name: '스껄', lastMessage: '마지막 메세지입니다#3', timestamp: new Date(Date.now() - 2 * 86400000), participants: 8 },
-  ]);
-  
+  const [chatRooms, setChatRooms] = useState([]);
   const [searchTerm, setSearchTerm] = useState(''); 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchChatRooms(); 
+  }, []);
+
+  const fetchChatRooms = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      
+      // 1. 채팅방 목록 불러오기
+      const response = await axiosInstance.get('/api/rooms', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (response.status === 200) {
+        const rooms = response.data.data;
+  
+        // 2. 마지막 메시지 불러오기
+        const lastMessagesResponse = await axiosInstance.get('/api/chat/rooms/last', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        const lastMessages = lastMessagesResponse.data.data;
+        console.log(lastMessages);
+  
+        // 3. 채팅방 목록에 마지막 메시지 추가
+        const formattedChatRooms = rooms.map((room) => {
+        const lastMessageData = lastMessages.find(msg => msg.travelRoomId === room.id);
+  
+          return {
+            id: room.id,
+            name: room.name,
+            participants: room.memberCount,
+            lastMessage: lastMessageData ? lastMessageData.message : '채팅이 아직 시작되지 않았습니다', // 해당 채팅방의 마지막 메시지
+            timestamp: lastMessageData ? new Date(lastMessageData.createdAt) : '', // 마지막 메시지 타임스탬프
+          };
+        });
+  
+        setChatRooms(formattedChatRooms); // 채팅방 상태 업데이트
+      } else {
+        console.error('채팅방 로딩 실패:', response.statusText);
+      }
+    } catch (error) {
+      console.error('채팅방 불러오기 중 오류 발생:', error);
+    }
+  };
+  
+  
 
   const handleChatRoomClick = (roomId) => {
     navigate(`/chat/${roomId}`);
@@ -27,7 +77,7 @@ const ChatListPage = () => {
       const hours = date.getHours();
       const minutes = date.getMinutes();
       const ampm = hours >= 12 ? '오후' : '오전';
-      const formattedHours = hours % 12 || 12; 
+      const formattedHours = hours % 12 || 12;
       const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
       return `${ampm} ${formattedHours}시 ${formattedMinutes}분`;
     } else if (diffInDays === 1) {
@@ -68,7 +118,7 @@ const ChatListPage = () => {
                 </RoomHeader>
                 <MessageContainer>
                   <LastMessage>{room.lastMessage}</LastMessage>
-                  <Timestamp>{formatTime(new Date(room.timestamp))}</Timestamp>
+                  {room.timestamp && <Timestamp>{formatTime(new Date(room.timestamp))}</Timestamp>} 
                 </MessageContainer>
               </ChatRoomItem>
             ))
@@ -84,6 +134,7 @@ const ChatListPage = () => {
 };
 
 export default ChatListPage;
+
 
 const Container = styled.div`
   display: flex;
@@ -134,7 +185,7 @@ const SearchContainer = styled.div`
 `;
 
 const SearchInput = styled.input`
-  width: 332px;
+  width: 312px;
   padding: 12px;
   border: 2px solid #d0e2ff; 
   border-radius: 25px; 
@@ -151,6 +202,9 @@ const SearchInput = styled.input`
 const ChatList = styled.div`
   flex: 1;
   background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: 15px; 
   overflow-y: auto;
 
@@ -161,12 +215,13 @@ const ChatList = styled.div`
 
 const ChatRoomItem = styled.div`
   display: flex;
+  width: 316px;
   flex-direction: column;
   padding: 18px 10px;
   margin-bottom: 10px; 
-  border-radius: 12px; 
+  border-radius: 8px; 
   background-color: #ffffff;
-  border: 1px solid #e0e0e0;
+  border: 2px solid #f2f2f2;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.3s ease, color 0.3s ease;
 
@@ -174,7 +229,7 @@ const ChatRoomItem = styled.div`
     background-color: #dff1ff; 
     border: 2px solid #89c5ff;
     color: #4a90e2; 
-    transform: translateY(-3px); 
+    transform: scale(1.05);  
   }
 `;
 
@@ -184,7 +239,7 @@ const RoomHeader = styled.div`
 `;
 
 const RoomName = styled.span`
-  font-size: 18px;
+  font-size: 15px;
   font-weight: bold;
   color: #333;
 `;

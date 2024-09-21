@@ -6,7 +6,7 @@ import Title from '../../components/shared/title.js';
 import Toggle from '../../components/searchPage/toggle.js';
 import FlightSearch from './flightSearch.jsx';
 import HotelSearch from './hotelSearch.jsx';
-import InfoImage from '../../images/information.png'; // 이미지 임포트
+import InfoImage from '../../images/information.png'; 
 
 const SearchingPage = () => {
   const [selectedOption, setSelectedOption] = useState('항공'); 

@@ -24,11 +24,12 @@ import PrivacyPage from './pages/mainPage/privacyPage';
 import ChatPage from './pages/chatPage/chatPage';
 import ChatTest from './pages/chatPage/chatTest';
 import ChatListPage from './pages/chatPage/chatListPage';
+import ExpenseSettlement from './components/schedulePage/settlement';
 
 import './App.css';
 import './i18n';
 
-import { requestForToken } from './firebase'; 
+
 
 const libraries = ['places'];
 
@@ -38,11 +39,8 @@ function App() {
     libraries,
   });
 
-  const [isTokenFound, setTokenFound] = useState(false);
+  // const [isTokenFound, setTokenFound] = useState(false);
 
-  useEffect(() => {
-    requestForToken(setTokenFound); // FCM 토큰 요청
-  }, []);
 
   if (!isLoaded) {
     return null;
@@ -94,6 +92,7 @@ function MainRouter() {
       <Route path="/chat/:travelRoomId" element={<ChatPage />} />
       <Route path="/chat/test" element={<ChatTest />} />
       <Route path="/chatList" element={<ChatListPage />} />
+      <Route path="/settlement" element={<ExpenseSettlement />} />
     </Routes>
   );
 }

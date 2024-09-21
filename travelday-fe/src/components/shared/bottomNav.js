@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 import homeIcon from '../../images/footer/home.png';
 import airplaneIcon from '../../images/footer/airplane.png';
 import scheduleIcon from '../../images/footer/schedule.png';
+import chatIcon from '../../images/footer/chat.png';
 import mapIcon from '../../images/footer/map.png';
 
 const BottomNav = () => {
@@ -18,6 +19,10 @@ const BottomNav = () => {
           <NavItem href="/schedule" isActive={location.pathname === '/schedule'}>
             <NavIcon src={scheduleIcon} alt="일정" />
             <NavText isActive={location.pathname === '/schedule'}>일정</NavText>
+          </NavItem>
+          <NavItem href="/chatList" isActive={location.pathname === '/chatList'}>
+              <NavIcon src={chatIcon} alt="채팅" />
+              <NavText isActive={location.pathname === '/chatList'}>채팅</NavText>
           </NavItem>
           <NavItem href="/map" isActive={location.pathname === '/map'}>
             <NavIcon src={mapIcon} alt="지도" />
@@ -55,10 +60,10 @@ const NavItem = styled.a`
   text-decoration: none;
   color: ${({ isActive }) => (isActive ? '#007bff' : '#000')};
   transition: transform 0.2s, color 0.2s;
-  width: 60px; /* Increase the width for a larger clickable area */
-  height: 60px; /* Increase the height for a larger clickable area */
-  padding: 10px; /* Add padding to create a larger clickable area */
-  box-sizing: border-box; /* Ensure padding does not affect size */
+  width: 60px; 
+  height: 60px; 
+  padding: 10px; 
+  box-sizing: border-box; 
   &:active {
     transform: scale(1.1);
   }

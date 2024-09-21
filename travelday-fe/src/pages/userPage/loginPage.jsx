@@ -12,6 +12,7 @@ const LoginPage = () => {
     const baseURL = process.env.REACT_APP_GENERATED_SERVER_URL;
     const kakaoURL = `${baseURL}oauth2/authorization/kakao`;
 
+
     const handleLogin = () => {
         window.location.href = kakaoURL;
     };
