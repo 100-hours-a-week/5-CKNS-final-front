@@ -9,6 +9,7 @@ import calendarIcon from '../../images/filter/calendar.png';
 import penIcon from '../../images/pen.png';
 import ScheduleDetailList from '../../components/schedulePage/scheduleDetailList';
 import InviteModal from '../../components/schedulePage/inviteModal.js';
+import ScheduleTab from "../../components/schedulePage/scheduleTab";
 
 const ScheduleDetail = () => {
     const { travelRoomId } = useParams();
@@ -139,11 +140,12 @@ const ScheduleDetail = () => {
                                     <PlusIcon>+</PlusIcon>지도에서 장소 추가
                                 </ActionButton>
                             </ButtonWrapper>
-                            <ScheduleDetailList
-                                travelRoomId={travelRoomId}
-                                startDate={fetchedSchedule.startDate}
-                                endDate={fetchedSchedule.endDate}
-                            />
+                            {/*<ScheduleDetailList*/}
+                            {/*    travelRoomId={travelRoomId}*/}
+                            {/*    startDate={fetchedSchedule.startDate}*/}
+                            {/*    endDate={fetchedSchedule.endDate}*/}
+                            {/*/>*/}
+                            <ScheduleTab travelRoomId={travelRoomId} startDate={fetchedSchedule.startDate} endDate={fetchedSchedule.endDate} />
                         </ContentContainer>
                     </>
                 ) : (
