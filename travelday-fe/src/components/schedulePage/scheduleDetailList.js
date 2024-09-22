@@ -233,7 +233,6 @@ export default ScheduleDetailList;
 const ListContainer = styled.div`
   width: 100%;
   background-color: #fff;
-  margin-top: 20px;
 `;
 const TitleWrapper = styled.div`
     display: flex;
@@ -282,6 +281,7 @@ const ListItem = styled.div`
   padding: 10px 20px;
   background-color: #fff;
   border-radius: 4px;
+  width: 350px;
 `;
 
 const StyledDay = styled.div`
@@ -304,7 +304,7 @@ const Position = styled.div`
 
 const ScheduleBox = styled.div`
     font-size: 18px;
-    width: 390px;
+    width: 346px;
     display: flex;
     justify-content: space-between;
     align-items: center;
