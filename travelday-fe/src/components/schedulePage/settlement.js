@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
+import axiosInstance from "../../utils/axiosInstance";
 
-const ExpenseSettlement = () => {
+const ExpenseSettlement = ({travelRoomId}) => {
   const [settling, setSettling] = useState(false);
   const [rounds, setRounds] = useState([]);
   const [newRoundName, setNewRoundName] = useState('');
-  const [newRoundAmount, setNewRoundAmount] = useState(0);
+  const [newRoundAmount, setNewRoundAmount] = useState('');
   const [people, setPeople] = useState([{ name: '하이든', amount: 0 }, { name: '션', amount: 0 }]);
   const [totalAmount, setTotalAmount] = useState(0);
   const [showPeople, setShowPeople] = useState(false);
@@ -25,9 +26,9 @@ const ExpenseSettlement = () => {
     }
     const newRound = { name: newRoundName, amount: parseInt(newRoundAmount) };
     setRounds([...rounds, newRound]);
-    setTotalAmount(totalAmount + newRound.amount);
+    // setTotalAmount(totalAmount + newRound.amount);
     setNewRoundName('');
-    setNewRoundAmount(0);
+    setNewRoundAmount('');
     setErrorMessage('');
   };
 
@@ -43,7 +44,7 @@ const ExpenseSettlement = () => {
     setRounds(updatedRounds);
     setTotalAmount(totalAmount - oldAmount + updatedRounds[index].amount);
     setNewRoundName('');
-    setNewRoundAmount(0);
+    setNewRoundAmount('');
     setIsEditingRound(null);
   };
 
@@ -89,6 +90,30 @@ const ExpenseSettlement = () => {
   // 차수 추가 버튼 비활성화 조건
   const isAddRoundDisabled = !newRoundName || newRoundAmount <= 0;
 
+
+  /** 서버에서 정산 리스트를 받아옴 */
+  function fetchSettlementList() {
+    axiosInstance.get(`/api/settlement/${travelRoomId}/`, {
+    })
+        .then(response => {
+          if (response.data?.data?.length > 0) {
+            // setRounds(response.data.data);
+            console.log(response.data?.data);
+          }
+          else{
+            // modifySchedule([]);
+          }
+        })
+        .catch(error => {
+          // modifySchedule([]);
+          // console.error('여행방 정보 로드 중 오류 발생:', error);
+        });
+  }
+  useEffect(()=>{
+    fetchSettlementList();
+  },[])
+
+
   return (
     <Container>
       {!settling ? (
@@ -115,45 +140,42 @@ const ExpenseSettlement = () => {
                   value={newRoundAmount}
                   onChange={(e) => setNewRoundAmount(e.target.value)}
                 />
-                <MainButton onClick={addRound} disabled={isAddRoundDisabled}>차수 추가</MainButton>
+                {isEditingRound !== null ? (
+                    <MainButton onClick={()=>saveRoundEdit(isEditingRound)}>차수 수정</MainButton>
+                ) :
+                    <MainButton onClick={addRound} disabled={isAddRoundDisabled}>차수 추가</MainButton>
+                }
                 {errorMessage && <HelperText>{errorMessage}</HelperText>}
               </InputContainer>
 
               <RoundList>
                 {rounds.map((round, index) => (
-                  <RoundItem key={index}>
+                  <>
                     {isEditingRound === index ? (
-                      <>
-                        <StyledInput
-                          type="text"
-                          value={newRoundName}
-                          onChange={(e) => setNewRoundName(e.target.value)}
-                          placeholder="정산 내역 이름"
-                        />
-                        <StyledInput
-                          type="number"
-                          value={newRoundAmount}
-                          onChange={(e) => setNewRoundAmount(e.target.value)}
-                          placeholder="금액"
-                        />
-                        <Button onClick={() => saveRoundEdit(index)}>저장</Button>
-                      </>
+                          <RoundItem key={index} style={{
+                            border: '1px solid black',
+                            boxSizing: 'border-box',
+                            maxHeight: '60px',
+                          }}>
+                            <RoundDetails>{round.name}: {round.amount.toLocaleString()}원</RoundDetails>
+                            <Button disabled={true} onClick={() => saveRoundEdit(index)} style={{backgroundColor:'white'}}>저장</Button>
+                          </RoundItem>
                     ) : (
-                      <>
-                        <RoundDetails>{round.name}: {round.amount.toLocaleString()}원</RoundDetails>
-                        <ButtonGroup>
-                          <Button onClick={() => {
-                            setIsEditingRound(index);
-                            setNewRoundName(round.name);
+                        <RoundItem key={index}>
+                          <RoundDetails>{round.name}: {round.amount.toLocaleString()}원</RoundDetails>
+                          <ButtonGroup>
+                            <Button onClick={() => {
+                              setIsEditingRound(index);
+                              setNewRoundName(round.name);
                             setNewRoundAmount(round.amount);
                           }}>
                             수정
                           </Button>
                           <DeleteButton onClick={() => deleteRound(index)}>삭제</DeleteButton>
                         </ButtonGroup>
-                      </>
+                        </RoundItem>
                     )}
-                  </RoundItem>
+                    </>
                 ))}
               </RoundList>
 
@@ -176,6 +198,7 @@ const ExpenseSettlement = () => {
                 ))}
               </PeopleList>
               <MainButton onClick={() => alert('정산 완료 알림이 전송되었습니다!')}>완료</MainButton>
+              <MainButton onClick={() => {setShowPeople(false)}}>돌아가기</MainButton>
             </>
           )}
         </>
@@ -186,10 +209,9 @@ const ExpenseSettlement = () => {
 
 
 const Container = styled.div`
-  width: 390px;
+  width: 350px;
   padding: 20px;
   margin: 0 auto;
-  border: 1px solid #eee;
   background-color: #fff;
   position: relative;
 `;
@@ -294,7 +316,7 @@ const RoundItem = styled.li`
   margin-bottom: 15px;
   font-size: 16px;
   padding: 12px;
-  background-color: #f8f8f8;
+  //background-color: #f12525;
   border-radius: 8px;
 `;
 
