@@ -13,6 +13,12 @@ const ExpenseSettlement = ({travelRoomId}) => {
   const [errorMessage, setErrorMessage] = useState('');
   const [isEditingRound, setIsEditingRound] = useState(null);
 
+  useEffect(() => {
+    const calculatedTotalAmount = rounds.reduce((sum, round) => sum + round.amount, 0);
+    setTotalAmount(calculatedTotalAmount);
+  }, [rounds]);
+
+
   // 정산 시작하기 버튼
   const startSettlement = () => {
     setSettling(true);
