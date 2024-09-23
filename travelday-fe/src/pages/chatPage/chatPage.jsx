@@ -29,8 +29,11 @@ const linkify = (text) => {
   });
 };
 
-const ChatPage = () => {  
-  const { travelRoomId } = useParams(); // URL에서 travelRoomId 추출
+const ChatPage = ({roomId,isSimple}) => {
+  let { travelRoomId } = useParams(); // URL에서 travelRoomId 추출
+  if(roomId !== undefined && roomId !== null) {
+    travelRoomId = roomId
+  }
 
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
@@ -320,8 +323,8 @@ const ChatPage = () => {
 
   return (
     <Container>
-      <ChatContainer>
-        <Navbar>
+      <ChatContainer style={isSimple && {  padding: 0 }}>
+        <Navbar style={{display: isSimple ? 'none' : 'auto'}}>
           <BackButton onClick={handleBackButtonClick}>뒤로</BackButton>
           <RoomTitle> </RoomTitle>
           <IconsContainer>
@@ -348,7 +351,7 @@ const ChatPage = () => {
           </SearchContainer>
         )}
 
-        <MessageList ref={messageListRef}>
+        <MessageList ref={messageListRef} style={{paddingTop:'200px'}}>
           {messages.map((message, index) => {
             const previousMessage = messages[index - 1];
             const nextMessage = messages[index + 1];
