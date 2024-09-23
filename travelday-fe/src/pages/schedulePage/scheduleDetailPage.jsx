@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../utils/axiosInstance.js';
 import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { GoogleMap, MarkerF, InfoWindowF } from '@react-google-maps/api'; 
+import {GoogleMap, MarkerF, InfoWindowF, PolylineF, Polyline} from '@react-google-maps/api';
 import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
 import calendarIcon from '../../images/filter/calendar.png';
@@ -76,6 +76,15 @@ const ScheduleDetail = () => {
         setIsInviteModalOpen(false);
     };
 
+    // Generate a color based on the index, following the rainbow gradient pattern
+    const getMarkerColor = (day) => {
+        const day1 = new Date(fetchedSchedule.startDate);
+        const day2 = new Date(fetchedSchedule.endDate)
+        const totalDate = (day2.getTime()-day1.getTime() ) / (1000 * 60 * 60 * 24) + 1
+        const hue = (day / totalDate) * 30 + 240; // Generate hue value from 0 to 360
+        return `hsl(${hue}, 100%, 50%)`; // Full saturation and medium lightness
+    };
+
     return (
         <Container>
             <Header showBackButton={true} onBackClick={() => navigate('/schedule')} />
@@ -115,9 +124,36 @@ const ScheduleDetail = () => {
                                                 key={index}
                                                 position={{ lat: marker.latitude, lng: marker.longitude }}
                                                 onClick={() => setSelectedMarker(marker)}
+                                                icon={{
+                                                    // path: marker.icons,
+                                                    path: "M12 2C7.58172 2 4 6.00258 4 10.5C4 14.9622 6.55332 19.8124 10.5371 21.6744C11.4657 22.1085 12.5343 22.1085 13.4629 21.6744C17.4467 19.8124 20 14.9622 20 10.5C20 6.00258 16.4183 2 12 2ZM12 12C13.1046 12 14 11.1046 14 10C14 8.89543 13.1046 8 12 8C10.8954 8 10 8.89543 10 10C10 11.1046 10.8954 12 12 12Z",
+                                                    fillColor: getMarkerColor(marker.scheduledDay),
+                                                    fillOpacity: 0.8,
+                                                    scale: 1.5,
+                                                    // strokeColor: getMarkerColor(marker.scheduledDay),
+                                                    strokeColor: "black",
+                                                    strokeWeight: 3,
+                                                    anchor: new window.google.maps.Point(12, 24) // Centering the marker
+                                                }}
                                                 animation={2}
                                             />
                                         ))
+                                    )}
+
+                                    {/* Draw lines between markers */}
+                                    {markersLoaded && (
+                                        <PolylineF
+                                            path={mapMarkers.map(marker => ({ lat: marker.latitude, lng: marker.longitude }))}
+                                            options={{
+                                                strokeColor: '#FF0000',
+                                                strokeOpacity: 0.8,
+                                                strokeWeight: 2,
+                                                clickable: false,
+                                                draggable: false,
+                                                editable: false,
+                                                geodesic: true,
+                                            }}
+                                        />
                                     )}
 
                                     {selectedMarker && (
@@ -140,11 +176,6 @@ const ScheduleDetail = () => {
                                     <PlusIcon>+</PlusIcon>지도에서 장소 추가
                                 </ActionButton>
                             </ButtonWrapper>
-                            {/*<ScheduleDetailList*/}
-                            {/*    travelRoomId={travelRoomId}*/}
-                            {/*    startDate={fetchedSchedule.startDate}*/}
-                            {/*    endDate={fetchedSchedule.endDate}*/}
-                            {/*/>*/}
                             <ScheduleTab travelRoomId={travelRoomId} startDate={fetchedSchedule.startDate} endDate={fetchedSchedule.endDate} />
                         </ContentContainer>
                     </>
