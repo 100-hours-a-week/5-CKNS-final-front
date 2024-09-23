@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import Header from '../../components/shared/header.js'; 
@@ -160,8 +159,26 @@ const FlightDetailPage = () => {
       });
   }, [id]);
 
-  const image = images[id];
-
+  useEffect(() => {
+    axiosInstance.get(`/api/flights/lowestPrice/list`)
+      .then(response => {
+        const filteredFlight = response.data.data.find(flight => {
+          const destinationCode = flight.itineraries[0]?.segments[flight.itineraries[0].segments.length - 1]?.arrival.iataCode;
+          return destinationCode === id;
+        });
+  
+        if (!filteredFlight && id === 'ICN') {
+          // 인천 도착의 경우 예외 처리
+          alert('인천 도착 항공편 데이터가 없습니다.');
+        }
+  
+        setFlight(filteredFlight);
+      })
+      .catch(error => {
+        console.error('항공 데이터 가져오는데 오류가 있습니다', error);
+      });
+  }, [id]);
+  
   if (!flight) {
     return <p>{t('loading')}</p>;
   }
@@ -177,7 +194,6 @@ const FlightDetailPage = () => {
     <PageContainer>
       <Header />
       <Content>
-        {image ? <StyledImage src={image} alt={`Image ${id}`} /> : <p>{t('imageNotFound')}</p>}
         <FlightItem>
           <SectionTitle>
             {t('항공 정보')}
@@ -221,10 +237,10 @@ const FlightDetailPage = () => {
           </SectionTitle>
           <BookingInfo>{t('bookingInfo.availableSeats')}: {flight.numberOfBookableSeats}</BookingInfo>
         </FlightItem>
-        <BookingInfo>{t('bookingInfo.lastTicketingDate')}: {flight.lastTicketingDate}</BookingInfo>
+        {/* <BookingInfo>{t('bookingInfo.lastTicketingDate')}: {flight.lastTicketingDate}</BookingInfo>
           <ReservationButton href={airlineUrl} target="_blank" rel="noopener noreferrer">
             {t('예약하러가기')}
-          </ReservationButton>
+          </ReservationButton> */}
           <PplImage 
             src={PplIcon} 
             alt="People" 

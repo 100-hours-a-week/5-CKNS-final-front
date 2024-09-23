@@ -342,14 +342,23 @@ const FlightSearch = () => {
         <AreaPopup
           isOpen={isPopupOpen}
           onClose={handlePopupClose}
-          searchResults={arrivalLocations} 
+          searchResults={arrivalLocations}  // 공항 리스트 전달
           onResultClick={(result) => {
+            const iataCode = result.match(/\((.*?)\)/)[1]; // IATA 코드를 추출
+
             if (tripType === 'round-trip') {
               setArrival(result);  // 도착지 설정
+              // 인천 도착인 경우 추가 로직
+              if (iataCode === 'ICN') {
+                alert("인천으로 도착하는 항공편을 검색합니다.");
+              }
+              navigate(`/flightdetail/${iataCode}`); // 도착지 IATA 코드로 페이지 이동
             } else if (tripType === 'one-way') {
               setDeparture(result);  // 출발지 설정
+              navigate(`/flightdetail/${iataCode}`); // 출발지 IATA 코드로 페이지 이동
             }
-            handlePopupClose();  // 팝업 닫기
+
+            handlePopupClose(); 
           }}
         >
           <SelectionPrompt>
@@ -357,6 +366,8 @@ const FlightSearch = () => {
           </SelectionPrompt>
         </AreaPopup>
       )}
+
+
 
       <FlightList flights={flights.length > 0 ? flights : [
         { image: img1, country: '미국', city: 'New York', schedule: '2024. 11. 16 - 11.18', price: '623,000원' },
@@ -369,7 +380,6 @@ const FlightSearch = () => {
 
 export default FlightSearch;
 
-// Styled components
 
 const Container = styled.div`
   display: flex;
