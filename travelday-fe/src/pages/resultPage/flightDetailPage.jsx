@@ -140,7 +140,7 @@ const convertToKRW = (amount, currency) => {
   return amount * rate;
 };
 
-const MainDetailPage = () => {
+const FlightDetailPage = () => {
   const { id } = useParams(); 
   const { t } = useTranslation();
   const [flight, setFlight] = useState(null);
@@ -239,7 +239,7 @@ const MainDetailPage = () => {
   );
 };
 
-export default MainDetailPage;
+export default FlightDetailPage;
 
 const PageContainer = styled.div`
   display: flex;
