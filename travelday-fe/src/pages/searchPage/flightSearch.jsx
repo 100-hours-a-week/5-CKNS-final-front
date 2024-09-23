@@ -39,10 +39,8 @@ const FlightSearch = () => {
       // IATA 코드에 따른 이미지 및 국가 매핑
       const destinationInfo = {
         JFK: { city: '뉴욕', country: '미국', image: img1 },
-        LGA: { city: '뉴욕', country: '미국', image: img1 },
         CDG: { city: '파리', country: '프랑스', image: img2 },
         NRT: { city: '도쿄', country: '일본', image: img3 },
-        HND: { city: '도쿄', country: '일본', image: img3 }
       };
   
       const response = await axiosInstance.get('/api/flights/lowestPrice/list', {
@@ -51,32 +49,43 @@ const FlightSearch = () => {
       });
   
       const flightData = response.data.data;
+      console.log('전체 항공권 데이터:', response);
   
-      // 항공편 데이터 필터링 및 매핑
-      const mappedFlights = flightData
-        .map(flight => {
-          const arrivalIata = flight.itineraries[0].segments[0].arrival.iataCode;
-          const destination = destinationInfo[arrivalIata];
+      // 항공편 데이터에서 각 항공편의 마지막 구간 도착 IATA 코드를 사용하여 필터링
+      const flightsMap = new Map(); // 도착 IATA 코드 + 가격을 키로 하는 Map 생성
   
-          if (!destination) return null; // 매칭되지 않으면 null 반환
+      flightData.forEach(flight => {
+        const segments = flight.itineraries[0].segments;
+        const lastSegment = segments[segments.length - 1]; // 마지막 구간의 도착 IATA 코드 사용
+        const arrivalIata = lastSegment.arrival.iataCode; 
+        const destination = destinationInfo[arrivalIata];
   
+        if (destination) {
           const priceInWon = Math.round(flight.price.total * exchangeRate);
-          return {
-            image: destination.image,
-            country: destination.country,
-            city: destination.city,
-            schedule: flight.lastTicketingDate || '2024. 11. 16 - 11.18',
-            price: `${priceInWon.toLocaleString()}원`
-          };
-        })
-        .filter(Boolean); // null 값 제거
+          const flightKey = `${arrivalIata}_${priceInWon}`; // IATA 코드와 가격을 조합하여 키 생성
   
+          // 중복된 도착지와 가격이 없을 때만 추가
+          if (!flightsMap.has(flightKey)) {
+            flightsMap.set(flightKey, {
+              image: destination.image,
+              country: destination.country,
+              city: destination.city,
+              schedule: flight.lastTicketingDate || '2024. 11. 16 - 11.18',
+              price: `${priceInWon.toLocaleString()}원`,
+            });
+          }
+        }
+      });
+  
+      const mappedFlights = Array.from(flightsMap.values()); // Map의 값들을 배열로 변환
       setFlights(mappedFlights); // 상태에 저장
       console.log('필터링된 항공권 데이터:', mappedFlights);
     } catch (error) {
       console.error('항공권 데이터를 가져오는데 실패:', error);
     }
   };
+  
+  
   
   
   const handlePopupClose = () => {
@@ -151,6 +160,7 @@ const FlightSearch = () => {
       )}
 
 
+      <SemiTitle>이런 항공권도 있어요!</SemiTitle>
 
       <FlightList flights={flights.length > 0 ? flights : [
         { image: img1, country: '미국', city: 'New York', schedule: '2024. 11. 16 - 11.18', price: '623,000원' },
@@ -168,6 +178,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-color: #fff;
 `;
 
 const ButtonContainer = styled.div`
@@ -221,3 +232,10 @@ const SelectionPrompt = styled.p`
   border: none;
   font-size: 20px;
 `;
+
+const SemiTitle = styled.p`
+  font-size: 12px;
+  margin-top:30px;
+  margin-bottom: 10px;
+  color: #c2c2c2;
+`
