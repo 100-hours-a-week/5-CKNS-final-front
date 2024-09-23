@@ -5,8 +5,8 @@ import BottomNav from '../../components/shared/bottomNav.js';
 import Title from '../../components/shared/title.js';
 import Toggle from '../../components/searchPage/toggle.js';
 import FlightSearch from './flightSearch.jsx';
-import HotelSearch from './hotelSearch.jsx';
-import InfoImage from '../../images/information.png'; 
+// import HotelSearch from './hotelSearch.jsx';
+// import InfoImage from '../../images/information.png'; 
 
 const SearchingPage = () => {
   const [selectedOption, setSelectedOption] = useState('항공'); 

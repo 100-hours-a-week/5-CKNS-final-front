@@ -252,6 +252,7 @@ return (
       ) : (
         <>
           <PeopleList>
+          <Button onClick={goBack}>뒤로</Button>  
             {people.map((person, index) => (
               <PeopleItem key={index}>
                 {person.name} 
