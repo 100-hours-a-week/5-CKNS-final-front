@@ -8,6 +8,7 @@ import switchIcon from '../../images/switch.png';
 import AreaPopup from '../../components/shared/areaPopup';
 import TripTypeSelector from '../../components/searchPage/tripType';
 import axiosInstance from '../../utils/axiosInstance'; 
+import Footer from '../../components/footer/footer'
 import img1 from '../../images/search/1.png';
 import img2 from '../../images/search/2.png';
 import img3 from '../../images/search/3.png';
@@ -166,7 +167,8 @@ const FlightSearch = () => {
         { image: img1, country: '미국', city: 'New York', schedule: '2024. 11. 16 - 11.18', price: '623,000원' },
         { image: img2, country: '프랑스', city: 'Paris', schedule: '2024. 9. 12 - 9.18', price: '1,092,000원' },
         { image: img3, country: '일본', city: 'Tokyo', schedule: '2024. 8. 23 - 8.30', price: '340,000원' },
-      ]} />  
+      ]} /> 
+    <Footer /> 
     </Container>
   );
 };
