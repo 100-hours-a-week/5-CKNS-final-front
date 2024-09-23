@@ -550,6 +550,7 @@ const MessageContent = styled.div`
   max-width: 70%;
   box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s ease;
+  word-break: break-word;
 
   &:after {
     content: '';
@@ -628,6 +629,7 @@ const DateSeparator = styled.div`
   text-align: center;
   font-size: 12px;
   color: #999;
+  margin-bottom: 5px;
 `;
 
 const SearchContainer = styled.div`

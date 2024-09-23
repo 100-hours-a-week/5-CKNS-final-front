@@ -90,6 +90,12 @@ const ChatListPage = () => {
   const filteredChatRooms = chatRooms.filter((room) =>
     room.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  const truncateMessage = (message, maxLength) => {
+    if (message.length > maxLength) {
+      return message.substring(0, maxLength) + '...';
+    }
+    return message;
+  };
 
   return (
     <Container>
@@ -117,7 +123,8 @@ const ChatListPage = () => {
                   <Participants>{room.participants}</Participants>
                 </RoomHeader>
                 <MessageContainer>
-                  <LastMessage>{room.lastMessage}</LastMessage>
+                <LastMessage>{truncateMessage(room.lastMessage, 20)}</LastMessage>
+
                   {room.timestamp && <Timestamp>{formatTime(new Date(room.timestamp))}</Timestamp>} 
                 </MessageContainer>
               </ChatRoomItem>

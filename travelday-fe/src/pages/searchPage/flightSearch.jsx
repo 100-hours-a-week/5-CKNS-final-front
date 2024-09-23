@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import FlightList from '../../components/searchPage/flightList';
 import useFlightStore from '../../store/useFlightStore'; 
-import { getFlights } from '../../utils/flightSearch'; 
+// import { getFlights } from '../../utils/flightSearch'; 
 import switchIcon from '../../images/switch.png';
 import AreaPopup from '../../components/shared/areaPopup';
 import TripTypeSelector from '../../components/searchPage/tripType';
