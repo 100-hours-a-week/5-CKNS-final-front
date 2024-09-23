@@ -1,7 +1,6 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import backIcon from '../../images/header/back.png';
-import arrowIcon from '../../images/arrow.png'; 
 
 const slideUp = keyframes`
   from {
@@ -31,11 +30,9 @@ const AreaPopup = ({ isOpen, onClose, children, searchResults = [], onResultClic
         <Divider />
         {searchResults.length > 0 && (
           <>
-            <SearchResultsTitle>검색결과</SearchResultsTitle>
             <SearchResults>
               {searchResults.map((result, index) => (
                 <SearchResultItem key={index} onClick={() => onResultClick(result)}>
-                  <img src={arrowIcon} alt="화살표" />
                   {result}
                 </SearchResultItem>
               ))}
@@ -129,15 +126,9 @@ const SearchResults = styled.div`
 const SearchResultItem = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   cursor: pointer;
-
-  img {
-    margin-left: 10px;
-    margin-right: 21px;
-    width: 16px; /* 화살표 이미지 크기 */
-    height: 16px;
-  }
+  font-size: 18px;
 `;
 
 export default AreaPopup;
