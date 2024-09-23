@@ -323,7 +323,7 @@ const ChatPage = ({roomId,isSimple}) => {
 
   return (
     <Container>
-      <ChatContainer>
+      <ChatContainer style={isSimple && {  padding: 0 }}>
         <Navbar style={{display: isSimple ? 'none' : 'auto'}}>
           <BackButton onClick={handleBackButtonClick}>뒤로</BackButton>
           <RoomTitle> </RoomTitle>
