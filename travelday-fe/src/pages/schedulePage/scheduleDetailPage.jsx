@@ -286,6 +286,7 @@ const ButtonWrapper = styled.div`
   justify-content: space-between;
   width: 350px;
   margin-top: 20px;
+  margin-bottom: 20px;
 `;
 
 const ActionButton = styled.button`
