@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import styled from 'styled-components';
 import axiosInstance from "../../utils/axiosInstance";
 
@@ -12,7 +12,8 @@ const ExpenseSettlement = ({travelRoomId}) => {
   const [showPeople, setShowPeople] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isEditingRound, setIsEditingRound] = useState(null);
-
+  const [settlementId,setSettlementId] = useState(null);
+  const needFetch = useRef(true);
   useEffect(() => {
     const calculatedTotalAmount = rounds.reduce((sum, round) => sum + round.amount, 0);
     setTotalAmount(calculatedTotalAmount);
@@ -84,8 +85,15 @@ const handleRoundAmountChange = (e) => {
       return;
     }
 
+    axiosInstance.post(`/api/settlement/${travelRoomId}/${settlementId}`,{ name: newRoundName, amount: newRoundAmount })
+        .then(response=> {
+          fetchSettlementDetails(settlementId);
+        })
+        .catch(error => console.log(error))
+
+
     const newRound = { name: newRoundName, amount: newRoundAmount };
-    setRounds([...rounds, newRound]);
+    // setRounds([...rounds, newRound]);
     // setTotalAmount(totalAmount + newRound.amount);
     setNewRoundName('');
     setNewRoundAmount('');
@@ -98,21 +106,36 @@ const handleRoundAmountChange = (e) => {
       setErrorMessage('0원 이하의 금액은 입력할 수 없습니다.');
       return;
     }
-    const updatedRounds = [...rounds];
-    const oldAmount = updatedRounds[index].amount;
-    updatedRounds[index] = { name: newRoundName, amount: parseInt(newRoundAmount) };
-    setRounds(updatedRounds);
-    setTotalAmount(totalAmount - oldAmount + updatedRounds[index].amount);
-    setNewRoundName('');
-    setNewRoundAmount('');
-    setIsEditingRound(null);
+
+    const settlementDetailId = rounds[index].id;
+    axiosInstance.patch(`/api/settlement/${travelRoomId}/${settlementId}/${settlementDetailId}`,{ name: newRoundName, amount: parseInt(newRoundAmount) })
+        .then(response=>{fetchSettlementDetails(settlementId)})
+        .catch(error=>console.log(error));
+
+    // const updatedRounds = [...rounds];
+    // const oldAmount = updatedRounds[index].amount;
+    // updatedRounds[index] = { name: newRoundName, amount: parseInt(newRoundAmount) };
+    // setRounds(updatedRounds);
+    // setTotalAmount(totalAmount - oldAmount + updatedRounds[index].amount);
+    // setNewRoundName('');
+    // setNewRoundAmount('');
+    // setIsEditingRound(null);
+
+
   };
 
   // 정산 내역 삭제
   const deleteRound = (index) => {
-    const updatedRounds = rounds.filter((_, i) => i !== index);
-    setTotalAmount(totalAmount - rounds[index].amount);
-    setRounds(updatedRounds);
+    // const updatedRounds = rounds.filter((_, i) => i !== index);
+    // setTotalAmount(totalAmount - rounds[index].amount);
+    // setRounds(updatedRounds);
+
+    const settlementDetailId = rounds[index].id;
+    const settlementId = rounds[index].settlementId;
+    console.table(rounds)
+    axiosInstance.delete(`/api/settlement/${travelRoomId}/${settlementId}/${settlementDetailId}`, {})
+        .then(response=>{fetchSettlementDetails(settlementId)})
+        .catch(error=>console.log(error));
   };
 
   // 정산하기 버튼 눌렀을 때 사람들에게 금액 할당
@@ -175,65 +198,52 @@ const goBack = () => {
 };
 
 
-  /** 서버에서 정산 리스트를 받아옴 */
+  /** 서버에서 정산 리스트를 받아옴 단계 1 */
   function fetchSettlementList() {
-    axiosInstance.get(`/api/settlement/${travelRoomId}/`, {
+    if(settlementId!==null && settlementId!==undefined){
+      fetchSettlementDetails(settlementId);
+      return
+    }
+
+    axiosInstance.get(`/api/settlement/${travelRoomId}`, {
     })
         .then(response => {
-          if (response.data?.data?.length > 0) {
-            // setRounds(response.data.data);
-            console.log(response.data?.data);
-          }
-          else{
-            // modifySchedule([]);
-          }
+          // console.table(response.data.data);
+          setSettlementId(response.data.data.id);
+          setTotalAmount(response.data.data.totalAmount)
+          fetchSettlementDetails(response.data.data.id)
         })
         .catch(error => {
-          // modifySchedule([]);
-          // console.error('여행방 정보 로드 중 오류 발생:', error);
+          console.error('정산 리스트 조회 중 오류 발생:', error);
         });
   }
+  /** 서버에서 정산 리스트를 받아옴 단계 2 */
+  function fetchSettlementDetails(settlementId) {
+    axiosInstance.get(`/api/settlement/${travelRoomId}/${settlementId}/detail`, {})
+        .then(response=>{
+          const fetchedSettlement = response.data.data.map(settlement => {
+            return {...settlement,key:settlement.id}
+          });
+          console.table(fetchedSettlement);
+          setRounds(fetchedSettlement);
+        })
+        .catch(error=>{
+          console.error(error)
+        })
+  }
+
+
+
   useEffect(()=>{
-    fetchSettlementList();
-  },[])
+    if (needFetch.current){
+      needFetch.current = false
+      fetchSettlementList();
+    }
+  },[needFetch.current])
 
-
-  return (
-    <Container>
-      {!settling ? (
-        <>
-          <NoDataText>정산 내역이 없습니다!</NoDataText>
-          <MainButton onClick={startSettlement}>정산 시작하기</MainButton>
-        </>
-      ) : (
-        <>
-          <TotalAmount>총 정산 금액: {totalAmount.toLocaleString()}원</TotalAmount>
-
-          {!showPeople && (
-            <>
-              <InputContainer>
-                <StyledInput
-                  type="text"
-                  placeholder="정산 내역 이름"
-                  value={newRoundName}
-                  onChange={(e) => setNewRoundName(e.target.value)}
-                />
-                <StyledInput
-                  type="number"
-                  placeholder="금액"
-                  value={newRoundAmount}
-                  onChange={(e) => setNewRoundAmount(e.target.value)}
-                />
-                {isEditingRound !== null ? (
-                    <MainButton onClick={()=>saveRoundEdit(isEditingRound)}>차수 수정</MainButton>
-                ) :
-                    <MainButton onClick={addRound} disabled={isAddRoundDisabled}>차수 추가</MainButton>
-                }
-                {errorMessage && <HelperText>{errorMessage}</HelperText>}
-              </InputContainer>
 return (
 <Container>
-  {!settling ? (
+  {!settling && !rounds ? (
     <>
       <NoDataText>정산 내역이 없습니다!</NoDataText>
       <MainButton onClick={startSettlement}>정산 시작하기</MainButton>
@@ -271,7 +281,7 @@ return (
 
           <RoundList>
             {rounds.map((round, index) => (
-              <RoundItem key={index}>
+              <RoundItem key={round.key}>
               {isEditingRound === index ? (
                 <>
                   <Input
@@ -311,43 +321,12 @@ return (
             </RoundItem>
             ))}
           </RoundList>
-              <RoundList>
-                {rounds.map((round, index) => (
-                  <>
-                    {isEditingRound === index ? (
-                          <RoundItem key={index} style={{
-                            border: '1px solid black',
-                            boxSizing: 'border-box',
-                            maxHeight: '60px',
-                          }}>
-                            <RoundDetails>{round.name}: {round.amount.toLocaleString()}원</RoundDetails>
-                            <Button disabled={true} onClick={() => saveRoundEdit(index)} style={{backgroundColor:'white'}}>저장</Button>
-                          </RoundItem>
-                    ) : (
-                        <RoundItem key={index}>
-                          <RoundDetails>{round.name}: {round.amount.toLocaleString()}원</RoundDetails>
-                          <ButtonGroup>
-                            <Button onClick={() => {
-                              setIsEditingRound(index);
-                              setNewRoundName(round.name);
-                            setNewRoundAmount(round.amount);
-                          }}>
-                            수정
-                          </Button>
-                          <DeleteButton onClick={() => deleteRound(index)}>삭제</DeleteButton>
-                        </ButtonGroup>
-                        </RoundItem>
-                    )}
-                    </>
-                ))}
-              </RoundList>
 
           <MainButton onClick={allocateAmounts}>정산하기</MainButton>
         </>
       ) : (
         <>
           <PeopleList>
-          <Button onClick={goBack}>뒤로</Button>
             {people.map((person, index) => (
               <PeopleItem key={index}>
                 {person.name}
@@ -363,6 +342,7 @@ return (
             ))}
           </PeopleList>
           <ButtonGroup>
+            <BackButton onClick={goBack}>뒤로</BackButton>
             <MainButton onClick={() => alert('정산 완료 알림이 전송되었습니다!')}>완료</MainButton>
           </ButtonGroup>
         </>
@@ -466,6 +446,28 @@ const MainButton = styled.button`
     cursor: not-allowed;
   }
 `;
+
+const BackButton = styled.button`
+  padding: 15px;
+  background-color: gray;
+  color: white;
+  font-size: 18px;
+  border: none;
+  border-radius: 8px;
+  margin-top: 10px;
+  width: 100%;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #515151;
+  }
+
+  &:disabled {
+    background-color: #f58b9f;
+    cursor: not-allowed;
+  }
+`
 
 const ButtonGroup = styled.div`
   display: flex;
