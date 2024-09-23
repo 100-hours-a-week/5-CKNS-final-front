@@ -25,6 +25,7 @@ import ChatPage from './pages/chatPage/chatPage';
 import ChatTest from './pages/chatPage/chatTest';
 import ChatListPage from './pages/chatPage/chatListPage';
 import ExpenseSettlement from './components/schedulePage/settlement';
+import FlightDetailPage from './pages/resultPage/flightDetailPage';
 
 import './App.css';
 import './i18n';
@@ -93,6 +94,7 @@ function MainRouter() {
       <Route path="/chat/test" element={<ChatTest />} />
       <Route path="/chatList" element={<ChatListPage />} />
       <Route path="/settlement" element={<ExpenseSettlement />} />
+      <Route path='/flightdetail/:id' element={<FlightDetailPage />} />
     </Routes>
   );
 }
