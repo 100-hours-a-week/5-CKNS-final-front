@@ -3,13 +3,15 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import SimpleHeader from '../../components/shared/simpleHeader.js';
 import BottomNav from '../../components/shared/bottomNav.js';  
-import LogoImage from '../../images/logo/logo12.png';  
-import PenIcon from '../../images/pen.png'; 
+import PenIcon from '../../images/pen.png';
 import axiosInstance from '../../utils/axiosInstance.js';
+
+import ProfileImageComponent from "../../components/myPage/ProfileImageComponent";
 
 const MyPage = () => {
   const navigate = useNavigate();
   const [nickname, setNickname] = useState('');
+  const [profileImagePath, setProfileImagePath] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false); 
   const [errorMessage, setErrorMessage] = useState(''); 
@@ -44,8 +46,9 @@ const MyPage = () => {
   
       if (response.status === 200) {
         const nickname = response.data.data.nickname; 
-        // console.log('닉네임:', nickname);
+        console.table(response.data.data);
         setNickname(nickname);
+        setProfileImagePath(response.data.data?.profileImagePath ? "https://img.thetravelday.co.kr/" + response.data.data.profileImagePath : "https://placehold.co/200x200?text=?" );
         setIsLoading(false); 
       } else {
         throw new Error('사용자 정보 요청 실패');
@@ -101,9 +104,9 @@ const MyPage = () => {
       <SimpleHeader title="마이 페이지" showBackButton={true} />
       
       <Content>
-        <LogoWrapper>
-          <Logo src={LogoImage} alt="로고" />
-        </LogoWrapper>
+        <ProfileImageWrapper>
+            <ProfileImageComponent profileImagePath={profileImagePath} />
+        </ProfileImageWrapper>
 
         <UserInfo>
           <NicknameContainer>
@@ -127,7 +130,7 @@ const MyPage = () => {
             <ModalTitle>정말 탈퇴하시겠습니까?</ModalTitle>
             <ButtonGroup>
               <ConfirmButton onClick={() => {
-                setShowConfirmModal(false); 
+                setShowConfirmModal(false);
                 setShowModal(true);
               }}>
                 예
@@ -152,10 +155,10 @@ const MyPage = () => {
               <br/>
               감사합니다.
             </ModalMessage>
-            <ModalButton 
+            <ModalButton
               onClick={() => {
-                localStorage.removeItem('accessToken'); 
-                navigate('/intro'); 
+                localStorage.removeItem('accessToken');
+                navigate('/intro');
               }}
             >
               닫기
@@ -190,7 +193,7 @@ const Content = styled.div`
   background-color: #fff;
 `;
 
-const LogoWrapper = styled.div`
+const ProfileImageWrapper = styled.div`
   margin-top: 20px;
   margin-bottom: 30px; 
   display: flex;
@@ -198,11 +201,15 @@ const LogoWrapper = styled.div`
   width: 100%;
 `;
 
+
+
 const Logo = styled.img`
-  width: 100px; 
-  height: auto;
-  margin-top: 80px;
+  display: inline;
+  margin: 0 auto;
+  height: 100%;
+  width: auto;
 `;
+
 
 const UserInfo = styled.div`
   display: flex;
