@@ -66,7 +66,6 @@ const BottomPadding = styled.div`
 
 const Title = styled.div`
   font-size: 20px;
-  font-weight: bold;
   margin-bottom: 40px;
   margin-top: 50px;
 
