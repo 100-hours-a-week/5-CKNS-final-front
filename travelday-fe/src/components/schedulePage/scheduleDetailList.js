@@ -5,6 +5,7 @@ import {DndContext, PointerSensor, useSensor, useSensors} from '@dnd-kit/core';
 import {restrictToVerticalAxis} from '@dnd-kit/modifiers';
 import {SortableContext, useSortable, verticalListSortingStrategy} from '@dnd-kit/sortable';
 import axiosInstance from '../../utils/axiosInstance';
+import { DeleteOutlined, MenuOutlined} from "@ant-design/icons";
 
 /**
  * Customizing arrayMove function from @dnd-kit
@@ -151,6 +152,7 @@ const ScheduleDetailList = ({ travelRoomId, startDate, endDate }) => {
         })
             .then(response => {
                 if (response.data?.data?.length > 0) {
+                    console.table(response.data.data);
                     modifySchedule(response.data.data);
                 }
                 else{
@@ -187,7 +189,10 @@ const ScheduleDetailList = ({ travelRoomId, startDate, endDate }) => {
                 // console.log(response.data.data);
                 setIsModalOpen(true);  // 저장 후 모달 열기
                 setIsEditing(false);
-                setTimeout(() => setIsModalOpen(false), 2000);  // 2초 후에 모달 자동 닫기
+                setTimeout(() =>
+                    window.location.reload()
+                    // setIsModalOpen(false)
+                    , 2000);  // 2초 후에 모달 자동 닫기
             })
             .catch(error => {
                 console.error('여행방 정보 로드 중 오류 발생:', error);
@@ -231,9 +236,9 @@ const ScheduleDetailList = ({ travelRoomId, startDate, endDate }) => {
                 >
                     {scheduleDetails.map((item, index) => (
                         item.position === 0 ? (
-                            <SortableItem item={item} key={index} id={item.id} customStyle={StyledDay}></SortableItem>
+                            <SortableItem travelRoomId={travelRoomId} item={item} key={index} id={item.id} customStyle={StyledDay}></SortableItem>
                         ) : (
-                            <SortableItem key={index} id={item.id} item={item} isEditing={isEditing} />
+                            <SortableItem travelRoomId={travelRoomId} key={index} id={item.id} item={item} isEditing={isEditing} />
                         )
                     ))}
                 </SortableContext>
@@ -318,7 +323,7 @@ const StyledDay = styled.div`
 `;
 const Position = styled.div`
     color: #333;
-    font-size: 30px;
+    //font-size: 30px;
     cursor: move;
     touch-action: none;
 `;
@@ -345,7 +350,8 @@ const ScheduleBox = styled.div`
 `;
 
 const ListItemName = styled.div`
-    width: 300px;
+    max-width: 250px;
+    //width: 300px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -368,7 +374,7 @@ const ModalContent = styled.div`
     text-align: center;
 `;
 
-const SortableItem = ({id, item, customStyle: CustomStyleComponent,isEditing} ) => {
+const SortableItem = ({travelRoomId, id, item, customStyle: CustomStyleComponent,isEditing} ) => {
     const {
         attributes,
         listeners,
@@ -391,6 +397,21 @@ const SortableItem = ({id, item, customStyle: CustomStyleComponent,isEditing} ) 
             : {}),
     };
 
+    const handleDelete = async () => {
+        try {
+            await axiosInstance.delete(`/api/rooms/${travelRoomId}/plan/${id}`, {
+            }).then(response=>{
+                // item = item.filter(detail => detail.id !== id);
+                // console.table(item)
+                window.location.reload();
+            })
+            // Update the scheduleDetails state by removing the item with the specific id
+
+        } catch (error) {
+            console.error('Error deleting schedule item:', error);
+        }
+    };
+
     return (
         <ListItem
             ref={setNodeRef}
@@ -400,14 +421,31 @@ const SortableItem = ({id, item, customStyle: CustomStyleComponent,isEditing} ) 
             {CustomStyleComponent ? (
                 <CustomStyleComponent>{item.name}</CustomStyleComponent>
             ) : (
-                <ScheduleBox><ListItemName>{item.name}</ListItemName>
-                    {
+                 <ScheduleBox>
+                     {
                         isEditing ?
-                        (<Position{...listeners}>=</Position>)
-                        :
-                        (<Position style={{cursor:"default",color:"white"}}>=</Position>)
+                            (
+                                <Position{...listeners}><MenuOutlined style={{cursor:'move'}}/></Position>
+                                // <DeleteOutlined style={{ cursor: 'pointer' }} onClick={handleDelete} />
+                            ) :
+                            (
+                                <Position style={{cursor:"default",color:"white"}}><MenuOutlined/></Position>
+                                // <DeleteOutlined style={{ cursor: 'pointer' }} onClick={handleDelete} />
+                            )
                     }
+                    <ListItemName>{item.name}</ListItemName>
+                     {
+                         isEditing ?
+                             (
+                                 // <Position{...listeners}><MenuOutlined style={{cursor:'move'}}/></Position>
+                                 <DeleteOutlined style={{ cursor: 'pointer' }} onClick={handleDelete}/>
 
+                             ) :
+                             (
+                                 // <Position style={{cursor:"default",color:"white"}}><MenuOutlined/></Position>
+                                 <DeleteOutlined style={{ cursor: 'default', color:"white" }} onClick={handleDelete} />
+                             )
+                     }
                 </ScheduleBox>
             )}
         </ListItem>
