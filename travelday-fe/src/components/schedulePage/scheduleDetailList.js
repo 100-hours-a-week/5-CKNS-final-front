@@ -122,6 +122,7 @@ function reverseGroupAndSort(arr) {
 const ScheduleDetailList = ({ travelRoomId, startDate, endDate }) => {
     const [scheduleDetails, setScheduleDetails] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);  // 모달 상태 추가
+    const [isEditing, setIsEditing] = useState(false);
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: {
@@ -185,11 +186,27 @@ const ScheduleDetailList = ({ travelRoomId, startDate, endDate }) => {
             .then(response => {
                 // console.log(response.data.data);
                 setIsModalOpen(true);  // 저장 후 모달 열기
+                setIsEditing(false);
                 setTimeout(() => setIsModalOpen(false), 2000);  // 2초 후에 모달 자동 닫기
             })
             .catch(error => {
                 console.error('여행방 정보 로드 중 오류 발생:', error);
             });
+    }
+
+    async function handleEditButton() {
+        const isEditable = await checkEditable();
+        setIsEditing(isEditable);
+    }
+
+    async function checkEditable() {
+        try {
+            const response = await axiosInstance.post(`/api/rooms/${travelRoomId}/plan/check/editable`,{});
+            return response.data?.data?.length > 0;
+        } catch (error) {
+            console.error('Error checking editable state:', error);
+            return false; // Return false or handle the error as needed
+        }
     }
 
     useEffect(() => {
@@ -201,7 +218,11 @@ const ScheduleDetailList = ({ travelRoomId, startDate, endDate }) => {
         <ListContainer>
             <TitleWrapper>
                 <Title>일정 보기</Title>
-                <SaveButton onClick={postPlans}>저장하기</SaveButton>
+                {isEditing === false ? (
+                    <SaveButton onClick={handleEditButton}>수정하기</SaveButton>
+                ) : (
+                    <SaveButton onClick={postPlans}>저장하기</SaveButton>
+                    )}
             </TitleWrapper>
             <DndContext sensors={sensors} modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
                 <SortableContext
@@ -212,7 +233,7 @@ const ScheduleDetailList = ({ travelRoomId, startDate, endDate }) => {
                         item.position === 0 ? (
                             <SortableItem item={item} key={index} id={item.id} customStyle={StyledDay}></SortableItem>
                         ) : (
-                            <SortableItem key={index} id={item.id} item={item} />
+                            <SortableItem key={index} id={item.id} item={item} isEditing={isEditing} />
                         )
                     ))}
                 </SortableContext>
@@ -347,7 +368,7 @@ const ModalContent = styled.div`
     text-align: center;
 `;
 
-const SortableItem = ({id, item, customStyle: CustomStyleComponent}) => {
+const SortableItem = ({id, item, customStyle: CustomStyleComponent,isEditing} ) => {
     const {
         attributes,
         listeners,
@@ -379,7 +400,15 @@ const SortableItem = ({id, item, customStyle: CustomStyleComponent}) => {
             {CustomStyleComponent ? (
                 <CustomStyleComponent>{item.name}</CustomStyleComponent>
             ) : (
-                <ScheduleBox><ListItemName>{item.name}</ListItemName><Position {...listeners}>=</Position></ScheduleBox>
+                <ScheduleBox><ListItemName>{item.name}</ListItemName>
+                    {
+                        isEditing ?
+                        (<Position{...listeners}>=</Position>)
+                        :
+                        (<Position style={{cursor:"default",color:"white"}}>=</Position>)
+                    }
+
+                </ScheduleBox>
             )}
         </ListItem>
     );
