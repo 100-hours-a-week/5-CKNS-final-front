@@ -72,8 +72,8 @@ const InviteModal = ({ isOpen, onClose, searchInput, setSearchInput }) => {
             }, 2000);
     
         } catch (error) {
-            console.error('초대 중 오류가 발생했습니다:', error);
-            setErrorMessage('초대 중 오류가 발생했습니다.');
+            console.error('초대 중 오류가 발생했습니다:', error.response.data.message);
+            setErrorMessage(error.response.data.message);
         }
     };
 
