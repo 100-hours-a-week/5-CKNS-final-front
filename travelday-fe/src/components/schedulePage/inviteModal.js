@@ -8,7 +8,10 @@ const InviteModal = ({ isOpen, onClose, searchInput, setSearchInput }) => {
     const [filteredResults, setFilteredResults] = useState([]);
     const [errorMessage, setErrorMessage] = useState(''); 
     const [successMessage, setSuccessMessage] = useState('');
+    const [helperText, setHelperText] = useState(''); 
     const [showConfirmation, setShowConfirmation] = useState(false);
+
+    const nicknameRegex = /^[가-힣a-zA-Z0-9]+$/;
 
     useEffect(() => {
         if (!isOpen) {
@@ -16,11 +19,27 @@ const InviteModal = ({ isOpen, onClose, searchInput, setSearchInput }) => {
             setSearchInput('');
             setErrorMessage(''); 
             setSuccessMessage('');
+            setHelperText(''); 
             setShowConfirmation(false);
         }
     }, [isOpen, setSearchInput]);
 
-    const handleSearch = async () => {
+
+
+
+ const handleSearch = async () => {
+        // Nickname validation: length and special characters
+        if (searchInput.length > 10) {
+            setHelperText('닉네임은 10글자 이내여야 합니다.');
+            setFilteredResults([]);
+            return;
+        }
+        if (!nicknameRegex.test(searchInput)) {
+            setHelperText('닉네임에 특수문자는 사용할 수 없습니다.');
+            setFilteredResults([]);
+            return;
+        }
+
         try {
             const token = localStorage.getItem('accessToken');
             const response = await axiosInstance.get(`/api/rooms/${travelRoomId}/user/search`, {
@@ -34,8 +53,8 @@ const InviteModal = ({ isOpen, onClose, searchInput, setSearchInput }) => {
             if (response.data && Array.isArray(response.data.data) && response.data.data.length > 0) {
                 setFilteredResults(response.data.data);
                 setErrorMessage('');
+                setHelperText(''); // Clear helper text when search is valid
             } else {
-                console.log(response);
                 setFilteredResults([]);
                 setErrorMessage('검색 결과가 없습니다.');
             }
@@ -103,6 +122,7 @@ const InviteModal = ({ isOpen, onClose, searchInput, setSearchInput }) => {
                     placeholder="일행을 추가해 보세요 (최대 15명)"
                     disabled={showConfirmation} 
                 />
+                  <HelperText>{helperText || '\u00A0'}</HelperText>
                 <SearchResults>
                     {errorMessage ? (
                         <ErrorMessage>{errorMessage}</ErrorMessage>
@@ -269,5 +289,13 @@ const ConfirmButton = styled.button`
         transform: translateY(0);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
+`;
+
+const HelperText = styled.p`
+    color: #999;
+    font-size: 12px;
+    margin-top: 8px;
+    text-align: left;
+    width: 100%;
 `;
 
