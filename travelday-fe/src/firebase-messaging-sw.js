@@ -16,7 +16,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 // // FCM 초기화
-// const messaging = getMessaging(app);
+const messaging = getMessaging(app);
 //
 // export const requestForToken = (setTokenFound) => {
 //   return getToken(messaging, { vapidKey: "BIs8qF7l2tBm1Ygtf7g8_xdmAHbAf15yQ9bx-UAEYuPmOPDsO2P8cAO2ntlkyrQ40r5wZ6-fXm7BqbXAR7PBCXk" })
