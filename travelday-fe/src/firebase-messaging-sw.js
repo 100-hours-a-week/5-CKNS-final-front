@@ -4,7 +4,7 @@ import axiosInstance from "./utils/axiosInstance";
 
 const firebaseConfig = {
     apiKey: "AIzaSyB8gOvYAD2c_sVuRZKMhfn13wXd5mwHRp4",
-    // authDomain: "travelday-6fd20.firebaseapp.com",
+    authDomain: "travelday-6fd20",
     projectId: "travelday-6fd20",
     storageBucket: "travelday-6fd20.appspot.com",
     messagingSenderId: "395135515942",
