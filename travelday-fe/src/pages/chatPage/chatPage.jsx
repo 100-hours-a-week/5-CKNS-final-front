@@ -92,7 +92,7 @@ const ChatPage = () => {
     let retryCount = 0;
     const connectStompClient = () => {
       // console.log('STOMP 클라이언트 연결 시도 중...');
-      const socket = new SockJS('https://localhost:8080/ws');
+      const socket = new SockJS('https://def.thetravelday.co.kr/ws');
       console.log('소켓 접속 성공');
       const stompClient = Stomp.over(socket);
 
