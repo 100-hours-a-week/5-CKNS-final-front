@@ -95,11 +95,12 @@ const ChatPage = ({roomId,isSimple}) => {
     let retryCount = 0;
     const connectStompClient = () => {
       // console.log('STOMP 클라이언트 연결 시도 중...');
-      const socket = new SockJS('https://dev.thetravelday.co.kr/ws');
+      const socket = new SockJS('https://def.thetravelday.co.kr/ws');
+      console.log('소켓 접속 성공');
       const stompClient = Stomp.over(socket);
 
       stompClient.connect({ Authorization: `Bearer ${localStorage.getItem('accessToken')}` }, (frame) => {
-        // console.log('STOMP 연결 성공', frame);
+        console.log('STOMP 연결 성공', frame);
         setIsConnected(true);
         retryCount = 0;
 
