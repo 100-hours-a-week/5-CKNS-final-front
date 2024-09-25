@@ -37,11 +37,12 @@ export async function handleAllowNotification() {
         const permission = await Notification.requestPermission();
 
         if (permission === "granted") {
-            const token = await getToken(messaging, {
+            const fcmRegistrationToken = await getToken(messaging, {
                 vapidKey: "BIs8qF7l2tBm1Ygtf7g8_xdmAHbAf15yQ9bx-UAEYuPmOPDsO2P8cAO2ntlkyrQ40r5wZ6-fXm7BqbXAR7PBCXk"
             });
-            if (token) {
-                sendTokenToServer(token);// (토큰을 서버로 전송하는 로직)
+            if (fcmRegistrationToken) {
+                console.log("Allow Notification", fcmRegistrationToken);
+                sendTokenToServer(fcmRegistrationToken);// (토큰을 서버로 전송하는 로직)
             } else {
                 alert(
                     "토큰 등록이 불가능 합니다. 생성하려면 권한을 허용해주세요"

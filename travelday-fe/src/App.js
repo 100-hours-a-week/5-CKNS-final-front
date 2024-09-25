@@ -38,6 +38,7 @@ import './i18n';
 
 
 import FlightDetailPage from './pages/resultPage/flightDetailPage';
+import {handleAllowNotification} from "./firebase";
 
 
 const libraries = ['places'];
@@ -48,9 +49,16 @@ function App() {
     libraries,
   });
 
+    useEffect(() => {
+        handleAllowNotification()
+    },[])
+
+
   if (!isLoaded) {
     return null;
   }
+
+
 
   return (
     <Router>
