@@ -30,7 +30,7 @@ import ChatTest from './pages/chatPage/chatTest';
 import ChatListPage from './pages/chatPage/chatListPage';
 import ExpenseSettlement from './components/schedulePage/settlement';
 
-import "./firebase-messaging-sw.js";
+import "./firebase.js";
 
 import './App.css';
 import './i18n';
@@ -47,19 +47,6 @@ function App() {
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAP_KEY,
     libraries,
   });
-
-  useEffect(() => {
-    // 서비스 워커 등록
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/firebase-messaging-sw.js')
-        .then(function (registration) {
-          console.log('Service Worker registered with scope:', registration.scope);
-        })
-        .catch(function (error) {
-          console.error('Service Worker registration failed:', error);
-        });
-    }
-  }, []);
 
   if (!isLoaded) {
     return null;
