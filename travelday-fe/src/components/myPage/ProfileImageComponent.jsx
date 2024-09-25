@@ -256,10 +256,15 @@ const ThumbnailImage = styled.img`
   max-width: 300px;
   max-height: 300px;
   border-radius: 5px;
+    box-shadow: 10px 1px 10px rgba(0, 0, 0, 0.3);
   object-fit: cover;
     
     &:hover{
-        filter: grayscale(0.7);
+        filter: brightness(90%);
+        //filter: grayscale(1.0);
+        //scale: 150%;
+        //transition: filter 0.5s;
+        
     }
 `;
 
