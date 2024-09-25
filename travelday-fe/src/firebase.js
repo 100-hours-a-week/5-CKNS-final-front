@@ -37,12 +37,12 @@ export async function handleAllowNotification() {
         const permission = await Notification.requestPermission();
 
         if (permission === "granted") {
-            const fcmRegistrationToken = await getToken(messaging, {
+            const fcmToken = await getToken(messaging, {
                 vapidKey: "BIs8qF7l2tBm1Ygtf7g8_xdmAHbAf15yQ9bx-UAEYuPmOPDsO2P8cAO2ntlkyrQ40r5wZ6-fXm7BqbXAR7PBCXk"
             });
-            if (fcmRegistrationToken) {
-                console.log("Allow Notification", fcmRegistrationToken);
-                sendTokenToServer(fcmRegistrationToken);// (토큰을 서버로 전송하는 로직)
+            if (fcmToken) {
+                console.log("Allow Notification", fcmToken);
+                sendTokenToServer(fcmToken);// (토큰을 서버로 전송하는 로직)
             } else {
                 alert(
                     "토큰 등록이 불가능 합니다. 생성하려면 권한을 허용해주세요"
@@ -58,10 +58,10 @@ export async function handleAllowNotification() {
     }
 }
 
-const sendTokenToServer = async (fcmRegistrationToken) => {
+const sendTokenToServer = async (fcmToken) => {
     try {
         const response = await axiosInstance.post('/api/fcm',
-            { fcmRegistrationToken }, // 요청 바디
+            {fcmToken}, // 요청 바디
             {
             }
         );
