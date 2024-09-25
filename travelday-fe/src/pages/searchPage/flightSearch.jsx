@@ -26,7 +26,7 @@ const FlightSearch = () => {
   // 도착지를 19개 공항으로 고정
   const arrivalLocations = [
     '푸꾸옥(PQC)', '오이타(OIT)', '치암마이(CNX)', '타이페이 타이완 타오위엔(TPE)',
-    '오사카 이타미(ITM)', '오사카 간사이(KIX)', '도쿄 나리타(NRT)', '도쿄 하네다(HND)',
+    '오사카 간사이(KIX)', '도쿄 나리타(NRT)', 
     '발리 응우라라이(DPS)', '오키나와 나하(OKA)', '후쿠오카(FUK)', '뉴욕 존 F. 케네디(JFK)',
     '뉴욕 라과디아(LGA)', '나고야 츄부(NGO)', '파리 샤를드골(CDG)', '호주 시드니(SYD)',
     '마드리드(MAD)', '런던 히드로(LHR)', '비엔나(VIE)', '프랑크푸르트(FRA)', '로마 피우미치노(FCO)'
@@ -163,11 +163,11 @@ const FlightSearch = () => {
 
       <SemiTitle>이런 항공권도 있어요!</SemiTitle>
 
-      <FlightList flights={flights.length > 0 ? flights : [
-        { image: img1, country: '미국', city: 'New York', schedule: '2024. 11. 16 - 11.18', price: '623,000원' },
-        { image: img2, country: '프랑스', city: 'Paris', schedule: '2024. 9. 12 - 9.18', price: '1,092,000원' },
-        { image: img3, country: '일본', city: 'Tokyo', schedule: '2024. 8. 23 - 8.30', price: '340,000원' },
-      ]} /> 
+      <FlightList flights={[
+        { iataCode: 'JFK', image: img1, country: '미국', city: 'New York', schedule: '2024. 11. 16 - 11.18', price: '623,000원' },
+        { iataCode: 'CDG', image: img2, country: '프랑스', city: 'Paris', schedule: '2024. 9. 12 - 9.18', price: '1,092,000원' },
+        { iataCode: 'NRT', image: img3, country: '일본', city: 'Tokyo', schedule: '2024. 8. 23 - 8.30', price: '340,000원' }
+      ]} />
     <Footer /> 
     </Container>
   );
