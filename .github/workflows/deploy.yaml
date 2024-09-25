@@ -31,9 +31,9 @@ jobs:
         run: echo 'npm cache missed!'
         working-directory: travelday-fe
 
-      - name: public 폴더에 firebase-messaging-sw.js 생성
-        run: echo "${{ secrets.FIREBASE_MESSAGING_SW_JS }}" > travelday-fe/public/firebase-messaging-sw.js
-
+#      - name: public 폴더에 firebase-messaging-sw.js 생성
+#        run: echo "${{ secrets.FIREBASE_MESSAGING_SW_JS }}" > travelday-fe/public/firebase-messaging-sw.js
+#
       - name: 의존성 설치 및 빌드
         run: |
           npm ci
