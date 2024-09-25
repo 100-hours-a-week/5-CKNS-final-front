@@ -33,7 +33,7 @@ const InviteModal = ({ isOpen, onClose, searchInput, setSearchInput }) => {
             return;
         }
         if (!nicknameRegex.test(searchInput)) {
-            setHelperText('닉네임에 특수문자는 사용할 수 없습니다.');
+            setHelperText('닉네임에 특수문자 및 공백을 사용할 수 없습니다.');
             setFilteredResults([]);
             return;
         }

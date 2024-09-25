@@ -68,7 +68,8 @@ const MyPage = () => {
           Authorization: `Bearer ${token}`
         },
         withCredentials: true
-      });
+      }).then(response=>{console.log(response)})
+      .catch(error=>{console.error(error)});
   
       localStorage.removeItem('accessToken');
       navigate('/');
