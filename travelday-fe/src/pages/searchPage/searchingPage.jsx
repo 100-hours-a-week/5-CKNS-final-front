@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import Header from '../../components/shared/header.js';
 import BottomNav from '../../components/shared/bottomNav.js';
-import Title from '../../components/shared/title.js';
 import Toggle from '../../components/searchPage/toggle.js';
 import FlightSearch from './flightSearch.jsx';
 // import HotelSearch from './hotelSearch.jsx';
@@ -15,8 +14,8 @@ const SearchingPage = () => {
   return (
     <Container>
       <Header />
-      <Content>
-        <Title mainTitle="검색" subTitle="한 번의 검색으로 가격을 비교하세요!" />
+      <Content> 
+      <Title>검색</Title>
         <Toggle
           options={['항공']}
           selectedOption={selectedOption}
@@ -46,7 +45,7 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   background-color: #fafafa;
   position: relative;
 `;
@@ -55,14 +54,23 @@ const Content = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
+  width: 390px;
   box-sizing: border-box;
   text-align: center;
+  background-color: #fff;
 `;
 
 const BottomPadding = styled.div`
   height: 80px;
 `;
+
+const Title = styled.div`
+  font-size: 20px;
+  margin-bottom: 40px;
+  margin-top: 50px;
+
+`;
+
 
 // const Overlay = styled.div`
 //   position: fixed;

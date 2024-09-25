@@ -1,6 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
 import { useJsApiLoader } from '@react-google-maps/api';
+import './App.css';
+import './i18n';
+
+// 필요한 페이지 컴포넌트 임포트
 import FindPage from './pages/searchPage/searchingPage';
 import FlightResultPage from './pages/resultPage/flightResultPage';
 import HotelResultPage from './pages/resultPage/hotelResultPage';
@@ -25,11 +29,15 @@ import ChatPage from './pages/chatPage/chatPage';
 import ChatTest from './pages/chatPage/chatTest';
 import ChatListPage from './pages/chatPage/chatListPage';
 import ExpenseSettlement from './components/schedulePage/settlement';
+
 import "./firebase";
 
 import './App.css';
 import './i18n';
 
+
+
+import FlightDetailPage from './pages/resultPage/flightDetailPage';
 
 
 const libraries = ['places'];
@@ -40,8 +48,18 @@ function App() {
     libraries,
   });
 
-  // const [isTokenFound, setTokenFound] = useState(false);
-
+  useEffect(() => {
+    // 서비스 워커 등록
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/firebase-messaging-sw.js')
+        .then(function (registration) {
+          console.log('Service Worker registered with scope:', registration.scope);
+        })
+        .catch(function (error) {
+          console.error('Service Worker registration failed:', error);
+        });
+    }
+  }, []);
 
   if (!isLoaded) {
     return null;
@@ -94,6 +112,7 @@ function MainRouter() {
       <Route path="/chat/test" element={<ChatTest />} />
       <Route path="/chatList" element={<ChatListPage />} />
       <Route path="/settlement" element={<ExpenseSettlement />} />
+      <Route path='/flightdetail/:id' element={<FlightDetailPage />} />
     </Routes>
   );
 }

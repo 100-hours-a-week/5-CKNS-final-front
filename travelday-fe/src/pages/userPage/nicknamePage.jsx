@@ -36,7 +36,7 @@ const LoginPage = () => {
 
       // 특수문자 포함 여부 검사
       if (!nicknameRegex.test(nickname)) {
-        setNicknameError('특수문자는 사용할 수 없습니다.');
+        setNicknameError('특수문자 및 공백을 사용할 수 없습니다.');
         setIsButtonEnabled(false);
         return;
       }

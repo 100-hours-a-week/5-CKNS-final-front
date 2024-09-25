@@ -8,13 +8,13 @@ const TripTypeSelector = ({ tripType, setTripType }) => {
         selected={tripType === 'round-trip'}
         onClick={() => setTripType('round-trip')}
       >
-        왕복
+        인천 출발
       </Button>
       <Button
         selected={tripType === 'one-way'}
         onClick={() => setTripType('one-way')}
       >
-        편도
+        인천 도착
       </Button>
     </ButtonContainer>
   );
@@ -29,8 +29,8 @@ const ButtonContainer = styled.div`
 `;
 
 const Button = styled.button`
-  width: 50px;
-  height: 30px;
+  width: 75px;
+  height: 40px;
   background-color: ${({ selected }) => (selected ? '#007BFF' : '#F4F4F4')};
   color: ${({ selected }) => (selected ? '#fff' : '#000')};
   border: none;

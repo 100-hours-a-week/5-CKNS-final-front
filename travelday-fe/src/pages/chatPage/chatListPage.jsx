@@ -90,6 +90,12 @@ const ChatListPage = () => {
   const filteredChatRooms = chatRooms.filter((room) =>
     room.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  const truncateMessage = (message, maxLength) => {
+    if (message.length > maxLength) {
+      return message.substring(0, maxLength) + '...';
+    }
+    return message;
+  };
 
   return (
     <Container>
@@ -117,7 +123,8 @@ const ChatListPage = () => {
                   <Participants>{room.participants}</Participants>
                 </RoomHeader>
                 <MessageContainer>
-                  <LastMessage>{room.lastMessage}</LastMessage>
+                <LastMessage>{truncateMessage(room.lastMessage, 20)}</LastMessage>
+
                   {room.timestamp && <Timestamp>{formatTime(new Date(room.timestamp))}</Timestamp>} 
                 </MessageContainer>
               </ChatRoomItem>
@@ -125,7 +132,9 @@ const ChatListPage = () => {
           ) : (
             <NoChatRooms>채팅방이 없습니다.</NoChatRooms>
           )}
+        
         </ChatList>
+        <BottomPadding />
       </ChatListContainer>
 
       <BottomNav />
@@ -141,11 +150,10 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   margin: 0 auto;
   background-color: #fafafa; 
   position: relative;
-  overflow-y: auto;
 
   &::-webkit-scrollbar {
     display: none;
@@ -169,7 +177,6 @@ const Navbar = styled.div`
 
 const PageTitle = styled.h1`
   font-size: 20px;
-  font-weight: bold;
   margin-bottom: 40px;
   margin-top: 50px;
 `;
@@ -206,7 +213,6 @@ const ChatList = styled.div`
   flex-direction: column;
   align-items: center;
   padding: 15px; 
-  overflow-y: auto;
 
   &::-webkit-scrollbar {
     display: none;
@@ -276,3 +282,8 @@ const NoChatRooms = styled.div`
   color: #999;
   font-size: 16px;
 `;
+
+const BottomPadding = styled.div`
+  height: 80px;
+
+`

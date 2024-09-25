@@ -5,6 +5,7 @@ import {DndContext, PointerSensor, useSensor, useSensors} from '@dnd-kit/core';
 import {restrictToVerticalAxis} from '@dnd-kit/modifiers';
 import {SortableContext, useSortable, verticalListSortingStrategy} from '@dnd-kit/sortable';
 import axiosInstance from '../../utils/axiosInstance';
+import { DeleteOutlined, MenuOutlined} from "@ant-design/icons";
 
 /**
  * Customizing arrayMove function from @dnd-kit
@@ -122,6 +123,7 @@ function reverseGroupAndSort(arr) {
 const ScheduleDetailList = ({ travelRoomId, startDate, endDate }) => {
     const [scheduleDetails, setScheduleDetails] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);  // 모달 상태 추가
+    const [isEditing, setIsEditing] = useState(false);
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: {
@@ -150,6 +152,7 @@ const ScheduleDetailList = ({ travelRoomId, startDate, endDate }) => {
         })
             .then(response => {
                 if (response.data?.data?.length > 0) {
+                    console.table(response.data.data);
                     modifySchedule(response.data.data);
                 }
                 else{
@@ -185,11 +188,30 @@ const ScheduleDetailList = ({ travelRoomId, startDate, endDate }) => {
             .then(response => {
                 // console.log(response.data.data);
                 setIsModalOpen(true);  // 저장 후 모달 열기
-                setTimeout(() => setIsModalOpen(false), 2000);  // 2초 후에 모달 자동 닫기
+                setIsEditing(false);
+                setTimeout(() =>
+                    window.location.reload()
+                    // setIsModalOpen(false)
+                    , 2000);  // 2초 후에 모달 자동 닫기
             })
             .catch(error => {
                 console.error('여행방 정보 로드 중 오류 발생:', error);
             });
+    }
+
+    async function handleEditButton() {
+        const isEditable = await checkEditable();
+        setIsEditing(isEditable);
+    }
+
+    async function checkEditable() {
+        try {
+            const response = await axiosInstance.post(`/api/rooms/${travelRoomId}/plan/check/editable`,{});
+            return response.data?.data?.length > 0;
+        } catch (error) {
+            console.error('Error checking editable state:', error);
+            return false; // Return false or handle the error as needed
+        }
     }
 
     useEffect(() => {
@@ -201,7 +223,11 @@ const ScheduleDetailList = ({ travelRoomId, startDate, endDate }) => {
         <ListContainer>
             <TitleWrapper>
                 <Title>일정 보기</Title>
-                <SaveButton onClick={postPlans}>저장하기</SaveButton>
+                {isEditing === false ? (
+                    <SaveButton onClick={handleEditButton}>수정하기</SaveButton>
+                ) : (
+                    <SaveButton onClick={postPlans}>저장하기</SaveButton>
+                    )}
             </TitleWrapper>
             <DndContext sensors={sensors} modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
                 <SortableContext
@@ -210,9 +236,9 @@ const ScheduleDetailList = ({ travelRoomId, startDate, endDate }) => {
                 >
                     {scheduleDetails.map((item, index) => (
                         item.position === 0 ? (
-                            <SortableItem item={item} key={index} id={item.id} customStyle={StyledDay}></SortableItem>
+                            <SortableItem travelRoomId={travelRoomId} item={item} key={index} id={item.id} customStyle={StyledDay}></SortableItem>
                         ) : (
-                            <SortableItem key={index} id={item.id} item={item} />
+                            <SortableItem travelRoomId={travelRoomId} key={index} id={item.id} item={item} isEditing={isEditing} />
                         )
                     ))}
                 </SortableContext>
@@ -233,7 +259,6 @@ export default ScheduleDetailList;
 const ListContainer = styled.div`
   width: 100%;
   background-color: #fff;
-  margin-top: 20px;
 `;
 const TitleWrapper = styled.div`
     display: flex;
@@ -282,6 +307,7 @@ const ListItem = styled.div`
   padding: 10px 20px;
   background-color: #fff;
   border-radius: 4px;
+  width: 350px;
 `;
 
 const StyledDay = styled.div`
@@ -297,14 +323,14 @@ const StyledDay = styled.div`
 `;
 const Position = styled.div`
     color: #333;
-    font-size: 30px;
+    //font-size: 30px;
     cursor: move;
     touch-action: none;
 `;
 
 const ScheduleBox = styled.div`
     font-size: 18px;
-    width: 390px;
+    width: 346px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -324,7 +350,8 @@ const ScheduleBox = styled.div`
 `;
 
 const ListItemName = styled.div`
-    width: 300px;
+    max-width: 250px;
+    //width: 300px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -347,7 +374,7 @@ const ModalContent = styled.div`
     text-align: center;
 `;
 
-const SortableItem = ({id, item, customStyle: CustomStyleComponent}) => {
+const SortableItem = ({travelRoomId, id, item, customStyle: CustomStyleComponent,isEditing} ) => {
     const {
         attributes,
         listeners,
@@ -370,6 +397,21 @@ const SortableItem = ({id, item, customStyle: CustomStyleComponent}) => {
             : {}),
     };
 
+    const handleDelete = async () => {
+        try {
+            await axiosInstance.delete(`/api/rooms/${travelRoomId}/plan/${id}`, {
+            }).then(response=>{
+                // item = item.filter(detail => detail.id !== id);
+                // console.table(item)
+                window.location.reload();
+            })
+            // Update the scheduleDetails state by removing the item with the specific id
+
+        } catch (error) {
+            console.error('Error deleting schedule item:', error);
+        }
+    };
+
     return (
         <ListItem
             ref={setNodeRef}
@@ -379,7 +421,32 @@ const SortableItem = ({id, item, customStyle: CustomStyleComponent}) => {
             {CustomStyleComponent ? (
                 <CustomStyleComponent>{item.name}</CustomStyleComponent>
             ) : (
-                <ScheduleBox><ListItemName>{item.name}</ListItemName><Position {...listeners}>=</Position></ScheduleBox>
+                 <ScheduleBox>
+                     {
+                        isEditing ?
+                            (
+                                <Position{...listeners}><MenuOutlined style={{cursor:'move'}}/></Position>
+                                // <DeleteOutlined style={{ cursor: 'pointer' }} onClick={handleDelete} />
+                            ) :
+                            (
+                                <Position style={{cursor:"default",color:"white"}}><MenuOutlined/></Position>
+                                // <DeleteOutlined style={{ cursor: 'pointer' }} onClick={handleDelete} />
+                            )
+                    }
+                    <ListItemName>{item.name}</ListItemName>
+                     {
+                         isEditing ?
+                             (
+                                 // <Position{...listeners}><MenuOutlined style={{cursor:'move'}}/></Position>
+                                 <DeleteOutlined style={{ cursor: 'pointer' }} onClick={handleDelete}/>
+
+                             ) :
+                             (
+                                 // <Position style={{cursor:"default",color:"white"}}><MenuOutlined/></Position>
+                                 <DeleteOutlined style={{ cursor: 'default', color:"white" }} onClick={handleDelete} />
+                             )
+                     }
+                </ScheduleBox>
             )}
         </ListItem>
     );

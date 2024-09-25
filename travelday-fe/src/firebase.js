@@ -11,20 +11,15 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_FIREBASE_APPID
 };
 
+// Firebase 초기화
 const app = initializeApp(firebaseConfig);
 
+// FCM 초기화
 const messaging = getMessaging(app);
 
-let tokenRequestInProgress = false; // 중복 호출 방지를 위한 플래그
-
 export const requestForToken = (setTokenFound) => {
-  if (tokenRequestInProgress) return; // 이미 요청이 진행 중이면 함수 종료
-
-  tokenRequestInProgress = true; // 토큰 요청이 시작되면 플래그를 true로 설정
-
-  return getToken(messaging, { vapidKey: process.env.REACT_APP_FIREBASE__KEY })
+  return getToken(messaging, { vapidKey: process.env.REACT_APP_FIREBASE_VAPID_KEY })
     .then((currentToken) => {
-      tokenRequestInProgress = false; // 요청이 완료되면 플래그를 false로 설정
       if (currentToken) {
         // FCM 토큰을 백엔드로 전송하는 함수 호출
         sendTokenToServer(currentToken);
@@ -34,29 +29,41 @@ export const requestForToken = (setTokenFound) => {
       }
     })
     .catch((err) => {
-      tokenRequestInProgress = false; // 요청이 실패해도 플래그를 false로 설정
       console.error("An error occurred while retrieving token. ", err);
       setTokenFound && setTokenFound(false);
     });
 };
 
+// const sendTokenToServer = async (fcmToken) => {
+//   try {
+//     const token = localStorage.getItem('accessToken'); 
 
-const sendTokenToServer = async (fcmToken) => {
-  try {
-    const token = localStorage.getItem('accessToken'); 
+//     const response = await axiosInstance.post('/api/fcm', 
+//       { fcmToken }, // 요청 바디
+//       {
+//         headers: {
+//           Authorization: `Bearer ${token}`
+//         }
+//       }
+//     );
 
-    const response = await axiosInstance.post('/api/fcm', 
-      { fcmToken }, // 요청 바디
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
+//     console.log("서버로 토큰 전달 완료:", response.data);
+//   } catch (error) {
+//     console.error("토큰 전달시 에러 발생:", error);
+//   }
+// };
 
-    console.log("서버로 토큰 전달 완료:", response.data);
-  } catch (error) {
-    console.error("토큰 전달시 에러 발생:", error);
-  }
-
+const baseURL = process.env.REACT_APP_GENERATED_SERVER_URL;
+const sendTokenToServer = (token) => {
+  // 서버로 토큰 전송
+  fetch(baseURL + "api/fcm", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ token }),
+  })
+  .then(response => response.json())
+  // .then(data => console.log("Token sent to server:", data))
+  .catch(error => console.error("Error sending token to server:", error));
 };

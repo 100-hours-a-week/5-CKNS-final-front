@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import backIcon from '../../images/header/back.png';
-import arrowIcon from '../../images/arrow.png'; 
 
 const slideUp = keyframes`
   from {
@@ -15,6 +14,21 @@ const slideUp = keyframes`
 `;
 
 const AreaPopup = ({ isOpen, onClose, children, searchResults = [], onResultClick }) => {
+
+  // useEffect를 사용하여 팝업이 열릴 때와 닫힐 때 body의 overflow를 변경
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'; // 부모 요소의 스크롤을 막음
+    } else {
+      document.body.style.overflow = ''; // 원래 상태로 복원
+    }
+
+    return () => {
+      // 컴포넌트가 언마운트되거나 팝업이 닫힐 때 스크롤을 원래 상태로 돌려놓음
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
@@ -31,11 +45,9 @@ const AreaPopup = ({ isOpen, onClose, children, searchResults = [], onResultClic
         <Divider />
         {searchResults.length > 0 && (
           <>
-            <SearchResultsTitle>검색결과</SearchResultsTitle>
             <SearchResults>
               {searchResults.map((result, index) => (
                 <SearchResultItem key={index} onClick={() => onResultClick(result)}>
-                  <img src={arrowIcon} alt="화살표" />
                   {result}
                 </SearchResultItem>
               ))}
@@ -61,12 +73,21 @@ const PopupOverlay = styled.div`
 
 const PopupContent = styled.div`
   width: 350px;
-  height: 80%; /* 높이를 화면의 80%로 설정 */
+  height: 80%;
   background-color: #fff;
   padding: 20px;
   border-radius: 8px 8px 0 0;
   animation: ${slideUp} 0.3s ease-out;
   box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;  
+`;
+
+const SearchResults = styled.div`
+  flex: 1;
+  font-size: 20px;
+  overflow-y: auto; 
+  max-height: 80%;  
 `;
 
 const Header = styled.div`
@@ -110,34 +131,20 @@ const Divider = styled.div`
   margin-bottom: 10px;
 `;
 
-const SearchResultsTitle = styled.div`
-  width: 100%;
-  text-align: left;
-  font-size: 16px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 10px;
-`;
-
-const SearchResults = styled.div`
-  flex: 1;
-  margin-top: 20px;
-  font-size: 20px;
-  overflow-y: auto; 
-`;
-
 const SearchResultItem = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   cursor: pointer;
-
-  img {
-    margin-left: 10px;
-    margin-right: 21px;
-    width: 16px; /* 화살표 이미지 크기 */
-    height: 16px;
+  font-size: 18px;
+  padding: 5px;
+  
+  &:hover {
+    background-color: #f0f0f0;
+    color: #007bff;
+    transition: all 0.3s ease;
   }
 `;
+
 
 export default AreaPopup;

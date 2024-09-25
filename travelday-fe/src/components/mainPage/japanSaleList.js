@@ -24,7 +24,7 @@ const JapanSaleList = () => {
   const handleScroll = (direction) => {
     const container = listContainerRef.current;
     if (container) {
-      const scrollAmount = direction === 'left' ? -200 : 200;
+      const scrollAmount = direction === 'left' ? -300 : 300;
       container.scrollBy({
         left: scrollAmount,
         behavior: 'smooth',

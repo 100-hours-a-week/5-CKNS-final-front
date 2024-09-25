@@ -29,8 +29,11 @@ const linkify = (text) => {
   });
 };
 
-const ChatPage = () => {  
-  const { travelRoomId } = useParams(); // URL에서 travelRoomId 추출
+const ChatPage = ({roomId,isSimple}) => {
+  let { travelRoomId } = useParams(); // URL에서 travelRoomId 추출
+  if(roomId !== undefined && roomId !== null) {
+    travelRoomId = roomId
+  }
 
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
@@ -92,11 +95,12 @@ const ChatPage = () => {
     let retryCount = 0;
     const connectStompClient = () => {
       // console.log('STOMP 클라이언트 연결 시도 중...');
-      const socket = new SockJS('http://localhost:8080/ws');
+      const socket = new SockJS('https://def.thetravelday.co.kr/ws');
+      console.log('소켓 접속 성공');
       const stompClient = Stomp.over(socket);
 
       stompClient.connect({ Authorization: `Bearer ${localStorage.getItem('accessToken')}` }, (frame) => {
-        // console.log('STOMP 연결 성공', frame);
+        console.log('STOMP 연결 성공', frame);
         setIsConnected(true);
         retryCount = 0;
 
@@ -320,8 +324,8 @@ const ChatPage = () => {
 
   return (
     <Container>
-      <ChatContainer>
-        <Navbar>
+      <ChatContainer style={isSimple && {  padding: 0 }}>
+        <Navbar style={{display: isSimple ? 'none' : 'auto'}}>
           <BackButton onClick={handleBackButtonClick}>뒤로</BackButton>
           <RoomTitle> </RoomTitle>
           <IconsContainer>
@@ -348,7 +352,7 @@ const ChatPage = () => {
           </SearchContainer>
         )}
 
-        <MessageList ref={messageListRef}>
+        <MessageList ref={messageListRef} style={{paddingTop:'200px'}}>
           {messages.map((message, index) => {
             const previousMessage = messages[index - 1];
             const nextMessage = messages[index + 1];
@@ -550,6 +554,7 @@ const MessageContent = styled.div`
   max-width: 70%;
   box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s ease;
+  word-break: break-word;
 
   &:after {
     content: '';
@@ -628,6 +633,7 @@ const DateSeparator = styled.div`
   text-align: center;
   font-size: 12px;
   color: #999;
+  margin-bottom: 5px;
 `;
 
 const SearchContainer = styled.div`
