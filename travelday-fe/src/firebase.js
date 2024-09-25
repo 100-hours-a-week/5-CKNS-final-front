@@ -17,33 +17,6 @@ const app = initializeApp(firebaseConfig);
 
 // // FCM 초기화
 const messaging = getMessaging(app);
-//
-export const requestForToken = () => {
-  return getToken(messaging, { vapidKey: "BIs8qF7l2tBm1Ygtf7g8_xdmAHbAf15yQ9bx-UAEYuPmOPDsO2P8cAO2ntlkyrQ40r5wZ6-fXm7BqbXAR7PBCXk" })
-    .then((fcmRegistrationToken) => {
-      if (fcmRegistrationToken) {
-        console.log(fcmRegistrationToken);
-        // FCM 토큰을 백엔드로 전송하는 함수 호출
-        sendTokenToServer(fcmRegistrationToken);
-      }
-    })
-    .catch((err) => {
-      console.error("An error occurred while retrieving token. ", err);
-    });
-};
-
-const sendTokenToServer = async (fcmRegistrationToken) => {
-    try {
-    const response = await axiosInstance.post('/api/fcm',
-      { fcmRegistrationToken }, // 요청 바디
-      {
-      }
-    );
-    console.log("서버로 토큰 전달 완료:", response.data);
-  } catch (error) {
-    console.error("토큰 전달시 에러 발생:", error);
-  }
-};
 
 onMessage(messaging, (payload) => {
     // console.log("알림 도착 ", payload);
@@ -64,7 +37,7 @@ export async function handleAllowNotification() {
 
         if (permission === "granted") {
             const token = await getToken(messaging, {
-                vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY
+                vapidKey: "BIs8qF7l2tBm1Ygtf7g8_xdmAHbAf15yQ9bx-UAEYuPmOPDsO2P8cAO2ntlkyrQ40r5wZ6-fXm7BqbXAR7PBCXk"
             });
             if (token) {
                 sendTokenToServer(token);// (토큰을 서버로 전송하는 로직)
@@ -82,6 +55,19 @@ export async function handleAllowNotification() {
         console.error("푸시 토큰 가져오는 중에 에러 발생", error);
     }
 }
+
+const sendTokenToServer = async (fcmRegistrationToken) => {
+    try {
+        const response = await axiosInstance.post('/api/fcm',
+            { fcmRegistrationToken }, // 요청 바디
+            {
+            }
+        );
+        console.log("서버로 토큰 전달 완료:", response.data);
+    } catch (error) {
+        console.error("토큰 전달시 에러 발생:", error);
+    }
+};
 
 export function registerServiceWorker() {
     if ("serviceWorker" in navigator) {
