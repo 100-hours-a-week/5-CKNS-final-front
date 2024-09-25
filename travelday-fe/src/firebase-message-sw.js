@@ -3,12 +3,12 @@ import { getMessaging, getToken } from "firebase/messaging";
 import axiosInstance from "./utils/axiosInstance";
 
 const firebaseConfig = {
-  apiKey: process.env.REACT_APP_FIREBASE_KEY,
-  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.REACT_APP_FIREBASE_STORAGEBUCKET,
-  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER,
-  appId: process.env.REACT_APP_FIREBASE_APPID
+  apiKey: "AIzaSyB8gOvYAD2c_sVuRZKMhfn13wXd5mwHRp4",
+  authDomain: "travelday-6fd20.firebaseapp.com",
+  projectId: "travelday-6fd20",
+  storageBucket: "travelday-6fd20.appspot.com",
+  messagingSenderId: "395135515942",
+  appId: "1:395135515942:web:186fc14a2959f7fb0f55e7"
 };
 
 // Firebase 초기화
@@ -54,16 +54,34 @@ export const requestForToken = (setTokenFound) => {
 // };
 
 const baseURL = process.env.REACT_APP_GENERATED_SERVER_URL;
-const sendTokenToServer = (token) => {
-  // 서버로 토큰 전송
-  fetch(baseURL + "api/fcm", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ token }),
-  })
-  .then(response => response.json())
-  // .then(data => console.log("Token sent to server:", data))
-  .catch(error => console.error("Error sending token to server:", error));
+const sendTokenToServer = async (token) => {
+    try {
+    const response = await axiosInstance.post('/api/fcm',
+      { token }, // 요청 바디
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    console.log("서버로 토큰 전달 완료:", response.data);
+  } catch (error) {
+    console.error("토큰 전달시 에러 발생:", error);
+  }
 };
+
+
+
+//   // 서버로 토큰 전송
+//   fetch(baseURL + "api/fcm", {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify({ token }),
+//   })
+//   .then(response => response.json())
+//   // .then(data => console.log("Token sent to server:", data))
+//   .catch(error => console.error("Error sending token to server:", error));
+// };

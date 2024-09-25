@@ -30,7 +30,7 @@ import ChatTest from './pages/chatPage/chatTest';
 import ChatListPage from './pages/chatPage/chatListPage';
 import ExpenseSettlement from './components/schedulePage/settlement';
 
-import "./firebase";
+import "./firebase-message-sw.js";
 
 import './App.css';
 import './i18n';
