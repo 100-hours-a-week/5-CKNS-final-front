@@ -54,7 +54,6 @@ export const requestForToken = (setTokenFound) => {
 //   }
 // };
 
-const baseURL = process.env.REACT_APP_GENERATED_SERVER_URL;
 const sendTokenToServer = async (token) => {
     try {
     const response = await axiosInstance.post('/api/fcm',

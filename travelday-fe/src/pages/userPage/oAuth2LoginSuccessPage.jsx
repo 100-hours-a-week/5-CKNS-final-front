@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { requestForToken } from '../../firebase-message-sw.js';
+import { requestForToken } from '../../firebase-messaging-sw.js';
 
 const OAuth2LoginSuccessPage = () => {
   const navigate = useNavigate();
