@@ -64,7 +64,7 @@ const CreateSchedulePage = () => {
 
     const start = new Date(startDate);
     const end = new Date(endDate);
-    const diffInDays = (end - start) / (1000 * 60 * 60 * 24); // 날짜 차이 계산
+    const diffInDays = (end - start) / (1000 * 60 * 60 * 24); 
 
     if (diffInDays > 90) {
       alert('일정 생성은 최대 90일까지 가능합니다.');

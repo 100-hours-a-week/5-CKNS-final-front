@@ -10,6 +10,8 @@ const FixSchedulePage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { schedule } = location.state || {};
+  const [titleError, setTitleError] = useState(''); // 제목 에러 상태 추가
+
 
   const [title, setTitle] = useState(schedule?.name || '');
   const [startDate, setStartDate] = useState(schedule?.startDate || '');
@@ -19,13 +21,35 @@ const FixSchedulePage = () => {
   const today = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
-    if (title && startDate && endDate) {
+    const today = new Date().toISOString().split('T')[0];
+  
+    // 제목이 15자 이하인지 확인
+    if (title.length > 15) {
+      setTitleError('제목은 15자 이내로 입력해주세요.');
+      setIsButtonEnabled(false);
+    } else {
+      setTitleError('');
+    }
+  
+    // 시작일과 종료일 검증
+    if (startDate && startDate < today) {
+      setStartDate(today); // 시작일은 오늘 이후로만 설정
+    }
+    if (endDate && endDate < startDate) {
+      setEndDate(startDate); // 종료일은 시작일 이후로만 설정
+    }
+  
+    const diffInDays = (new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24);
+    if (diffInDays > 90) {
+      alert('일정은 최대 90일까지 가능합니다.');
+      setIsButtonEnabled(false);
+    } else if (title && startDate && endDate && !titleError) {
       setIsButtonEnabled(true);
     } else {
       setIsButtonEnabled(false);
     }
   }, [title, startDate, endDate]);
-
+  
   const handleUpdateSchedule = async () => {
     if (!isButtonEnabled) return;
 
@@ -90,6 +114,7 @@ const FixSchedulePage = () => {
             onChange={(e) => setTitle(e.target.value)} 
             placeholder="새로운 여행 제목을 입력하세요" 
           />
+            {titleError && <HelperText>{titleError}</HelperText>}
         </InputField>
         <InputField>
           <Label>시작 날짜</Label>
@@ -208,4 +233,22 @@ const CreateButton = styled.button`
   &:hover {
     background-color: ${({ enabled }) => (enabled ? '#d11a45' : '#ccc')};
   }
+`;
+
+const helperFadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const HelperText = styled.p`
+  font-size: 12px;
+  color: #f12e5e;
+  margin-top: 5px;
+  animation: ${helperFadeIn} 0.3s ease-in-out;
 `;
