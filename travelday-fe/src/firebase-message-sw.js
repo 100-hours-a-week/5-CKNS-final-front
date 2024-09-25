@@ -3,12 +3,13 @@ import { getMessaging, getToken } from "firebase/messaging";
 import axiosInstance from "./utils/axiosInstance";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyB8gOvYAD2c_sVuRZKMhfn13wXd5mwHRp4",
-  authDomain: "travelday-6fd20.firebaseapp.com",
-  projectId: "travelday-6fd20",
-  storageBucket: "travelday-6fd20.appspot.com",
-  messagingSenderId: "395135515942",
-  appId: "1:395135515942:web:186fc14a2959f7fb0f55e7"
+    apiKey: "AIzaSyB8gOvYAD2c_sVuRZKMhfn13wXd5mwHRp4",
+    authDomain: "travelday-6fd20.firebaseapp.com",
+    projectId: "travelday-6fd20",
+    storageBucket: "travelday-6fd20.appspot.com",
+    messagingSenderId: "395135515942",
+    appId: "1:395135515942:web:186fc14a2959f7fb0f55e7",
+    measurementId: "G-2R5M42P16Z"
 };
 
 // Firebase 초기화
@@ -18,7 +19,7 @@ const app = initializeApp(firebaseConfig);
 const messaging = getMessaging(app);
 
 export const requestForToken = (setTokenFound) => {
-  return getToken(messaging, { vapidKey: process.env.REACT_APP_FIREBASE_VAPID_KEY })
+  return getToken(messaging, { vapidKey: "BIs8qF7l2tBm1Ygtf7g8_xdmAHbAf15yQ9bx-UAEYuPmOPDsO2P8cAO2ntlkyrQ40r5wZ6-fXm7BqbXAR7PBCXk" })
     .then((currentToken) => {
       if (currentToken) {
         // FCM 토큰을 백엔드로 전송하는 함수 호출
