@@ -18,70 +18,37 @@ const app = initializeApp(firebaseConfig);
 // // FCM 초기화
 const messaging = getMessaging(app);
 //
-// export const requestForToken = (setTokenFound) => {
-//   return getToken(messaging, { vapidKey: "BIs8qF7l2tBm1Ygtf7g8_xdmAHbAf15yQ9bx-UAEYuPmOPDsO2P8cAO2ntlkyrQ40r5wZ6-fXm7BqbXAR7PBCXk" })
-//     .then((currentToken) => {
-//       if (currentToken) {
-//         // FCM 토큰을 백엔드로 전송하는 함수 호출
-//         sendTokenToServer(currentToken);
-//         setTokenFound && setTokenFound(true); // setTokenFound가 전달된 경우에만 호출
-//       } else {
-//         setTokenFound && setTokenFound(false);
-//       }
-//     })
-//     .catch((err) => {
-//       console.error("An error occurred while retrieving token. ", err);
-//       setTokenFound && setTokenFound(false);
-//     });
-// };
+export const requestForToken = (setTokenFound) => {
+  return getToken(messaging, { vapidKey: "BIs8qF7l2tBm1Ygtf7g8_xdmAHbAf15yQ9bx-UAEYuPmOPDsO2P8cAO2ntlkyrQ40r5wZ6-fXm7BqbXAR7PBCXk" })
+    .then((currentToken) => {
+      if (currentToken) {
+        // FCM 토큰을 백엔드로 전송하는 함수 호출
+        sendTokenToServer(currentToken).then(response =>{console.log(response);});
+        setTokenFound && setTokenFound(true); // setTokenFound가 전달된 경우에만 호출
+      } else {
+        setTokenFound && setTokenFound(false);
+      }
+    })
+    .catch((err) => {
+      console.error("An error occurred while retrieving token. ", err);
+      setTokenFound && setTokenFound(false);
+    });
+};
 
-// const sendTokenToServer = async (fcmToken) => {
-//   try {
-//     const token = localStorage.getItem('accessToken'); 
+const sendTokenToServer = async (token) => {
+    try {
+    const response = await axiosInstance.post('/api/fcm',
+      { token }, // 요청 바디
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
 
-//     const response = await axiosInstance.post('/api/fcm', 
-//       { fcmToken }, // 요청 바디
-//       {
-//         headers: {
-//           Authorization: `Bearer ${token}`
-//         }
-//       }
-//     );
+    console.log("서버로 토큰 전달 완료:", response.data);
+  } catch (error) {
+    console.error("토큰 전달시 에러 발생:", error);
+  }
+};
 
-//     console.log("서버로 토큰 전달 완료:", response.data);
-//   } catch (error) {
-//     console.error("토큰 전달시 에러 발생:", error);
-//   }
-// };
-
-// const sendTokenToServer = async (token) => {
-//     try {
-//     const response = await axiosInstance.post('/api/fcm',
-//       { token }, // 요청 바디
-//       {
-//         headers: {
-//           Authorization: `Bearer ${token}`
-//         }
-//       }
-//     );
-//
-//     console.log("서버로 토큰 전달 완료:", response.data);
-//   } catch (error) {
-//     console.error("토큰 전달시 에러 발생:", error);
-//   }
-// };
-
-
-
-//   // 서버로 토큰 전송
-//   fetch(baseURL + "api/fcm", {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify({ token }),
-//   })
-//   .then(response => response.json())
-//   // .then(data => console.log("Token sent to server:", data))
-//   .catch(error => console.error("Error sending token to server:", error));
-// };
