@@ -40,7 +40,7 @@ function App() {
     libraries,
   });
 
-  const [isTokenFound, setTokenFound] = useState(false);
+  // const [isTokenFound, setTokenFound] = useState(false);
 
 
   if (!isLoaded) {

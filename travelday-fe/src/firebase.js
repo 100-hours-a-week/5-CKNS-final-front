@@ -34,21 +34,36 @@ export const requestForToken = (setTokenFound) => {
     });
 };
 
-const sendTokenToServer = async (fcmToken) => {
-  try {
-    const token = localStorage.getItem('accessToken'); 
+// const sendTokenToServer = async (fcmToken) => {
+//   try {
+//     const token = localStorage.getItem('accessToken'); 
 
-    const response = await axiosInstance.post('/api/fcm', 
-      { fcmToken }, // 요청 바디
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
+//     const response = await axiosInstance.post('/api/fcm', 
+//       { fcmToken }, // 요청 바디
+//       {
+//         headers: {
+//           Authorization: `Bearer ${token}`
+//         }
+//       }
+//     );
 
-    console.log("서버로 토큰 전달 완료:", response.data);
-  } catch (error) {
-    console.error("토큰 전달시 에러 발생:", error);
-  }
+//     console.log("서버로 토큰 전달 완료:", response.data);
+//   } catch (error) {
+//     console.error("토큰 전달시 에러 발생:", error);
+//   }
+// };
+
+const baseURL = process.env.REACT_APP_GENERATED_SERVER_URL;
+const sendTokenToServer = (token) => {
+  // 서버로 토큰 전송
+  fetch(baseURL + "api/fcm", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ token }),
+  })
+  .then(response => response.json())
+  // .then(data => console.log("Token sent to server:", data))
+  .catch(error => console.error("Error sending token to server:", error));
 };
