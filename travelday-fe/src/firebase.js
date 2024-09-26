@@ -2,7 +2,6 @@ import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import axiosInstance from "./utils/axiosInstance";
 
-
 const firebaseConfig = {
     apiKey: "AIzaSyB8gOvYAD2c_sVuRZKMhfn13wXd5mwHRp4",
     authDomain: "travelday-6fd20",

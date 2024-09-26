@@ -42,76 +42,80 @@ const airportNames = {
 };
 
 const airlineNames = {
-    KE: '대한항공',
-    OZ: '아시아나항공',
-    JL: '일본항공',
-    NH: '전일본공수',
-    AA: '아메리칸 항공',
-    UA: '유나이티드 항공',
-    DL: '델타 항공',
-    SQ: '싱가포르 항공',
-    CX: '캐세이퍼시픽 항공',
-    QF: '콴타스 항공',
-    BA: '영국항공',
-    AF: '에어프랑스',
-    LH: '루프트한자',
-    EK: '에미레이트 항공',
-    QR: '카타르 항공',
-    TG: '타이 항공',
-    MH: '말레이시아 항공',
-    BR: '에바 항공',
-    CI: '중화항공',
-    CZ: '중국남방항공',
-    MU: '중국동방항공',
-    CA: '중국국제항공',
-    NZ: '에어 뉴질랜드',
-    TK: '터키항공',
-    SU: '아에로플로트',
-    '7C': '제주항공', 
-    'H1': '한에어항공',
-    YP: '에어프레미아',
-    OD: '말린도항공',
-    TW: '티웨이항공',
-    VJ: '비엣젯항공',
-    NX: '아주항공',
-    HX: '홍콩항공'
+  KE: '대한항공',
+  OZ: '아시아나항공',
+  JL: '일본항공',
+  NH: '전일본공수',
+  AA: '아메리칸 항공',
+  UA: '유나이티드 항공',
+  DL: '델타 항공',
+  SQ: '싱가포르 항공',
+  CX: '캐세이퍼시픽 항공',
+  QF: '콴타스 항공',
+  BA: '영국항공',
+  AF: '에어프랑스',
+  LH: '루프트한자',
+  EK: '에미레이트 항공',
+  QR: '카타르 항공',
+  TG: '타이 항공',
+  MH: '말레이시아 항공',
+  BR: '에바 항공',
+  CI: '중화항공',
+  CZ: '중국남방항공',
+  MU: '중국동방항공',
+  CA: '중국국제항공',
+  NZ: '에어 뉴질랜드',
+  TK: '터키항공',
+  SU: '아에로플로트',
+  '7C': '제주항공', 
+  'H1': '한에어항공',
+  YP: '에어프레미아',
+  OD: '말린도항공',
+  TW: '티웨이항공',
+  VJ: '비엣젯항공',
+  NX: '아주항공',
+  HX: '홍콩항공',
+  W2: '플렉스플라이트'
 };
 
+
 const airlineUrls = {
-    KE: 'https://www.koreanair.com', // 대한항공
-    OZ: 'https://flyasiana.com', // 아시아나항공
-    JL: 'https://www.jal.com', // 일본항공
-    NH: 'https://www.ana.co.jp', // 전일본공수
-    AA: 'https://www.aa.com', // 아메리칸 항공
-    UA: 'https://www.united.com', // 유나이티드 항공
-    DL: 'https://www.delta.com', // 델타 항공
-    SQ: 'https://www.singaporeair.com', // 싱가포르 항공
-    CX: 'https://www.cathaypacific.com', // 캐세이퍼시픽 항공
-    QF: 'https://www.qantas.com/kr/en.html', // 콴타스 항공
-    BA: 'https://www.britishairways.com', // 영국항공
-    AF: 'https://www.airfrance.com', // 에어프랑스
-    LH: 'https://www.lufthansa.com', // 루프트한자
-    EK: 'https://www.lufthansa.com', // 에미레이트 항공
-    QR: 'https://www.qatarairways.com', // 카타르 항공
-    TG: 'https://www.thaiairways.com', // 타이 항공
-    MH: 'https://www.malaysiaairlines.com', // 말레이시아 항공
-    BR: 'https://www.evaair.com', // 에바 항공
-    CI: 'https://www.china-airlines.com', // 중화항공
-    CZ: 'https://www.csair.com', // 중국남방항공
-    MU: 'https://www.ceair.com', // 중국동방항공
-    CA: 'https://www.airchina.kr/KR/KO/Home', // 중국국제항공
-    NZ: 'https://www.airnewzealand.com', // 에어 뉴질랜드
-    TK: 'https://www.turkishairlines.com', // 터키항공
-    SU: 'https://www.aeroflot.ru', // 아에로플로트
-    '7C': 'https://www.jejuair.net', // 제주항공
-    'H1': 'https://www.hahnair.com', // 한에어항공
-    YP: 'https://www.airpremia.com', // 에어프레미아
-    OD: 'https://www.malindoair.com/kr/ko/',
-    TW: 'https://www.twayair.com/app/main',
-    VJ: 'https://www.vietjetair.com/ko', //비엣젯 항공
-    NX: 'https://www.airmacau.com.mo/#/' ,//아주항공
-    HX: 'https://www.hongkongairlines.com/en_HK/hx/homepage'//홍공항공
+  KE: 'https://www.koreanair.com', // 대한항공
+  OZ: 'https://flyasiana.com', // 아시아나항공
+  JL: 'https://www.jal.com', // 일본항공
+  NH: 'https://www.ana.co.jp', // 전일본공수
+  AA: 'https://www.aa.com', // 아메리칸 항공
+  UA: 'https://www.united.com', // 유나이티드 항공
+  DL: 'https://www.delta.com', // 델타 항공
+  SQ: 'https://www.singaporeair.com', // 싱가포르 항공
+  CX: 'https://www.cathaypacific.com', // 캐세이퍼시픽 항공
+  QF: 'https://www.qantas.com/kr/en.html', // 콴타스 항공
+  BA: 'https://www.britishairways.com', // 영국항공
+  AF: 'https://www.airfrance.com', // 에어프랑스
+  LH: 'https://www.lufthansa.com', // 루프트한자
+  EK: 'https://www.lufthansa.com', // 에미레이트 항공
+  QR: 'https://www.qatarairways.com', // 카타르 항공
+  TG: 'https://www.thaiairways.com', // 타이 항공
+  MH: 'https://www.malaysiaairlines.com', // 말레이시아 항공
+  BR: 'https://www.evaair.com', // 에바 항공
+  CI: 'https://www.china-airlines.com', // 중화항공
+  CZ: 'https://www.csair.com', // 중국남방항공
+  MU: 'https://www.ceair.com', // 중국동방항공
+  CA: 'https://www.airchina.kr/KR/KO/Home', // 중국국제항공
+  NZ: 'https://www.airnewzealand.com', // 에어 뉴질랜드
+  TK: 'https://www.turkishairlines.com', // 터키항공
+  SU: 'https://www.aeroflot.ru', // 아에로플로트
+  '7C': 'https://www.jejuair.net', // 제주항공
+  'H1': 'https://www.hahnair.com', // 한에어항공
+  YP: 'https://www.airpremia.com', // 에어프레미아
+  OD: 'https://www.malindoair.com/kr/ko/',
+  TW: 'https://www.twayair.com/app/main',
+  VJ: 'https://www.vietjetair.com/ko', //비엣젯 항공
+  NX: 'https://www.airmacau.com.mo/#/' ,//아주항공
+  HX: 'https://www.hongkongairlines.com/en_HK/hx/homepage',//홍공항공
+  W2: 'https://flexflight.dk/' //플렉스 플라이트
 };
+
 
 const getAirportName = (iataCode) => airportNames[iataCode] || iataCode;
 const getAirlineName = (carrierCode) => airlineNames[carrierCode] || carrierCode;
