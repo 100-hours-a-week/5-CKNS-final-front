@@ -29,7 +29,17 @@ import ChatPage from './pages/chatPage/chatPage';
 import ChatTest from './pages/chatPage/chatTest';
 import ChatListPage from './pages/chatPage/chatListPage';
 import ExpenseSettlement from './components/schedulePage/settlement';
+
+import "./firebase.js";
+
+import './App.css';
+import './i18n';
+
+
+
 import FlightDetailPage from './pages/resultPage/flightDetailPage';
+import {handleAllowNotification} from "./firebase";
+
 
 const libraries = ['places'];
 
@@ -40,43 +50,14 @@ function App() {
   });
 
   useEffect(() => {
-    // 서비스 워커 등록
-    if ('serviceWorker' in navigator) {
-      // 기존에 등록된 모든 서비스 워커 제거
-      navigator.serviceWorker.getRegistrations().then(function (registrations) {
-        registrations.forEach(function (registration) {
-          registration.unregister().then(function (success) {
-            if (success) {
-              console.log('기존 서비스 워커가 해제되었습니다.');
-            } else {
-              console.error('기존 서비스 워커 해제에 실패했습니다.');
-            }
-          });
-        });
-    
-        // 새로운 서비스 워커 등록
-        navigator.serviceWorker.register('/firebase-messaging-sw.js')
-          .then(function (registration) {
-            console.log('서비스 워커가 등록되었습니다. 스코프:', registration.scope);
-          })
-          .catch(function (error) {
-            console.error('서비스 워커 등록에 실패했습니다:', error);
-            
-            // 오류의 전체 정보를 출력
-            console.error('에러 전체 정보:', error.message);
-            console.error('에러 파일:', error.filename);
-            console.error('에러 라인:', error.lineno, '열:', error.colno);
-          });
-      }).catch(function (error) {
-        console.error('기존 서비스 워커 가져오기 실패:', error);
-      });
-    }
-    
+    handleAllowNotification()
   }, []);
 
   if (!isLoaded) {
     return null;
   }
+
+
 
   return (
     <Router>

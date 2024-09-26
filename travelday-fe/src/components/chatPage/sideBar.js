@@ -72,7 +72,7 @@ const Sidebar = ({ isSidebarVisible, toggleSidebar }) => {
 
   return (
     <>
-      <SidebarContainer isSidebarVisible={isSidebarVisible}>
+      <SidebarContainer style={{display: !isSidebarVisible? "none" : "block"}} isSidebarVisible={isSidebarVisible}>
         <Header>
           <SidebarTitle>채팅방 설정</SidebarTitle>
           <CloseButton onClick={toggleSidebar}>

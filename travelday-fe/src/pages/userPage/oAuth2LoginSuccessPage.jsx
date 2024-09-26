@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { requestForToken } from '../../firebase';
+import {handleAllowNotification} from '../../firebase.js';
 
 const OAuth2LoginSuccessPage = () => {
   const navigate = useNavigate();
@@ -11,7 +11,6 @@ const OAuth2LoginSuccessPage = () => {
 
     if (!accessToken) {
       // 로그인 실패 시 처리
-      // console.log("로그인 실패");
       return;
     }
 
@@ -21,7 +20,7 @@ const OAuth2LoginSuccessPage = () => {
       // console.log("로그인 성공");
 
       // 로그인 성공 후에 FCM 토큰 요청 및 서버로 전송
-      requestForToken();
+      handleAllowNotification()
     };
 
     storeAccessToken();
