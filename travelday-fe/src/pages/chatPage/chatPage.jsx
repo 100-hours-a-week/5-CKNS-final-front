@@ -58,6 +58,8 @@ const ChatPage = ({roomId,isSimple}) => {
   const [sendCount, setSendCount] = useState(0);
   const [isRateLimited, setIsRateLimited] = useState(false);
   const messageAcknowledgeTimer = useRef(null);
+  const [toastVisible, setToastVisible] = useState(false); // 토스트 메시지 상태 추가
+  const MAX_MESSAGE_LENGTH = 500; // 메시지 최대 길이
 
       // debounce로 입력 지연
     const handleChange = debounce((e) => {
@@ -215,6 +217,13 @@ const ChatPage = ({roomId,isSimple}) => {
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
+
+    if (newMessage.trim().length > MAX_MESSAGE_LENGTH) {
+      // 메시지 길이가 500자를 초과하면 전송하지 않음
+      setToastVisible(true);  // 토스트 메시지 표시
+      setTimeout(() => setToastVisible(false), 3000); // 3초 후에 숨김
+      return;
+    }
   
     if (newMessage.trim() !== '' && !isSending && !isRateLimited) {
       setIsSending(true);
@@ -436,7 +445,7 @@ const ChatPage = ({roomId,isSimple}) => {
           <div ref={messageEndRef} />
         </MessageList>
 
-
+        {toastVisible && <ToastMessage>최대 입력은 500자까지 가능합니다</ToastMessage>}
         <MessageInputContainer>
       
           <MessageInput
@@ -788,6 +797,19 @@ const ConnectionStatus = styled.div`
       opacity: 1;
     }
   }
+`;
+
+const ToastMessage = styled.div`
+  position: fixed;
+  bottom: 150px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 14px;
+  z-index: 9999;
 `;
 
 
