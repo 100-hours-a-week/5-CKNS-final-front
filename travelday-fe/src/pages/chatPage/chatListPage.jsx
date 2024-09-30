@@ -4,10 +4,12 @@ import BottomNav from '../../components/shared/bottomNav.js';
 import Header from '../../components/shared/header.js'; 
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosInstance';
+import Footer from '../../components/footer/footer.js';
 
 const ChatListPage = () => {
   const [chatRooms, setChatRooms] = useState([]);
   const [searchTerm, setSearchTerm] = useState(''); 
+  const [isLoading, setIsLoading] = useState(true); // 로딩 상태 추가
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -42,7 +44,7 @@ const ChatListPage = () => {
   
         // 3. 채팅방 목록에 마지막 메시지 추가
         const formattedChatRooms = rooms.map((room) => {
-        const lastMessageData = lastMessages.find(msg => msg.travelRoomId === room.id);
+          const lastMessageData = lastMessages.find(msg => msg.travelRoomId === room.id);
   
           return {
             id: room.id,
@@ -59,10 +61,10 @@ const ChatListPage = () => {
       }
     } catch (error) {
       console.error('채팅방 불러오기 중 오류 발생:', error);
+    } finally {
+      setIsLoading(false); // 로딩 완료
     }
   };
-  
-  
 
   const handleChatRoomClick = (roomId) => {
     navigate(`/chat/${roomId}`);
@@ -115,25 +117,28 @@ const ChatListPage = () => {
         </SearchContainer>
 
         <ChatList>
-          {filteredChatRooms.length > 0 ? (
-            filteredChatRooms.map((room) => (
-              <ChatRoomItem key={room.id} onClick={() => handleChatRoomClick(room.id)}>
-                <RoomHeader>
-                  <RoomName>{room.name}</RoomName>
-                  <Participants>{room.participants}</Participants>
-                </RoomHeader>
-                <MessageContainer>
-                <LastMessage>{truncateMessage(room.lastMessage, 20)}</LastMessage>
-
-                  {room.timestamp && <Timestamp>{formatTime(new Date(room.timestamp))}</Timestamp>} 
-                </MessageContainer>
-              </ChatRoomItem>
-            ))
+          {isLoading ? ( // 로딩 중일 때 Loading 표시
+            <LoadingMessage>Loading...</LoadingMessage>
           ) : (
-            <NoChatRooms>채팅방이 없습니다.</NoChatRooms>
+            filteredChatRooms.length > 0 ? (
+              filteredChatRooms.map((room) => (
+                <ChatRoomItem key={room.id} onClick={() => handleChatRoomClick(room.id)}>
+                  <RoomHeader>
+                    <RoomName>{room.name}</RoomName>
+                    <Participants>{room.participants}</Participants>
+                  </RoomHeader>
+                  <MessageContainer>
+                    <LastMessage>{truncateMessage(room.lastMessage, 20)}</LastMessage>
+                    {room.timestamp && <Timestamp>{formatTime(new Date(room.timestamp))}</Timestamp>} 
+                  </MessageContainer>
+                </ChatRoomItem>
+              ))
+            ) : (
+              <NoChatRooms>채팅방이 없습니다.</NoChatRooms>
+            )
           )}
-        
         </ChatList>
+        <Footer />
         <BottomPadding />
       </ChatListContainer>
 
@@ -180,7 +185,6 @@ const PageTitle = styled.h1`
   margin-bottom: 40px;
   margin-top: 50px;
 `;
-
 
 const SearchContainer = styled.div`
   padding: 10px;
@@ -283,7 +287,15 @@ const NoChatRooms = styled.div`
   font-size: 16px;
 `;
 
+const LoadingMessage = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  color: #999;
+  font-size: 16px;
+`;
+
 const BottomPadding = styled.div`
   height: 80px;
-
 `
