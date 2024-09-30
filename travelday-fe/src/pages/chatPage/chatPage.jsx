@@ -132,8 +132,8 @@ const ChatPage = ({roomId,isSimple}) => {
     let retryCount = 0;
     const connectStompClient = () => {
       // console.log('STOMP 클라이언트 연결 시도 중...');
-      // const socket = new SockJS('https://dev.thetravelday.co.kr/ws');
-      const socket = new SockJS('http://localhost:8080/ws');
+      const socket = new SockJS('https://dev.thetravelday.co.kr/ws');
+      // const socket = new SockJS('http://localhost:8080/ws');
       console.log('소켓 접속 성공');
       const stompClient = Stomp.over(socket);
 
@@ -415,7 +415,7 @@ const ChatPage = ({roomId,isSimple}) => {
           {isLoading || messages.length === 0  ? (
             // 로딩 중일 때 스켈레톤을 3개 표시
             <>
-              <SkeletonChat />
+              <SkeletonChat />    
               <SkeletonText>채팅을 불러오고 있습니다...</SkeletonText>
               <SkeletonChat />
               <SkeletonChat />
