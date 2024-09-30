@@ -42,6 +42,7 @@ const ChatPage = ({roomId,isSimple}) => {
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [nickname, setNickname] = useState(''); // 닉네임 상태 추가
+  const [userId, setUserId] = useState(''); //아이디 상태 추가
   const [isLoading, setIsLoading] = useState(true); // 로딩 상태 추가
   const [currentSearchIndex, setCurrentSearchIndex] = useState(0);
   const [searchResults, setSearchResults] = useState([]);
@@ -96,26 +97,29 @@ const ChatPage = ({roomId,isSimple}) => {
       if (!token) {
         throw new Error('토큰이 없습니다.');
       }
-
+  
       const response = await axiosInstance.get('/api/user', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
-
+  
       if (response.status === 200) {
         const fetchedNickname = response.data.data.nickname;
+        const fetchedUserId = response.data.data.userId; // userId도 함께 저장
         setNickname(fetchedNickname); // 닉네임 설정
+        setUserId(fetchedUserId); // userId 설정
         setIsLoading(false);
       } else {
         throw new Error('사용자 정보 요청 실패');
       }
     } catch (error) {
-      // console.log('응답을 받지 못했습니다:', error.message);
+      console.error('사용자 정보 요청 실패:', error.message);
       setIsLoading(false);
     }
   };
+  
 
   useEffect(() => {
     fetchKakaoUserProfile(); // 컴포넌트가 마운트될 때 프로필 정보를 불러옴
@@ -198,7 +202,7 @@ const ChatPage = ({roomId,isSimple}) => {
           },
           withCredentials: true,
         });
-
+        console.log(response);
         const messages = response.data.data.map(msg => ({
           ...msg,
           content: msg.message,
@@ -412,7 +416,7 @@ const ChatPage = ({roomId,isSimple}) => {
             const showTimestamp = !isSameSenderAndTime(message, nextMessage);
             const showDate = !isSameDay(message, previousMessage) || index === 0;
 
-            const isOwnMessage = message.sender === nickname;
+            const isOwnMessage = message.senderId === userId; // senderId와 userId 비교
 
             const isHighlighted = searchResults.includes(index);
 
