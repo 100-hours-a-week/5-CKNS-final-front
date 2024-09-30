@@ -59,17 +59,25 @@ export async function handleAllowNotification() {
 }
 
 const sendTokenToServer = async (fcmToken) => {
-    try {
-        const response = await axiosInstance.post('/api/fcm',
-            {fcmToken}, // 요청 바디
-            {
-            }
-        );
-        console.log("서버로 토큰 전달 완료:", response.data);
-    } catch (error) {
-        console.error("토큰 전달시 에러 발생:", error);
-    }
+  try {
+      const accessToken = localStorage.getItem('accessToken'); 
+
+      const response = await axiosInstance.post(
+          '/api/fcm',
+          { fcmToken }, // 요청 바디
+          {
+              headers: {
+                  Authorization: `Bearer ${accessToken}`, 
+                  'Content-Type': 'application/json', 
+              },
+          }
+      );
+      console.log("서버로 토큰 전달 완료:", response.data);
+  } catch (error) {
+      console.error("토큰 전달시 에러 발생:", error);
+  }
 };
+
 
 export function registerServiceWorker() {
     return new Promise((resolve, reject) => {
