@@ -8,6 +8,7 @@ import { IoSearch, IoMenuOutline } from "react-icons/io5";
 import Sidebar from '../../components/chatPage/sideBar.js';  
 import SockJS from 'sockjs-client';
 import { Stomp } from '@stomp/stompjs';
+import debounce from 'lodash.debounce'; 
 
 const linkify = (text) => {
   if (!text) return '';
@@ -28,6 +29,7 @@ const linkify = (text) => {
     return part;
   });
 };
+
 
 const ChatPage = ({roomId,isSimple}) => {
   let { travelRoomId } = useParams(); // URL에서 travelRoomId 추출
@@ -50,6 +52,36 @@ const ChatPage = ({roomId,isSimple}) => {
   const messageEndRef = useRef(null);
   const messageListRef = useRef(null);
   const stompClientRef = useRef(null); // STOMP 클라이언트 저장할 Ref
+  const MAX_MESSAGES_PER_SECOND = 5; // 초당 5개의 메시지
+  const RATE_LIMIT_DURATION = 5000; // 5초 동안 입력 차단
+  const DEBOUNCE_DELAY = 200; // 0.2초 동안 입력 지연
+  const [sendCount, setSendCount] = useState(0);
+  const [isRateLimited, setIsRateLimited] = useState(false);
+  const messageAcknowledgeTimer = useRef(null);
+  const [toastVisible, setToastVisible] = useState(false); // 토스트 메시지 상태 추가
+  const MAX_MESSAGE_LENGTH = 500; // 메시지 최대 길이
+
+      // debounce로 입력 지연
+    const handleChange = debounce((e) => {
+      setNewMessage(e.target.value);
+    }, DEBOUNCE_DELAY);
+
+
+
+    // 전송 제한 리셋 함수
+    const resetRateLimit = () => {
+      setSendCount(0);
+      setIsRateLimited(false);
+    };
+
+      useEffect(() => {
+    if (sendCount >= MAX_MESSAGES_PER_SECOND) {
+      setIsRateLimited(true);
+      setTimeout(() => {
+        resetRateLimit();
+      }, RATE_LIMIT_DURATION); // 5초 후 입력 가능
+    }
+  }, [sendCount]);
 
   useEffect(() => {
     // console.log("Messages 상태가 업데이트되었습니다:", messages);
@@ -95,7 +127,8 @@ const ChatPage = ({roomId,isSimple}) => {
     let retryCount = 0;
     const connectStompClient = () => {
       // console.log('STOMP 클라이언트 연결 시도 중...');
-      const socket = new SockJS('https://def.thetravelday.co.kr/ws');
+      const socket = new SockJS('https://dev.thetravelday.co.kr/ws');
+      // const socket = new SockJS('http://localhost:8080/ws');
       console.log('소켓 접속 성공');
       const stompClient = Stomp.over(socket);
 
@@ -105,11 +138,11 @@ const ChatPage = ({roomId,isSimple}) => {
         retryCount = 0;
 
         stompClient.subscribe(`/sub/chat/rooms/${travelRoomId}`, (message) => {
-          // console.log("수신된 메시지:", message.body); // 수신된 메시지 원본 확인
-        
+          console.log("수신된 메시지:", message.body); // 수신된 메시지 원본 확인
+          
           if (message.body) {
             const parsedMessage = JSON.parse(message.body);
-            // console.log("파싱된 메시지:", parsedMessage); // 파싱된 메시지 확인
+            console.log("파싱된 메시지:", parsedMessage); // 파싱된 메시지 확인
         
             const messageToAdd = {
               id: parsedMessage.id || new Date().getTime(),
@@ -120,8 +153,12 @@ const ChatPage = ({roomId,isSimple}) => {
               sender: parsedMessage.senderNickname || 'Unknown'
             };
         
-            // console.log("추가할 메시지:", messageToAdd); // 추가할 메시지 확인
+            console.log("추가할 메시지:", messageToAdd); // 추가할 메시지 확인
             setMessages((prevMessages) => [...prevMessages, messageToAdd]);
+        
+            // 메시지 응답이 오면 응답 처리 타이머 해제
+            clearTimeout(messageAcknowledgeTimer.current);
+            console.log("서버로부터 메시지 응답 수신, 입력 차단 해제");
           } else {
             console.error("메시지 본문이 없습니다.");
           }
@@ -181,15 +218,22 @@ const ChatPage = ({roomId,isSimple}) => {
   const handleSendMessage = async (e) => {
     e.preventDefault();
 
-    if (newMessage.trim() !== '' && !isSending) {
+    if (newMessage.trim().length > MAX_MESSAGE_LENGTH) {
+      // 메시지 길이가 500자를 초과하면 전송하지 않음
+      setToastVisible(true);  // 토스트 메시지 표시
+      setTimeout(() => setToastVisible(false), 3000); // 3초 후에 숨김
+      return;
+    }
+  
+    if (newMessage.trim() !== '' && !isSending && !isRateLimited) {
       setIsSending(true);
-
-      // STOMP를 통해서만 메시지를 보냄
+      setSendCount(sendCount + 1);
+  
+      // STOMP를 통해 메시지를 보냄
       try {
         if (stompClientRef.current && stompClientRef.current.connected) {
-          // STOMP를 통해 메시지를 전송
           stompClientRef.current.send(`/pub/chat/rooms/${travelRoomId}`, {}, newMessage);
-          // console.log('pub 성공');
+          console.log('메시지 전송 시도:', newMessage); // 메시지 전송 시도 로그
         } else {
           console.error('STOMP 클라이언트가 연결되어 있지 않습니다.');
         }
@@ -199,8 +243,16 @@ const ChatPage = ({roomId,isSimple}) => {
         setIsSending(false);
         setNewMessage(''); // 입력 필드 초기화
       }
+  
+      // 서버로부터 메시지 응답이 오지 않을 시 5초 동안 입력 차단
+      messageAcknowledgeTimer.current = setTimeout(() => {
+        setIsRateLimited(true);
+        console.log('응답 없음, 입력 5초간 차단');
+        resetRateLimit();
+      }, 5000);
     }
   };
+  
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
@@ -366,8 +418,6 @@ const ChatPage = ({roomId,isSimple}) => {
 
             const isActiveResult = isHighlighted && index === searchResults[currentSearchIndex] && searchResults.length > 0;
 
-            // 메시지 내용 확인
-            // console.log(`렌더링할 메시지 (index: ${index}):`, message.message);
 
             return (
               <React.Fragment key={index}>
@@ -395,16 +445,19 @@ const ChatPage = ({roomId,isSimple}) => {
           <div ref={messageEndRef} />
         </MessageList>
 
-
+        {toastVisible && <ToastMessage>최대 입력은 500자까지 가능합니다</ToastMessage>}
         <MessageInputContainer>
+      
           <MessageInput
-            type="text"
-            placeholder="메시지를 입력하세요..."
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            disabled={!isConnected || isSending}
-          />
+              type="text"
+              placeholder={isRateLimited ? "입력이 너무 빠릅니다." : "메시지를 입력하세요..."}
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value) && handleChange}
+              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(e) && handleKeyPress}
+              disabled={isRateLimited || isSending}
+            />
+
+
           <SendButton onClick={handleSendMessage} disabled={!isConnected || isSending}>
             {isSending ? '전송 중...' : '전송'}
           </SendButton>
@@ -745,3 +798,18 @@ const ConnectionStatus = styled.div`
     }
   }
 `;
+
+const ToastMessage = styled.div`
+  position: fixed;
+  bottom: 150px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 14px;
+  z-index: 9999;
+`;
+
+

@@ -75,7 +75,8 @@ const airlineNames = {
     TW: '티웨이항공',
     VJ: '비엣젯항공',
     NX: '아주항공',
-    HX: '홍콩항공'
+    HX: '홍콩항공',
+    W2: '플렉스플라이트'
 };
 
 const airlineUrls = {
@@ -111,7 +112,8 @@ const airlineUrls = {
     TW: 'https://www.twayair.com/app/main',
     VJ: 'https://www.vietjetair.com/ko', //비엣젯 항공
     NX: 'https://www.airmacau.com.mo/#/' ,//아주항공
-    HX: 'https://www.hongkongairlines.com/en_HK/hx/homepage'//홍공항공
+    HX: 'https://www.hongkongairlines.com/en_HK/hx/homepage',//홍공항공
+    W2: 'https://flexflight.dk/' //플렉스 플라이트
 };
 
 const getAirportName = (iataCode) => airportNames[iataCode] || iataCode;

@@ -49,10 +49,9 @@ function App() {
     libraries,
   });
 
-    useEffect(() => {
-        handleAllowNotification()
-    },[])
-
+  useEffect(() => {
+    handleAllowNotification()
+  }, []);
 
   if (!isLoaded) {
     return null;
