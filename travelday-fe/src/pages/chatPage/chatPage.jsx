@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import axiosInstance from '../../utils/axiosInstance.js';
 import BottomNav from '../../components/shared/bottomNav.js'; 
+import SkeletonChat from '../../components/chatPage/skeletonChat';
 import { useNavigate } from 'react-router-dom';
 import { IoSearch, IoMenuOutline } from "react-icons/io5";
 import Sidebar from '../../components/chatPage/sideBar.js';  
@@ -53,9 +54,9 @@ const ChatPage = ({roomId,isSimple}) => {
   const messageEndRef = useRef(null);
   const messageListRef = useRef(null);
   const stompClientRef = useRef(null); // STOMP 클라이언트 저장할 Ref
-  const MAX_MESSAGES_PER_SECOND = 5; // 초당 5개의 메시지
+  const MAX_MESSAGES_PER_SECOND = 10; // 초당 5개의 메시지
   const RATE_LIMIT_DURATION = 5000; // 5초 동안 입력 차단
-  const DEBOUNCE_DELAY = 200; // 0.2초 동안 입력 지연
+  const DEBOUNCE_DELAY = 100; // 0.1초 동안 입력 지연
   const [sendCount, setSendCount] = useState(0);
   const [isRateLimited, setIsRateLimited] = useState(false);
   const messageAcknowledgeTimer = useRef(null);
@@ -131,8 +132,8 @@ const ChatPage = ({roomId,isSimple}) => {
     let retryCount = 0;
     const connectStompClient = () => {
       // console.log('STOMP 클라이언트 연결 시도 중...');
-      const socket = new SockJS('https://dev.thetravelday.co.kr/ws');
-      // const socket = new SockJS('http://localhost:8080/ws');
+      // const socket = new SockJS('https://dev.thetravelday.co.kr/ws');
+      const socket = new SockJS('http://localhost:8080/ws');
       console.log('소켓 접속 성공');
       const stompClient = Stomp.over(socket);
 
@@ -202,7 +203,7 @@ const ChatPage = ({roomId,isSimple}) => {
           },
           withCredentials: true,
         });
-        console.log(response);
+
         const messages = response.data.data.map(msg => ({
           ...msg,
           content: msg.message,
@@ -211,8 +212,10 @@ const ChatPage = ({roomId,isSimple}) => {
         }));
 
         setMessages(messages);
+        setIsLoading(false); // 로딩 완료 후 상태 업데이트
       } catch (error) {
         console.error('채팅 내역을 불러오지 못했습니다:', error);
+        setIsLoading(false);
       }
     };
 
@@ -408,46 +411,55 @@ const ChatPage = ({roomId,isSimple}) => {
           </SearchContainer>
         )}
 
-        <MessageList ref={messageListRef} style={{paddingTop:'200px'}}>
-          {messages.map((message, index) => {
-            const previousMessage = messages[index - 1];
-            const nextMessage = messages[index + 1];
-            const showSender = !isSameSenderAndTime(message, previousMessage);
-            const showTimestamp = !isSameSenderAndTime(message, nextMessage);
-            const showDate = !isSameDay(message, previousMessage) || index === 0;
+        <MessageList ref={messageListRef} style={{paddingTop:'100px'}}>
+          {isLoading ? (
+            // 로딩 중일 때 스켈레톤을 3개 표시
+            <>
+              <SkeletonChat />
+              <SkeletonChat />
+              <SkeletonChat />
+            </>
+          ) : (
+            messages.map((message, index) => {
+              const previousMessage = messages[index - 1];
+              const nextMessage = messages[index + 1];
+              const showSender = !isSameSenderAndTime(message, previousMessage);
+              const showTimestamp = !isSameSenderAndTime(message, nextMessage);
+              const showDate = !isSameDay(message, previousMessage) || index === 0;
 
-            const isOwnMessage = message.senderId === userId; // senderId와 userId 비교
+              const isOwnMessage = message.senderId === userId; // senderId와 userId 비교
 
-            const isHighlighted = searchResults.includes(index);
+              const isHighlighted = searchResults.includes(index);
 
-            const isActiveResult = isHighlighted && index === searchResults[currentSearchIndex] && searchResults.length > 0;
+              const isActiveResult = isHighlighted && index === searchResults[currentSearchIndex] && searchResults.length > 0;
 
-
-            return (
-              <React.Fragment key={index}>
-                {showDate && (
-                  <DateSeparator>{formatDate(new Date(message.timestamp))}</DateSeparator>
-                )}
-                <MessageItem isOwnMessage={isOwnMessage} isActiveResult={isActiveResult}>
-                  {showSender && (
-                    <MessageSender>{message.sender}</MessageSender>
+              return (
+                <React.Fragment key={index}>
+                  {showDate && (
+                    <DateSeparator>{formatDate(new Date(message.timestamp))}</DateSeparator>
                   )}
-                  <MessageWrapper isOwnMessage={isOwnMessage}>
-                    <MessageContent isOwnMessage={isOwnMessage}>
-                      {linkify(message.message)} {/* linkify 함수 적용 */}
-                    </MessageContent>
-                    {showTimestamp && (
-                      <MessageTimestamp isOwnMessage={isOwnMessage}>
-                        {formatTime(new Date(message.timestamp))}
-                      </MessageTimestamp>
+                  <MessageItem isOwnMessage={isOwnMessage} isActiveResult={isActiveResult}>
+                    {showSender && (
+                      <MessageSender>{message.sender}</MessageSender>
                     )}
-                  </MessageWrapper>
-                </MessageItem>
-              </React.Fragment>
-            );
-          })}
+                    <MessageWrapper isOwnMessage={isOwnMessage}>
+                      <MessageContent isOwnMessage={isOwnMessage}>
+                        {linkify(message.message)} {/* linkify 함수 적용 */}
+                      </MessageContent>
+                      {showTimestamp && (
+                        <MessageTimestamp isOwnMessage={isOwnMessage}>
+                          {formatTime(new Date(message.timestamp))}
+                        </MessageTimestamp>
+                      )}
+                    </MessageWrapper>
+                  </MessageItem>
+                </React.Fragment>
+              );
+            })
+          )}
           <div ref={messageEndRef} />
         </MessageList>
+
 
         {toastVisible && <ToastMessage>최대 입력은 500자까지 가능합니다</ToastMessage>}
         <MessageInputContainer>
