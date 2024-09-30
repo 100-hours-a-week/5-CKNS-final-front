@@ -54,7 +54,7 @@ const ChatPage = ({roomId,isSimple}) => {
   const messageEndRef = useRef(null);
   const messageListRef = useRef(null);
   const stompClientRef = useRef(null); // STOMP 클라이언트 저장할 Ref
-  const MAX_MESSAGES_PER_SECOND = 10; // 초당 5개의 메시지
+  const MAX_MESSAGES_PER_SECOND = 10; // 초당 10개의 메시지
   const RATE_LIMIT_DURATION = 5000; // 5초 동안 입력 차단
   const DEBOUNCE_DELAY = 100; // 0.1초 동안 입력 지연
   const [sendCount, setSendCount] = useState(0);
@@ -412,10 +412,11 @@ const ChatPage = ({roomId,isSimple}) => {
         )}
 
         <MessageList ref={messageListRef} style={{paddingTop:'100px'}}>
-          {isLoading ? (
+          {isLoading || messages.length === 0  ? (
             // 로딩 중일 때 스켈레톤을 3개 표시
             <>
               <SkeletonChat />
+              <SkeletonText>채팅을 불러오고 있습니다...</SkeletonText>
               <SkeletonChat />
               <SkeletonChat />
             </>
@@ -828,4 +829,9 @@ const ToastMessage = styled.div`
   z-index: 9999;
 `;
 
-
+const SkeletonText = styled.p`
+  text-align: center;
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 20px;
+`;
