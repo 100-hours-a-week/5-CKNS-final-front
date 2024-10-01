@@ -28,7 +28,7 @@ import PrivacyPage from './pages/mainPage/privacyPage';
 import ChatPage from './pages/chatPage/chatPage';
 import ChatTest from './pages/chatPage/chatTest';
 import ChatListPage from './pages/chatPage/chatListPage';
-import ExpenseSettlement from './components/schedulePage/settlement';
+import ExpenseSettlement from "./components/schedulePage/settlement";
 
 import "./firebase.js";
 

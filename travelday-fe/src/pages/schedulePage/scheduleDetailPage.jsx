@@ -303,7 +303,7 @@ const ContentContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-bottom: 20vh;
+  padding-bottom: 150px;
 `;
 
 const MapContainer = styled.div`
