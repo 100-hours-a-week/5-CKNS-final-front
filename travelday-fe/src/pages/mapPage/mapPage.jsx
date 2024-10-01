@@ -60,7 +60,8 @@ function MapPage() {
             map.setZoom(12);
           }
         } else {
-          console.error('Places Service failed:', status); 
+          console.error('Places Service failed:', status);
+          alert("검색 결과가 없습니다!")
         }
       });
     } else {
