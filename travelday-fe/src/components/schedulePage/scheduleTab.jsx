@@ -4,7 +4,7 @@ import ScheduleDetailList from "./scheduleDetailList";
 import StickyBox from 'react-sticky-box';
 import styled from "styled-components";
 import ChatPage from "../../pages/chatPage/chatPage";
-import Settlement from "./settlement";
+import SettlementList from "./settlementList";
 const items = (travelRoomId,startDate,endDate) => [
     {
         label:"일정 보기",
@@ -25,7 +25,8 @@ const items = (travelRoomId,startDate,endDate) => [
     {
         label:"정산 하기",
         key:"정산",
-        children: <Settlement travelRoomId={travelRoomId}/>
+        children: <SettlementList travelRoomId={travelRoomId}/>
+
     }
 ]
 // console.table(items)
