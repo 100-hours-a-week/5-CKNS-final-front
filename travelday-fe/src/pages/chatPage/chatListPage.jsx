@@ -217,6 +217,7 @@ const ChatList = styled.div`
   flex-direction: column;
   align-items: center;
   padding: 15px; 
+  min-height: 300px;
 
   &::-webkit-scrollbar {
     display: none;
