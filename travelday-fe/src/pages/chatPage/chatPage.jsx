@@ -414,7 +414,7 @@ const ChatPage = ({roomId,isSimple}) => {
         )}
 
         <MessageList ref={messageListRef} style={{paddingTop:'100px'}}>
-          {isLoading || messages.length === 0  ? (
+          {isLoading ? (
             // 로딩 중일 때 스켈레톤을 3개 표시
             <>
               <SkeletonChat />    
@@ -422,6 +422,9 @@ const ChatPage = ({roomId,isSimple}) => {
               <SkeletonChat />
               <SkeletonChat />
             </>
+          ) : messages.length === 0 ? (
+            // 메시지가 없을 때 빈 메시지 표시
+            <NoMessagesText>아직 채팅이 없습니다. 첫 번째 메시지를 보내보세요!</NoMessagesText>
           ) : (
             messages.map((message, index) => {
               const previousMessage = messages[index - 1];
@@ -462,6 +465,7 @@ const ChatPage = ({roomId,isSimple}) => {
           )}
           <div ref={messageEndRef} />
         </MessageList>
+
 
 
         {toastVisible && <ToastMessage>최대 입력은 500자까지 가능합니다</ToastMessage>}
@@ -836,4 +840,10 @@ const SkeletonText = styled.p`
   font-size: 16px;
   color: #333;
   margin-bottom: 20px;
+`;
+
+const NoMessagesText = styled.div`
+  text-align: center;
+  color: #888;
+  margin-top: 20px;
 `;
