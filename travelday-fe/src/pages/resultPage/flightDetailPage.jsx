@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import Header from '../../components/shared/header.js'; 
 import BottomNav from '../../components/shared/bottomNav.js';  
 import { images } from '../../data/mainPage.js'; 
+import { useNavigate } from 'react-router-dom';
 import TakeoffIcon from '../../images/filter/takeoff.png';
 import PriceIcon from '../../images/filter/price.png';
 import ScheduleIcon from '../../images/footer/schedule.png';
@@ -147,6 +148,7 @@ const FlightDetailPage = () => {
   const { id } = useParams(); 
   const { t } = useTranslation();
   const [flight, setFlight] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     axiosInstance.get(`/api/flights/lowestPrice/list`)
@@ -194,9 +196,10 @@ const FlightDetailPage = () => {
 
   const priceInKRW = convertToKRW(parseFloat(price.grandTotal), price.currency);
 
+
   return (
     <PageContainer>
-      <Header />
+      <Header showBackButton={true} onBackClick={() => navigate(-1)} />
       <Content>
         <FlightItem>
           <SectionTitle>

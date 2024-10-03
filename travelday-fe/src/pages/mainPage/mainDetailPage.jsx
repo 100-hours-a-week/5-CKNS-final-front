@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import Header from '../../components/shared/header.js'; 
@@ -11,6 +10,7 @@ import PriceIcon from '../../images/filter/price.png';
 import ScheduleIcon from '../../images/footer/schedule.png';
 import PplIcon from '../../images/main/detail/ppl.png';
 import axiosInstance from "../../utils/axiosInstance";
+import { useNavigate } from 'react-router-dom';
 
 const airportNames = {
   PQC: '푸꾸옥 국제공항',
@@ -146,6 +146,7 @@ const MainDetailPage = () => {
   const { id } = useParams(); 
   const { t } = useTranslation();
   const [flight, setFlight] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     axiosInstance.get(`/api/flights/lowestPrice/list`)
@@ -177,7 +178,7 @@ const MainDetailPage = () => {
 
   return (
     <PageContainer>
-      <Header />
+     <Header showBackButton={true} onBackClick={() => navigate(-1)} />
       <Content>
         {image ? <StyledImage src={image} alt={`Image ${id}`} /> : <p>{t('imageNotFound')}</p>}
         <FlightItem>
