@@ -107,6 +107,8 @@ const ChatPage = ({roomId,isSimple}) => {
       });
   
       if (response.status === 200) {
+        console.log('유저 정보 받아왔다!',response);
+        console.log('포챠코 아이디:',userId);
         const fetchedNickname = response.data.data.nickname;
         const fetchedUserId = response.data.data.userId; // userId도 함께 저장
         setNickname(fetchedNickname); // 닉네임 설정
@@ -132,8 +134,8 @@ const ChatPage = ({roomId,isSimple}) => {
     let retryCount = 0;
     const connectStompClient = () => {
       // console.log('STOMP 클라이언트 연결 시도 중...');
-      const socket = new SockJS('https://dev.thetravelday.co.kr/ws');
-      // const socket = new SockJS('http://localhost:8080/ws');
+      // const socket = new SockJS('https://dev.thetravelday.co.kr/ws');
+      const socket = new SockJS('http://localhost:8080/ws');
       console.log('소켓 접속 성공');
       const stompClient = Stomp.over(socket);
 
