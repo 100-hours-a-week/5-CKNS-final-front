@@ -113,13 +113,11 @@ const ChatPage = ({roomId,isSimple}) => {
         const fetchedUserId = response.data.data.userId; // userId도 함께 저장
         setNickname(fetchedNickname); // 닉네임 설정
         setUserId(fetchedUserId); // userId 설정
-        setIsLoading(false);
       } else {
         throw new Error('사용자 정보 요청 실패');
       }
     } catch (error) {
       console.error('사용자 정보 요청 실패:', error.message);
-      setIsLoading(false);
     }
   };
   
@@ -422,10 +420,8 @@ const ChatPage = ({roomId,isSimple}) => {
               <SkeletonChat />
               <SkeletonChat />
             </>
-          ) : messages.length === 0 ? (
-            // 메시지가 없을 때 빈 메시지 표시
-            <NoMessagesText>아직 채팅이 없습니다. 첫 번째 메시지를 보내보세요!</NoMessagesText>
-          ) : (
+          ) : messages.length > 0 ? (
+            // 메시지가 있을 때 메시지를 표시
             messages.map((message, index) => {
               const previousMessage = messages[index - 1];
               const nextMessage = messages[index + 1];
@@ -462,12 +458,12 @@ const ChatPage = ({roomId,isSimple}) => {
                 </React.Fragment>
               );
             })
-          )}
+          ) : !isLoading && messages.length === 0 ? (
+            // 로딩이 끝난 후 메시지가 없을 때 빈 메시지 표시
+            <NoMessagesText>아직 채팅이 없습니다. 첫 번째 메시지를 보내보세요!</NoMessagesText>
+          ) : null}
           <div ref={messageEndRef} />
         </MessageList>
-
-
-
         {toastVisible && <ToastMessage>최대 입력은 500자까지 가능합니다</ToastMessage>}
         <MessageInputContainer>
       
