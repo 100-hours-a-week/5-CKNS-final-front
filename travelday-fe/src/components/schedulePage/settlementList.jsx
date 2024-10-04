@@ -9,12 +9,13 @@ const SLIDER_CONTENT_WIDTH = 310;
 const SLIDER_HEIGHT = "80vh"; // Adjust to your desired height
 // const imageList = ['red', 'blue', 'green','yellow','purple']; // Example images
 
-const SettlementList = ({travelRoomId}) => {
+const SettlementList = ({travelRoomId, people}) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [transX, setTransX] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const startXRef = useRef(0);
     const [fetchedList,setFetchedList] = useState([]);
+
     const onMouseDown = (e) => {
         setIsDragging(true);
         startXRef.current = e.clientX;
@@ -85,7 +86,7 @@ const SettlementList = ({travelRoomId}) => {
         axiosInstance.post(`/api/settlement/${travelRoomId}`, {
         })
             .then(response => {
-                console.table(response.data.data);
+                // console.table(response.data.data);
                 fetchSettlementList()
             })
             .catch(error => {
@@ -93,8 +94,15 @@ const SettlementList = ({travelRoomId}) => {
             });
     }
 
-    function fetchSettlementDetails(settlementId) {
-        axiosInstance.get(`/api/settlement/${travelRoomId}`, {})
+    function deleteSettlement(settlementId) {
+        axiosInstance.delete(`/api/settlement/${travelRoomId}/${settlementId}`, {})
+            .then(response=>{
+                console.log(response);
+                fetchSettlementList();
+        })
+            .catch(error => {
+                console.error('정산 리스트 삭제 중 오류 발생',error)
+            })
     }
 
     useEffect(() => {
@@ -126,17 +134,17 @@ const SettlementList = ({travelRoomId}) => {
                 >
                     {/* Slide */}
                     {fetchedList.map((i, index) => (
-                        <div>
-                            <div key={index} style={{
+                        <div key={index}>
+                            <div  style={{
                                 width: `${SLIDER_CONTENT_WIDTH}px`,
-                                paddingLeft: currentIndex? 0 : 30,
+                                marginLeft: currentIndex? 0 : 15,
                                 // height: SLIDER_HEIGHT,
                                 height: "100%",
                                 display: "flex",
                                 justifyContent: "center",
                                 alignItems:"start"
                             }}>
-                                <Settlement settlementId={fetchedList[index].id} postSettlementList={postSettlementList} travelRoomId={travelRoomId} />
+                                <Settlement people={people} hasNoData={fetchedList.length === 1} settlementId={fetchedList[index].id} postSettlementList={postSettlementList} travelRoomId={travelRoomId} deleteSettlement={deleteSettlement} />
                             </div>
                         </div>
                     ))}
