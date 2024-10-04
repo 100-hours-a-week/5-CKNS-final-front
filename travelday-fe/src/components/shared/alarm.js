@@ -9,17 +9,16 @@ const AlarmSidebar = ({ isOpen, onClose, alarms = [] }) => {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleAlarmClick = (travelRoomId, content, notificationId) => {
-    // console.log('notificationId:',notificationId);
-    setSelectedRoom({ travelRoomId, content, notificationId });
+  const handleAlarmClick = (travelRoomId, content, notificationId, invitationId) => {
+    setSelectedRoom({ travelRoomId, content, notificationId, invitationId });
     setIsModalOpen(true);
   };
-
+  
   const handleAccept = async () => {
     try {
       const accessToken = localStorage.getItem('accessToken');
       const response = await axiosInstance.put(
-        `/api/rooms/${selectedRoom.travelRoomId}/invitation/${selectedRoom.notificationId}`,
+        `/api/rooms/${selectedRoom.travelRoomId}/invitation/${selectedRoom.invitationId}`,
         { status: 'Y' },
         {
           headers: {
@@ -32,12 +31,16 @@ const AlarmSidebar = ({ isOpen, onClose, alarms = [] }) => {
         console.log('초대 수락 성공');
         setIsModalOpen(false);
         onClose();
+        setSelectedRoom(null); // 선택된 방 정보 초기화
         navigate(`/schedule/${selectedRoom.travelRoomId}`);
       }
     } catch (error) {
-      console.error('초대 수락 실패:', error);
+      console.log('invitationId:', selectedRoom.invitationId);
+      console.log('notificationId:', selectedRoom.notificationId);
+      console.error('초대 수락 실패:', error.message); 
     }
   };
+  
 
   const handleDecline = async () => {
     try {
