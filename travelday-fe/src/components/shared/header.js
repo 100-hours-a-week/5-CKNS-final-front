@@ -40,26 +40,32 @@ const Header = ({ showBackButton = false, onBackClick }) => {
               },
           });
       
-          const notification = response.data.data;
+          const notifications = response.data.data;
       
-          if (Array.isArray(notification)) {
-              // 알림이 배열인 경우 그대로 사용
-              setAlarms(notification);
+          if (Array.isArray(notifications)) {
+            console.log('노티피케이션:',notifications);
+              // 알림 배열에서 notificationId와 invitionId 추출
+              const alarmsWithInvitionId = notifications.map(notification => ({
+                  notificationId: notification.notificationId,
+                  invitationId: notification.invitationId ,
+                  ...notification,  // 기존 알림 정보도 포함
+              }));
+
+              setAlarms(alarmsWithInvitionId);  // 알람에 invitionId 추가
+              setHasNewAlarm(true);
+              console.log('알람 조회 성공! 알람 내용:', alarmsWithInvitionId);
           } else {
               setHasNewAlarm(false);
-              // console.log('알람이 없습니다.');
+              console.log('알람이 없습니다.');
           }
-      
-          setHasNewAlarm(true);
-          console.log('알람 조회 성공! 알람 내용:', notification);
-      } catch (error) {
+
+        } catch (error) {
           console.error('알림 확인 중 오류 발생:', error);
-      }
-      
+        }
     };
 
     checkNotifications(); // 함수 호출
-}, []);
+  }, []);
 
 
 
