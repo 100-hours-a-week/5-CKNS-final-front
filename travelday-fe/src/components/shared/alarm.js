@@ -14,6 +14,8 @@ const AlarmSidebar = ({ isOpen, onClose, alarms = [] }) => {
     setIsModalOpen(true);
   };
   
+
+  
   const handleAccept = async () => {
     try {
       const accessToken = localStorage.getItem('accessToken');
@@ -46,7 +48,7 @@ const AlarmSidebar = ({ isOpen, onClose, alarms = [] }) => {
     try {
       const accessToken = localStorage.getItem('accessToken');
       const response = await axiosInstance.put(
-        `/api/rooms/${selectedRoom.travelRoomId}/invitation/${selectedRoom.notificationId}`,
+        `/api/rooms/${selectedRoom.travelRoomId}/invitation/${selectedRoom.invitationId}`,
         { status: 'N' },
         {
           headers: {
@@ -130,7 +132,7 @@ const AlarmSidebar = ({ isOpen, onClose, alarms = [] }) => {
             {alarms.map((alarm, index) => (
               <AlarmItem
                 key={index}
-                onClick={() => handleAlarmClick(alarm.travelRoomId, alarm.content, alarm.notificationId)}
+                onClick={() => handleAlarmClick(alarm.travelRoomId, alarm.content, alarm.notificationId, alarm.invitationId)} // invitationId 추가
               >
                 <AlarmMessage>{alarm.content}</AlarmMessage>
                 <InviteTime>{getTimeDifference(alarm.notificationTime)}</InviteTime>
