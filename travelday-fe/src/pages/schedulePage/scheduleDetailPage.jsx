@@ -14,7 +14,7 @@ import ScheduleTab from "../../components/schedulePage/scheduleTab";
 const ScheduleDetail = () => {
     const { travelRoomId } = useParams();
     const navigate = useNavigate();
-
+    const [users, setUsers] = useState([]);
     const [fetchedSchedule, setFetchedSchedule] = useState(null);
     const [mapMarkers, setMapMarkers] = useState([]);
     const [selectedMarker, setSelectedMarker] = useState(null);
@@ -84,6 +84,22 @@ const ScheduleDetail = () => {
         const hue = (day / totalDate) * 30 + 240; // Generate hue value from 0 to 360
         return `hsl(${hue}, 100%, 50%)`; // Full saturation and medium lightness
     };
+
+
+    function fetchUsers() {
+        axiosInstance.get(`/api/rooms/${travelRoomId}/user`)
+        .then(response => {
+            if (response.data) {
+                // console.log("ADSADADASD")
+                // console.log(response.data.data);
+                setUsers(response.data.data);
+            }
+        })
+    }
+
+    useEffect(()=>{
+        fetchUsers()
+    },[])
 
     return (
         <Container>
@@ -176,7 +192,7 @@ const ScheduleDetail = () => {
                                     <PlusIcon>+</PlusIcon>지도에서 장소 추가
                                 </ActionButton>
                             </ButtonWrapper>
-                            <ScheduleTab travelRoomId={travelRoomId} startDate={fetchedSchedule.startDate} endDate={fetchedSchedule.endDate} />
+                            <ScheduleTab people={users} travelRoomId={travelRoomId} startDate={fetchedSchedule.startDate} endDate={fetchedSchedule.endDate} />
                         </ContentContainer>
                     </>
                 ) : (

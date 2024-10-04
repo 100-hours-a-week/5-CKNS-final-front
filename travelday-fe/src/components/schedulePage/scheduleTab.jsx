@@ -5,7 +5,7 @@ import StickyBox from 'react-sticky-box';
 import styled from "styled-components";
 import ChatPage from "../../pages/chatPage/chatPage";
 import SettlementList from "./settlementList";
-const items = (travelRoomId,startDate,endDate) => [
+const items = (travelRoomId,startDate,endDate,people) => [
     {
         label:"일정 보기",
         key:"일정",
@@ -25,13 +25,12 @@ const items = (travelRoomId,startDate,endDate) => [
     {
         label:"정산 하기",
         key:"정산",
-        children: <SettlementList travelRoomId={travelRoomId}/>
+        children: <SettlementList people={people} travelRoomId={travelRoomId}/>
 
     }
 ]
-console.table(items)
 
-const ScheduleTab = ({travelRoomId,startDate,endDate}) => {
+const ScheduleTab = ({travelRoomId,startDate,endDate,people}) => {
     // const {
     //     token: { colorBgContainer },
     // } = theme.useToken();
@@ -56,7 +55,7 @@ const ScheduleTab = ({travelRoomId,startDate,endDate}) => {
         </StickyBox>
     );
 
-    return <StyledTabs defaultActiveKey="1" renderTabBar={renderTabBar}  items={items(travelRoomId,startDate,endDate)} />;
+    return <StyledTabs defaultActiveKey="1" renderTabBar={renderTabBar}  items={items(travelRoomId,startDate,endDate,people)} />;
 };
 
 
