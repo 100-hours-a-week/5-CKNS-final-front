@@ -207,7 +207,8 @@ const ScheduleDetailList = ({ travelRoomId, startDate, endDate }) => {
     async function checkEditable() {
         try {
             const response = await axiosInstance.post(`/api/rooms/${travelRoomId}/plan/check/editable`,{});
-            return response.data?.data?.length > 0;
+            // console.log(response);
+            return response.data?.data;
         } catch (error) {
             console.error('Error checking editable state:', error);
             return false; // Return false or handle the error as needed
