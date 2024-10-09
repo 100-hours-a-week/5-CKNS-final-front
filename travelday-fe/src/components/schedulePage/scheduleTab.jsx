@@ -29,6 +29,7 @@ const items = (travelRoomId,startDate,endDate,people) => [
 
     }
 ]
+// console.table(items)
 
 const ScheduleTab = ({travelRoomId,startDate,endDate,people}) => {
     // const {

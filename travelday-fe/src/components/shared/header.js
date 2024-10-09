@@ -24,16 +24,16 @@ const Header = ({ showBackButton = false, onBackClick }) => {
 
   useEffect(() => {
     const checkNotifications = async () => {
-        console.log('checkNotifications 함수 시작'); 
+        // console.log('checkNotifications 함수 시작'); 
 
         const accessToken = localStorage.getItem('accessToken');
         if (!accessToken) {
-            console.log('AccessToken이 없습니다. 알람 조회를 중단합니다.');
+            // console.log('AccessToken이 없습니다. 알람 조회를 중단합니다.');
             return;
         }
 
         try {
-          console.log('알람 조회 API 호출 시작');
+          // console.log('알람 조회 API 호출 시작');
           const response = await axiosInstance.get('/api/notification', {
               headers: {
                   Authorization: `Bearer ${accessToken}`,
@@ -43,7 +43,7 @@ const Header = ({ showBackButton = false, onBackClick }) => {
           const notifications = response.data.data;
       
           if (Array.isArray(notifications)) {
-            console.log('노티피케이션:',notifications);
+            // console.log('노티피케이션:',notifications);
               // 알림 배열에서 notificationId와 invitionId 추출
               const alarmsWithInvitionId = notifications.map(notification => ({
                   notificationId: notification.notificationId,
@@ -53,10 +53,10 @@ const Header = ({ showBackButton = false, onBackClick }) => {
 
               setAlarms(alarmsWithInvitionId);  // 알람에 invitionId 추가
               setHasNewAlarm(true);
-              console.log('알람 조회 성공! 알람 내용:', alarmsWithInvitionId);
+              // console.log('알람 조회 성공! 알람 내용:', alarmsWithInvitionId);
           } else {
               setHasNewAlarm(false);
-              console.log('알람이 없습니다.');
+              // console.log('알람이 없습니다.');
           }
 
         } catch (error) {

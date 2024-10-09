@@ -41,7 +41,7 @@ export async function handleAllowNotification() {
                 vapidKey: "BIs8qF7l2tBm1Ygtf7g8_xdmAHbAf15yQ9bx-UAEYuPmOPDsO2P8cAO2ntlkyrQ40r5wZ6-fXm7BqbXAR7PBCXk"
             });
             if (fcmToken) {
-                console.log("Allow Notification", fcmToken);
+                // console.log("Allow Notification", fcmToken);
                 sendTokenToServer(fcmToken);// (토큰을 서버로 전송하는 로직)
             } else {
                 alert(
@@ -72,7 +72,7 @@ const sendTokenToServer = async (fcmToken) => {
               },
           }
       );
-      console.log("서버로 토큰 전달 완료:", response.data);
+    //   console.log("서버로 토큰 전달 완료:", response.data);
   } catch (error) {
       console.error("토큰 전달시 에러 발생:", error);
   }
@@ -86,7 +86,7 @@ export function registerServiceWorker() {
                 navigator.serviceWorker
                     .register("/firebase-messaging-sw.js")
                     .then((registration) => {
-                        console.log("Service Worker가 scope에 등록되었습니다.:", registration.scope);
+                        // console.log("Service Worker가 scope에 등록되었습니다.:", registration.scope);
                         resolve(registration);
                     })
                     .catch((err) => {

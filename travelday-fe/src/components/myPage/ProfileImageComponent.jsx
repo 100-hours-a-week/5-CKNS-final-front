@@ -68,7 +68,7 @@ const ProfileImageComponent = ({profileImagePath}) => {
             });
 
             if (response.status === 200) {
-                console.log('Image uploaded successfully');
+                // console.log('Image uploaded successfully');
                 window.location.reload();
             } else {
                 throw new Error(`Upload failed with status: ${response.status}`);

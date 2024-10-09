@@ -40,7 +40,7 @@ const ChatListPage = () => {
         });
         
         const lastMessages = lastMessagesResponse.data.data;
-        console.log(lastMessages);
+        // console.log(lastMessages);
   
         // 3. 채팅방 목록에 마지막 메시지 추가
         const formattedChatRooms = rooms.map((room) => {

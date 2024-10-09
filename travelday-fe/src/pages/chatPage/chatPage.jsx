@@ -107,8 +107,8 @@ const ChatPage = ({roomId,isSimple}) => {
       });
   
       if (response.status === 200) {
-        console.log('유저 정보 받아왔다!',response);
-        console.log('포챠코 아이디:',userId);
+        // console.log('유저 정보 받아왔다!',response);
+        // console.log('포챠코 아이디:',userId);
         const fetchedNickname = response.data.data.nickname;
         const fetchedUserId = response.data.data.userId; // userId도 함께 저장
         setNickname(fetchedNickname); // 닉네임 설정
@@ -134,20 +134,20 @@ const ChatPage = ({roomId,isSimple}) => {
       // console.log('STOMP 클라이언트 연결 시도 중...');
       const socket = new SockJS('https://dev.thetravelday.co.kr/ws');
       // const socket = new SockJS('http://localhost:8080/ws');
-      console.log('소켓 접속 성공');
+      // console.log('소켓 접속 성공');
       const stompClient = Stomp.over(socket);
 
       stompClient.connect({ Authorization: `Bearer ${localStorage.getItem('accessToken')}` }, (frame) => {
-        console.log('STOMP 연결 성공', frame);
+        // console.log('STOMP 연결 성공', frame);
         setIsConnected(true);
         retryCount = 0;
 
         stompClient.subscribe(`/sub/chat/rooms/${travelRoomId}`, (message) => {
-          console.log("수신된 메시지:", message.body); // 수신된 메시지 원본 확인
+          // console.log("수신된 메시지:", message.body); // 수신된 메시지 원본 확인
           
           if (message.body) {
             const parsedMessage = JSON.parse(message.body);
-            console.log("파싱된 메시지:", parsedMessage); // 파싱된 메시지 확인
+            // console.log("파싱된 메시지:", parsedMessage); // 파싱된 메시지 확인
         
             const messageToAdd = {
               id: parsedMessage.id || new Date().getTime(),
@@ -158,12 +158,12 @@ const ChatPage = ({roomId,isSimple}) => {
               sender: parsedMessage.senderNickname || 'Unknown'
             };
         
-            console.log("추가할 메시지:", messageToAdd); // 추가할 메시지 확인
+            // console.log("추가할 메시지:", messageToAdd); // 추가할 메시지 확인
             setMessages((prevMessages) => [...prevMessages, messageToAdd]);
         
             // 메시지 응답이 오면 응답 처리 타이머 해제
             clearTimeout(messageAcknowledgeTimer.current);
-            console.log("서버로부터 메시지 응답 수신, 입력 차단 해제");
+            // console.log("서버로부터 메시지 응답 수신, 입력 차단 해제");
           } else {
             console.error("메시지 본문이 없습니다.");
           }
@@ -240,7 +240,7 @@ const ChatPage = ({roomId,isSimple}) => {
       try {
         if (stompClientRef.current && stompClientRef.current.connected) {
           stompClientRef.current.send(`/pub/chat/rooms/${travelRoomId}`, {}, newMessage);
-          console.log('메시지 전송 시도:', newMessage); // 메시지 전송 시도 로그
+          // console.log('메시지 전송 시도:', newMessage); // 메시지 전송 시도 로그
         } else {
           console.error('STOMP 클라이언트가 연결되어 있지 않습니다.');
         }
@@ -254,7 +254,7 @@ const ChatPage = ({roomId,isSimple}) => {
       // 서버로부터 메시지 응답이 오지 않을 시 5초 동안 입력 차단
       messageAcknowledgeTimer.current = setTimeout(() => {
         setIsRateLimited(true);
-        console.log('응답 없음, 입력 5초간 차단');
+        // console.log('응답 없음, 입력 5초간 차단');
         resetRateLimit();
       }, 5000);
     }

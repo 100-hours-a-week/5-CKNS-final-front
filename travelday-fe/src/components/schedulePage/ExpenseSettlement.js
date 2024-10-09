@@ -132,7 +132,7 @@ const handleRoundAmountChange = (e) => {
 
     const settlementDetailId = rounds[index].id;
     const settlementId = rounds[index].settlementId;
-    console.table(rounds)
+    // console.table(rounds)
     axiosInstance.delete(`/api/settlement/${travelRoomId}/${settlementId}/${settlementDetailId}`, {})
         .then(response=>{fetchSettlementDetails(settlementId)})
         .catch(error=>console.log(error));
@@ -224,7 +224,7 @@ const goBack = () => {
           const fetchedSettlement = response.data.data.map(settlement => {
             return {...settlement,key:settlement.id}
           });
-          console.table(fetchedSettlement);
+          // console.table(fetchedSettlement);
           setRounds(fetchedSettlement);
         })
         .catch(error=>{
