@@ -152,7 +152,7 @@ const ScheduleDetailList = ({ travelRoomId, startDate, endDate }) => {
         })
             .then(response => {
                 if (response.data?.data?.length > 0) {
-                    console.table(response.data.data);
+                    // console.table(response.data.data);
                     modifySchedule(response.data.data);
                 }
                 else{

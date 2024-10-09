@@ -28,7 +28,7 @@ const items = (travelRoomId,startDate,endDate) => [
         children: <Settlement travelRoomId={travelRoomId}/>
     }
 ]
-console.table(items)
+// console.table(items)
 
 const ScheduleTab = ({travelRoomId,startDate,endDate}) => {
     // const {

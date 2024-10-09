@@ -30,15 +30,15 @@ const AlarmSidebar = ({ isOpen, onClose, alarms = [] }) => {
         }
       );
       if (response.status === 200) {
-        console.log('초대 수락 성공');
+        // console.log('초대 수락 성공');
         setIsModalOpen(false);
         onClose();
         setSelectedRoom(null); // 선택된 방 정보 초기화
         navigate(`/schedule/${selectedRoom.travelRoomId}`);
       }
     } catch (error) {
-      console.log('invitationId:', selectedRoom.invitationId);
-      console.log('notificationId:', selectedRoom.notificationId);
+      // console.log('invitationId:', selectedRoom.invitationId);
+      // console.log('notificationId:', selectedRoom.notificationId);
       console.error('초대 수락 실패:', error.message); 
     }
   };
@@ -58,7 +58,7 @@ const AlarmSidebar = ({ isOpen, onClose, alarms = [] }) => {
         }
       );
       if (response.status === 200) {
-        console.log('초대 거절 성공');
+        // console.log('초대 거절 성공');
         setIsModalOpen(false);
         setSelectedRoom(null);
       }

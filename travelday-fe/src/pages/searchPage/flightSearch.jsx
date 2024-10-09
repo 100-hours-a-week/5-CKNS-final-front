@@ -50,7 +50,7 @@ const FlightSearch = () => {
       });
   
       const flightData = response.data.data;
-      console.log('전체 항공권 데이터:', response);
+      // console.log('전체 항공권 데이터:', response);
   
       // 항공편 데이터에서 각 항공편의 마지막 구간 도착 IATA 코드를 사용하여 필터링
       const flightsMap = new Map(); // 도착 IATA 코드 + 가격을 키로 하는 Map 생성
@@ -80,7 +80,7 @@ const FlightSearch = () => {
   
       const mappedFlights = Array.from(flightsMap.values()); // Map의 값들을 배열로 변환
       setFlights(mappedFlights); // 상태에 저장
-      console.log('필터링된 항공권 데이터:', mappedFlights);
+      // console.log('필터링된 항공권 데이터:', mappedFlights);
     } catch (error) {
       console.error('항공권 데이터를 가져오는데 실패:', error);
     }

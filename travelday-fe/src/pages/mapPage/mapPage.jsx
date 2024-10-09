@@ -127,7 +127,7 @@ function MapPage() {
             {markers.length > 0 ? markers.map((marker, index) => (
               <Marker
                 key={index} 
-                position={marker.position} 
+                position={marker.position}  
                 onClick={() => handleMarkerClick(marker)}
                 animation={2}
               />
