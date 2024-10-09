@@ -137,7 +137,8 @@
 
 ### system flow
 ---
-![service_architecture.png](./docs/images/service_architecture.png)
+img src = "https://github.com/user-attachments/assets/d2f4f24e-b411-447d-bc4f-27ccbcdde3d5" />
+
 
 ---
 ### user flow
@@ -148,7 +149,8 @@
 ## 📝 데이터베이스 설계 ERD
 
 ---
-![service_architecture.png](./docs/images/erd.png)
+![image](https://github.com/user-attachments/assets/f1703623-b5da-4edc-8d30-94abc6a51b02)
+
 
 ## ✅ 개발 문서 
 
