@@ -1,5 +1,5 @@
 # ✈️ 여행한DAY - The Travel Day ✈️
-<img src = "https://github.com/user-attachments/assets/c389a9c2-6e1c-425f-b10a-1ef4db17df05" width="600" height="400" align="center"/>
+<img src = "https://github.com/user-attachments/assets/c389a9c2-6e1c-425f-b10a-1ef4db17df05" width="600" align="center"/>
 
 # 🔎 서비스 소개 Introduction
 
