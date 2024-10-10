@@ -45,8 +45,8 @@ const FlightSearch = () => {
       };
   
       const response = await axiosInstance.get('/api/flights/lowestPrice/list', {
-        headers: { Authorization: `Bearer ${accessToken}` },
-        withCredentials: true, // 쿠키를 전송하기 위한 옵션
+        // headers: { Authorization: `Bearer ${accessToken}` },
+        // withCredentials: true, // 쿠키를 전송하기 위한 옵션
       });
   
       const flightData = response.data.data;
