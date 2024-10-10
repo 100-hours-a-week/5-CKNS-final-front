@@ -16,7 +16,7 @@ const Allocator = ({ people, setIsAllocating }) => {
                 {people.map((person, index) => (
                     <PeopleItem key={index}>
                         <Person>
-                            <ProfileImage src={`https:img.thetravelday.co.kr/${person.profileImagePath}`} alt={`${person.nickname} profile`} />
+                            <ProfileImage src={`https://img.thetravelday.co.kr/${person.profileImagePath}`} alt={`${person.nickname} profile`} />
                             {person.nickname}
                         </Person>
                         <AmountWrapper>
