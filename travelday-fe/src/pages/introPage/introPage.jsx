@@ -14,8 +14,8 @@ const Intro = () => {
     <PageContainer>
       <VideoContainer>
         <BackgroundVideo autoPlay loop muted>
-          {/* <source src={require('../../images/intro/intro.mp4')} type="video/mp4" /> */}
-          <source src="https://temp-travelday.s3.ap-northeast-2.amazonaws.com/intro.mp4" type="video/mp4" />
+          <source src={require('../../images/intro/intro.mp4')} type="video/mp4" />
+          {/* <source src="https://temp-travelday.s3.ap-northeast-2.amazonaws.com/intro.mp4" type="video/mp4" /> */}
           Your browser does not support the video tag.
         </BackgroundVideo>
         <OverlayButton onClick={handleButtonClick}>
