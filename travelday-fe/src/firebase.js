@@ -1,54 +1,101 @@
 import { initializeApp } from "firebase/app";
-import { getMessaging, getToken } from "firebase/messaging";
-
+import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import axiosInstance from "./utils/axiosInstance";
 
 const firebaseConfig = {
-  apiKey: process.env.REACT_APP_FIREBASE_KEY,
-  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.REACT_APP_FIREBASE_STORAGEBUCKET,
-  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER,
-  appId: process.env.REACT_APP_FIREBASE_APPID
+    apiKey: "AIzaSyB8gOvYAD2c_sVuRZKMhfn13wXd5mwHRp4",
+    authDomain: "travelday-6fd20",
+    projectId: "travelday-6fd20",
+    storageBucket: "travelday-6fd20.appspot.com",
+    messagingSenderId: "395135515942",
+    appId: "1:395135515942:web:186fc14a2959f7fb0f55e7",
+    measurementId: "G-2R5M42P16Z"
 };
 
 // Firebase 초기화
 const app = initializeApp(firebaseConfig);
 
-
-// FCM 초기화
+// // FCM 초기화
 const messaging = getMessaging(app);
 
+onMessage(messaging, (payload) => {
+    // console.log("알림 도착 ", payload);
+    const notificationTitle = payload.notification.title;
+    const notificationOptions = {
+        body: payload.notification.body
+    };
 
-export const requestForToken = (setTokenFound) => {
-  return getToken(messaging, { vapidKey: process.env.REACT_APP_FIREBASE_VAPID_KEY })
-    .then((currentToken) => {
-      if (currentToken) {
-        // console.log("FCM Token: ", currentToken);
-        setTokenFound(true);
-        // 토큰을 백엔드로 전송하는 함수 호출
-        sendTokenToServer(currentToken);
-      } else {
-        // console.log("No registration token available.");
-        setTokenFound(false);
-      }
-    })
-    .catch((err) => {
-      // console.log("An error occurred while retrieving token. ", err);
-      setTokenFound(false);
+    if (Notification.permission === "granted") {
+        new Notification(notificationTitle, notificationOptions);
+    }
+});
+
+export async function handleAllowNotification() {
+    try {
+        await registerServiceWorker();
+
+        const permission = await Notification.requestPermission();
+
+        if (permission === "granted") {
+            const fcmToken = await getToken(messaging, {
+                vapidKey: "BIs8qF7l2tBm1Ygtf7g8_xdmAHbAf15yQ9bx-UAEYuPmOPDsO2P8cAO2ntlkyrQ40r5wZ6-fXm7BqbXAR7PBCXk"
+            });
+            if (fcmToken) {
+                // console.log("Allow Notification", fcmToken);
+                sendTokenToServer(fcmToken);// (토큰을 서버로 전송하는 로직)
+            } else {
+                alert(
+                    "토큰 등록이 불가능 합니다. 생성하려면 권한을 허용해주세요"
+                );
+            }
+        } else if (permission === "denied") {
+            alert(
+                "web push 권한이 차단되었습니다. 알림을 사용하시려면 권한을 허용해주세요"
+            );
+        }
+    } catch (error) {
+        console.error("푸시 토큰 가져오는 중에 에러 발생", error);
+    }
+}
+
+const sendTokenToServer = async (fcmToken) => {
+  try {
+      const accessToken = localStorage.getItem('accessToken'); 
+
+      const response = await axiosInstance.post(
+          '/api/fcm',
+          { fcmToken }, // 요청 바디
+          {
+              headers: {
+                  Authorization: `Bearer ${accessToken}`, 
+                  'Content-Type': 'application/json', 
+              },
+          }
+      );
+    //   console.log("서버로 토큰 전달 완료:", response.data);
+  } catch (error) {
+      console.error("토큰 전달시 에러 발생:", error);
+  }
+};
+
+
+export function registerServiceWorker() {
+    return new Promise((resolve, reject) => {
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", function () {
+                navigator.serviceWorker
+                    .register("/firebase-messaging-sw.js")
+                    .then((registration) => {
+                        // console.log("Service Worker가 scope에 등록되었습니다.:", registration.scope);
+                        resolve(registration);
+                    })
+                    .catch((err) => {
+                        console.log("Service Worker 등록 실패:", err);
+                        reject(err);
+                    });
+            });
+        } else {
+            reject(new Error("Service Workers are not supported in this browser."));
+        }
     });
-};
-
-const baseURL = process.env.REACT_APP_GENERATED_SERVER_URL;
-const sendTokenToServer = (token) => {
-  // 서버로 토큰 전송
-  fetch(baseURL + "api/fcm", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ token }),
-  })
-  .then(response => response.json())
-  // .then(data => console.log("Token sent to server:", data))
-  .catch(error => console.error("Error sending token to server:", error));
-};
+}

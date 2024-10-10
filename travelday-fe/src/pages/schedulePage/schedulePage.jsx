@@ -6,7 +6,7 @@ import ScheduleList from '../../components/schedulePage/scheduleList';
 import { useNavigate } from 'react-router-dom';
 import Footer from '../../components/footer/footer.js';
 import axiosInstance from '../../utils/axiosInstance.js';
-import backgroundVideo from '../../images/schedule/null.mp4'; // 비디오 파일의 경로를 import로 수정
+import backgroundVideo from '../../images/schedule/null.mp4'; 
 
 const SchedulePage = () => {
   const [schedules, setSchedules] = useState([]);
@@ -118,7 +118,6 @@ const ContentWrapper = styled.div`
 
 const Title = styled.h1`
   font-size: 20px;
-  font-weight: bold;
   margin-bottom: 40px;
   margin-top: 50px;
 `;

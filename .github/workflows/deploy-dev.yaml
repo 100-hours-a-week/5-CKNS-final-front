@@ -30,6 +30,9 @@ jobs:
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: echo 'npm cache missed!'
         working-directory: travelday-fe
+#
+#      - name: public 폴더에 firebase.js 생성
+#        run: echo "${{ secrets.FIREBASE_MESSAGING_SW_JS }}" > travelday-fe/public/firebase.js
 
       - name: 의존성 설치 및 빌드
         run: |
@@ -65,7 +68,8 @@ jobs:
         uses: chetan/invalidate-cloudfront-action@v2
         env:
           DISTRIBUTION: ${{ secrets.AWS_DEV_CLOUDFRONT_ID }}
-          PATHS: "/index.html"
+#          PATHS: "/index.html"
+          PATHS: "/*"
           AWS_REGION: ${{ secrets.AWS_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

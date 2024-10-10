@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import Header from '../../components/shared/header.js'; 
@@ -11,6 +10,7 @@ import PriceIcon from '../../images/filter/price.png';
 import ScheduleIcon from '../../images/footer/schedule.png';
 import PplIcon from '../../images/main/detail/ppl.png';
 import axiosInstance from "../../utils/axiosInstance";
+import { useNavigate } from 'react-router-dom';
 
 const airportNames = {
   PQC: '푸꾸옥 국제공항',
@@ -75,7 +75,8 @@ const airlineNames = {
     TW: '티웨이항공',
     VJ: '비엣젯항공',
     NX: '아주항공',
-    HX: '홍콩항공'
+    HX: '홍콩항공',
+    W2: '플렉스플라이트'
 };
 
 const airlineUrls = {
@@ -111,7 +112,8 @@ const airlineUrls = {
     TW: 'https://www.twayair.com/app/main',
     VJ: 'https://www.vietjetair.com/ko', //비엣젯 항공
     NX: 'https://www.airmacau.com.mo/#/' ,//아주항공
-    HX: 'https://www.hongkongairlines.com/en_HK/hx/homepage'//홍공항공
+    HX: 'https://www.hongkongairlines.com/en_HK/hx/homepage',//홍공항공
+    W2: 'https://flexflight.dk/' //플렉스 플라이트
 };
 
 const getAirportName = (iataCode) => airportNames[iataCode] || iataCode;
@@ -144,6 +146,7 @@ const MainDetailPage = () => {
   const { id } = useParams(); 
   const { t } = useTranslation();
   const [flight, setFlight] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     axiosInstance.get(`/api/flights/lowestPrice/list`)
@@ -175,7 +178,7 @@ const MainDetailPage = () => {
 
   return (
     <PageContainer>
-      <Header />
+     <Header showBackButton={true} onBackClick={() => navigate(-1)} />
       <Content>
         {image ? <StyledImage src={image} alt={`Image ${id}`} /> : <p>{t('imageNotFound')}</p>}
         <FlightItem>

@@ -16,7 +16,9 @@ function handleSessionExpiration() {
 // Axios 인스턴스 생성
 const baseURL = process.env.REACT_APP_GENERATED_SERVER_URL;
 const axiosInstance = axios.create({
+  
   baseURL, // 백엔드 API의 기본 URL
+
   withCredentials: true, // 쿠키를 포함한 CORS 요청을 위해 true로 설정
 });
 

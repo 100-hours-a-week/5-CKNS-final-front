@@ -1,6 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
 import { useJsApiLoader } from '@react-google-maps/api';
+import './App.css';
+import './i18n';
+
+// 필요한 페이지 컴포넌트 임포트
 import FindPage from './pages/searchPage/searchingPage';
 import FlightResultPage from './pages/resultPage/flightResultPage';
 import HotelResultPage from './pages/resultPage/hotelResultPage';
@@ -24,11 +28,18 @@ import PrivacyPage from './pages/mainPage/privacyPage';
 import ChatPage from './pages/chatPage/chatPage';
 import ChatTest from './pages/chatPage/chatTest';
 import ChatListPage from './pages/chatPage/chatListPage';
+import ExpenseSettlement from "./components/schedulePage/settlement";
+
+import "./firebase.js";
 
 import './App.css';
 import './i18n';
 
-import { requestForToken } from './firebase'; 
+
+
+import FlightDetailPage from './pages/resultPage/flightDetailPage';
+import {handleAllowNotification} from "./firebase";
+
 
 const libraries = ['places'];
 
@@ -38,15 +49,15 @@ function App() {
     libraries,
   });
 
-  const [isTokenFound, setTokenFound] = useState(false);
-
-  useEffect(() => {
-    requestForToken(setTokenFound); // FCM 토큰 요청
-  }, []);
+  // useEffect(() => {
+  //   handleAllowNotification()
+  // }, []);
 
   if (!isLoaded) {
     return null;
   }
+
+
 
   return (
     <Router>
@@ -94,6 +105,8 @@ function MainRouter() {
       <Route path="/chat/:travelRoomId" element={<ChatPage />} />
       <Route path="/chat/test" element={<ChatTest />} />
       <Route path="/chatList" element={<ChatListPage />} />
+      <Route path="/settlement" element={<ExpenseSettlement />} />
+      <Route path='/flightdetail/:id' element={<FlightDetailPage />} />
     </Routes>
   );
 }

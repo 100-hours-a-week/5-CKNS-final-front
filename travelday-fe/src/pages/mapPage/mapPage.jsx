@@ -60,7 +60,8 @@ function MapPage() {
             map.setZoom(12);
           }
         } else {
-          console.error('Places Service failed:', status); 
+          console.error('Places Service failed:', status);
+          alert("검색 결과가 없습니다!")
         }
       });
     } else {
@@ -120,12 +121,14 @@ function MapPage() {
             center={center}
             zoom={10}
             onLoad={map => setMap(map)}
-            options={{streetViewControl:false,mapTypeControl:false,styles:[{featureType:"poi",stylers:[{visibility:'off'}]}]}}
+            options={{streetViewControl:false,mapTypeControl:false,styles:[{featureType:"poi",stylers:[{visibility:'off'}]}], gestureHandling: 'greedy'
+          }}
+
           >
             {markers.length > 0 ? markers.map((marker, index) => (
               <Marker
                 key={index} 
-                position={marker.position} 
+                position={marker.position}  
                 onClick={() => handleMarkerClick(marker)}
                 animation={2}
               />

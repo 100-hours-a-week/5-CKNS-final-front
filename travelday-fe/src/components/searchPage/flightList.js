@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom'; 
 
 const FlightList = ({ flights }) => {
   return (
@@ -12,8 +13,14 @@ const FlightList = ({ flights }) => {
 };
 
 const FlightItem = ({ flight }) => {
+  const navigate = useNavigate(); 
+
+  const handleClick = () => {
+    navigate(`/flightdetail/${flight.iataCode}`); 
+  };
+
   return (
-    <ItemContainer>
+    <ItemContainer onClick={handleClick}>
       <FlightImage src={flight.image} isEmpty={!flight.image} />
       <FlightDetails>
         <Country>{flight.country}</Country>
@@ -41,6 +48,9 @@ const ItemContainer = styled.div`
   flex-direction: column;
   background-color: #fff;
   gap: 10px;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease;
+
 `;
 
 const FlightImage = styled.div`
@@ -77,7 +87,6 @@ const Schedule = styled.div`
 const Price = styled.div`
   font-size: 12px;
   color: #007BFF;
-
 `;
 
 export default FlightList;

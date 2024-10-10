@@ -1,5 +1,6 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import axiosInstance from '../../utils/axiosInstance';
 import { useNavigate } from 'react-router-dom';
 import backIcon from '../../images/header/back.png'; 
 import bellIcon from '../../images/header/bell.png';
@@ -11,33 +12,62 @@ import AlarmSidebar from '../../components/shared/alarm.js';
 const Header = ({ showBackButton = false, onBackClick }) => {
   const navigate = useNavigate();
   const [isAlarmOpen, setIsAlarmOpen] = useState(false);
-  const [alarms, setAlarms] = useState([
-    {
-      roomId: 1,
-      inviter: '엘깅이',
-      roomName: '공듀들의 일본여행',
-      invitedAt: '2024-09-02 14:00',
-    },
-    {
-      roomId: 2,
-      inviter: '션',
-      roomName: '제주도 덩어리즈',
-      invitedAt: '2024-09-01 15:30',
-    },
-    {
-      roomId: 3,
-      inviter: '이든하',
-      roomName: '스껄',
-      invitedAt: '2024-09-01 14:00',
-    },
-  ]);
-  // for back button showing animation
-  const [isDelayedTrue, setIsDelayedTrue] = useState(false);
-  useEffect(()=>{
+  const [hasNewAlarm, setHasNewAlarm] = useState(false); 
+  const [alarms, setAlarms] = useState([]);
+  const [isDelayedTrue, setIsDelayedTrue] = useState(false); 
+
+  useEffect(() => {
     if (showBackButton) {
         setIsDelayedTrue(true);
     }
-  },[showBackButton])
+  }, [showBackButton]);
+
+  useEffect(() => {
+    const checkNotifications = async () => {
+        // console.log('checkNotifications 함수 시작'); 
+
+        const accessToken = localStorage.getItem('accessToken');
+        if (!accessToken) {
+            // console.log('AccessToken이 없습니다. 알람 조회를 중단합니다.');
+            return;
+        }
+
+        try {
+          // console.log('알람 조회 API 호출 시작');
+          const response = await axiosInstance.get('/api/notification', {
+              headers: {
+                  Authorization: `Bearer ${accessToken}`,
+              },
+          });
+      
+          const notifications = response.data.data;
+      
+          if (Array.isArray(notifications)) {
+            // console.log('노티피케이션:',notifications);
+              // 알림 배열에서 notificationId와 invitionId 추출
+              const alarmsWithInvitionId = notifications.map(notification => ({
+                  notificationId: notification.notificationId,
+                  invitationId: notification.invitationId ,
+                  ...notification,  // 기존 알림 정보도 포함
+              }));
+
+              setAlarms(alarmsWithInvitionId);  // 알람에 invitionId 추가
+              setHasNewAlarm(true);
+              // console.log('알람 조회 성공! 알람 내용:', alarmsWithInvitionId);
+          } else {
+              setHasNewAlarm(false);
+              // console.log('알람이 없습니다.');
+          }
+
+        } catch (error) {
+          console.error('알림 확인 중 오류 발생:', error);
+        }
+    };
+
+    checkNotifications(); // 함수 호출
+  }, []);
+
+
 
   const handleBackClick = () => {
     if (onBackClick) {
@@ -61,8 +91,14 @@ const Header = ({ showBackButton = false, onBackClick }) => {
   };
 
   const handleBellIconClick = () => {
-    navigate('/alarm'); 
-    // setIsAlarmOpen(!isAlarmOpen); // 알람 사이드바 열기/닫기
+    const accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) {
+      navigate('/login');
+      return;
+    }
+
+    setHasNewAlarm(false);
+    setIsAlarmOpen(!isAlarmOpen);
   };
 
   return (
@@ -72,7 +108,10 @@ const Header = ({ showBackButton = false, onBackClick }) => {
         <Logo src={logoImage} alt="여행한DAY 로고" show={isDelayedTrue} onClick={handleLogoClick} />
       </LeftSection>
       <RightSection>
-        <Icon src={bellIcon} alt="알람 아이콘" onClick={handleBellIconClick}/>
+      <IconContainer>
+        <BellIcon src={bellIcon} alt="알람 아이콘" onClick={handleBellIconClick} hasNewAlarm={hasNewAlarm} />
+        {hasNewAlarm && alarms.length > 0 && <Badge />} 
+      </IconContainer>
         <Icon src={userIcon} alt="유저 아이콘" onClick={handleUserIconClick} />
       </RightSection>
 
@@ -84,13 +123,13 @@ const Header = ({ showBackButton = false, onBackClick }) => {
 export default Header;
 
 const HeaderContainer = styled.div`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    background-color: #fff;
-    width: 350px;
-    height: 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #fff;
+  width: 350px;
+  height: 48px;
 `;
 
 const LeftSection = styled.div`
@@ -108,11 +147,33 @@ const Logo = styled.img`
   width: 140px;
   height: auto;
   cursor: pointer;
-  transform: ${(props) => (props.show ? 'translateX(0px)' : 'translateX(-20px)')}; // sliding effect
-  transition: transform 0.3s ease;  // smooth transition
+  transform: ${(props) => (props.show ? 'translateX(0px)' : 'translateX(-20px)')}; 
+  transition: transform 0.3s ease; 
   &:hover {
     content: url(${logoHoverImage}); 
   }
+`;
+
+const IconContainer = styled.div`
+  position: relative;
+`;
+
+const BellIcon = styled.img`
+  width: 24px;
+  height: 24px;
+  margin-top: 4px;
+  margin-left: 23px;
+  cursor: pointer;
+`;
+
+const Badge = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  border-radius: 50%;
 `;
 
 const Icon = styled.img`
@@ -127,6 +188,6 @@ const BackButton = styled.img`
   height: 24px;
   margin-right: 10px;
   cursor: pointer;
-  opacity: ${(props) => (props.show ? '1' : '0')};  // control visibility with opacity
-  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;  // smooth transition
+  opacity: ${(props) => (props.show ? '1' : '0')};  
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;  
 `;

@@ -2,45 +2,119 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { IoClose } from 'react-icons/io5';
+import axiosInstance from '../../utils/axiosInstance';
 
-const AlarmSidebar = ({ isOpen, onClose, alarms }) => {
+const AlarmSidebar = ({ isOpen, onClose, alarms = [] }) => {
   const navigate = useNavigate();
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleAlarmClick = (roomId, roomName) => {
-    setSelectedRoom({ roomId, roomName });
+  const handleAlarmClick = (travelRoomId, content, notificationId, invitationId) => {
+    setSelectedRoom({ travelRoomId, content, notificationId, invitationId });
     setIsModalOpen(true);
   };
+  
 
-  const handleAccept = () => {
-    setIsModalOpen(false);
-    onClose();
-    navigate(`/rooms/${selectedRoom.roomId}`);
+  
+  const handleAccept = async () => {
+    try {
+      const accessToken = localStorage.getItem('accessToken');
+      const response = await axiosInstance.put(
+        `/api/rooms/${selectedRoom.travelRoomId}/invitation/${selectedRoom.invitationId}`,
+        { status: 'Y' },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          withCredentials: true,
+        }
+      );
+      if (response.status === 200) {
+        // console.log('초대 수락 성공');
+        setIsModalOpen(false);
+        onClose();
+        setSelectedRoom(null); // 선택된 방 정보 초기화
+        navigate(`/schedule/${selectedRoom.travelRoomId}`);
+      }
+    } catch (error) {
+      // console.log('invitationId:', selectedRoom.invitationId);
+      // console.log('notificationId:', selectedRoom.notificationId);
+      console.error('초대 수락 실패:', error.message); 
+    }
   };
+  
 
-  const handleDecline = () => {
-    setIsModalOpen(false);
-    setSelectedRoom(null);
+  const handleDecline = async () => {
+    try {
+      const accessToken = localStorage.getItem('accessToken');
+      const response = await axiosInstance.put(
+        `/api/rooms/${selectedRoom.travelRoomId}/invitation/${selectedRoom.invitationId}`,
+        { status: 'N' },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          withCredentials: true,
+        }
+      );
+      if (response.status === 200) {
+        // console.log('초대 거절 성공');
+        setIsModalOpen(false);
+        setSelectedRoom(null);
+      }
+    } catch (error) {
+      console.error('초대 거절 실패:', error);
+    }
   };
 
   const getTimeDifference = (time) => {
+    if (!time) {
+      // console.log('시간 정보가 없음');
+      return '시간 정보 없음';
+    }
+  
+    // "24-09-21 12:47:58" 형식의 문자열을 Date 객체로 변환
+    // console.log('Original time:', time);  // 원본 time 출력
+  
+    // 먼저 브라우저가 인식할 수 있는 형식으로 변환
+    const [datePart, timePart] = time.split(' ');
+    const [year, month, day] = datePart.split('-');
+    // 'YYYY-MM-DDTHH:mm:ss' 형식으로 변환
+    const correctedTime = `20${year}-${month}-${day}T${timePart}`;
+    // console.log('Corrected time:', correctedTime);  // 수정된 시간 출력
+  
     const now = new Date();
-    const alarmTime = new Date(time);
+    const alarmTime = new Date(correctedTime);
+  
+    // alarmTime이 유효한지 확인
+    if (isNaN(alarmTime)) {
+      // console.log('유효하지 않은 시간 형식:', correctedTime);
+      return '유효하지 않은 시간';
+    }
+  
+    // console.log('Current time:', now);  // 현재 시간 출력
+    // console.log('Alarm time:', alarmTime);  // 알림 시간 출력
+  
     const differenceInMinutes = Math.floor((now - alarmTime) / 1000 / 60);
-
+    // console.log('Difference in minutes:', differenceInMinutes);  // 시간 차이(분) 출력
+  
     if (differenceInMinutes < 1) {
-      return "방금 전";
+      return '방금 전';
     } else if (differenceInMinutes < 60) {
       return `${differenceInMinutes}분 전`;
     } else if (differenceInMinutes < 1440) {
       const differenceInHours = Math.floor(differenceInMinutes / 60);
+      // console.log('Difference in hours:', differenceInHours);  // 시간 차이(시간) 출력
       return `${differenceInHours}시간 전`;
     } else {
       const differenceInDays = Math.floor(differenceInMinutes / 1440);
+      // console.log('Difference in days:', differenceInDays);  // 시간 차이(일) 출력
       return `${differenceInDays}일 전`;
     }
   };
+  
+  
+  
 
   return (
     <>
@@ -51,20 +125,23 @@ const AlarmSidebar = ({ isOpen, onClose, alarms }) => {
             <IoClose size={24} />
           </CloseButton>
         </SidebarHeader>
-        <AlarmList>
-          {alarms.map((alarm, index) => (
-            <AlarmItem 
-              key={index} 
-              onClick={() => handleAlarmClick(alarm.roomId, alarm.roomName)}
-            >
-              <AlarmMessage>
-                당신을 기다리고 있어요! <br />
-                <HighlightedText>{alarm.inviter}</HighlightedText>님이 <HighlightedText>{alarm.roomName}</HighlightedText>에 초대했습니다.
-              </AlarmMessage>
-              <InviteTime>{getTimeDifference(alarm.invitedAt)}</InviteTime>
-            </AlarmItem>
-          ))}
-        </AlarmList>
+
+        {/* alarms 배열이 비어있거나 null일 때 */}
+        {alarms && alarms.length > 0 ? (
+          <AlarmList>
+            {alarms.map((alarm, index) => (
+              <AlarmItem
+                key={index}
+                onClick={() => handleAlarmClick(alarm.travelRoomId, alarm.content, alarm.notificationId, alarm.invitationId)} // invitationId 추가
+              >
+                <AlarmMessage>{alarm.content}</AlarmMessage>
+                <InviteTime>{getTimeDifference(alarm.notificationTime)}</InviteTime>
+              </AlarmItem>
+            ))}
+          </AlarmList>
+        ) : (
+          <NoAlarmsMessage>새로운 알림이 없습니다!</NoAlarmsMessage>
+        )}
       </SidebarContainer>
 
       {isModalOpen && (
@@ -73,10 +150,17 @@ const AlarmSidebar = ({ isOpen, onClose, alarms }) => {
             <CloseModalButton onClick={() => setIsModalOpen(false)}>
               <IoClose size={24} />
             </CloseModalButton>
-            <ModalTitle>{`${selectedRoom.roomName} 초대를 수락하시겠습니까?`}</ModalTitle>
+            <ModalTitle>
+              {`${selectedRoom.content}`}
+              <br />
+              <br />
+              {`초대를 수락하시겠습니까?`}
+            </ModalTitle>
             <ModalButtons>
               <ModalButton onClick={handleAccept}>수락</ModalButton>
-              <ModalButton onClick={handleDecline} decline>거절</ModalButton>
+              <ModalButton onClick={handleDecline} decline>
+                거절
+              </ModalButton>
             </ModalButtons>
           </ModalContainer>
         </ModalOverlay>
@@ -86,6 +170,7 @@ const AlarmSidebar = ({ isOpen, onClose, alarms }) => {
 };
 
 export default AlarmSidebar;
+
 
 const SidebarContainer = styled.div`
   position: fixed;
@@ -133,6 +218,13 @@ const AlarmList = styled.div`
   padding: 20px;
 `;
 
+const NoAlarmsMessage = styled.div`
+  font-size: 16px;
+  color: #6c757d;
+  text-align: center;
+  padding: 50px 0;
+`;
+
 const AlarmItem = styled.div`
   padding: 15px;
   height: 90px;
@@ -153,20 +245,16 @@ const AlarmMessage = styled.div`
   color: #000;
   white-space: pre-wrap;
   line-height: 1.5;
-`;
-
-const HighlightedText = styled.span`
-  color: #007bff;
-  font-weight: 500;
+  text-align: left;
 `;
 
 const InviteTime = styled.div`
   font-size: 14px;
   color: #6c757d;
-  margin-top: 5px;
+  margin-top: 10px;
+  text-align: left; 
 `;
 
-// 모달 관련 스타일
 const ModalOverlay = styled.div`
   position: fixed;
   top: 0;
@@ -181,11 +269,13 @@ const ModalOverlay = styled.div`
 `;
 
 const ModalContainer = styled.div`
+  position:relative;
   background-color: white;
-  padding: 20px;
+  padding: 30px;
   border-radius: 10px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   text-align: center;
+  max-width: 330px; 
 `;
 
 const CloseModalButton = styled.button`
@@ -210,9 +300,9 @@ const ModalTitle = styled.h2`
 `;
 
 const ModalButtons = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const ModalButton = styled.button`
