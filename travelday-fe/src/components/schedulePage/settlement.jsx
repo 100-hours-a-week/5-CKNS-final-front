@@ -148,7 +148,7 @@ const Settlement = ({ settlementId, postSettlementList, travelRoomId, hasNoData,
                 </>
             }
             {isAllocating ? (
-                <Allocator people={people} setIsAllocating={setIsAllocating} />
+                <Allocator people={people} setIsAllocating={setIsAllocating} totalAmount={totalAmount} />
             ) : (
                 <>
                     {hasNoData ? (
