@@ -4,6 +4,7 @@ import axiosInstance from "../../utils/axiosInstance";
 import Allocator from "./allocator";
 import addImg from "../../images/filter/add.png";
 import trashImg from "../../images/trash.png";
+import {theme} from "antd";
 
 const Settlement = ({ settlementId, postSettlementList, travelRoomId, hasNoData, people, deleteSettlement }) => {
     const [settlementDetailList, setSettlementDetailList] = useState([]);
@@ -240,7 +241,9 @@ const Settlement = ({ settlementId, postSettlementList, travelRoomId, hasNoData,
                                         </RoundItem>
                                     ))}
                                 </RoundList>
-                                <MainButton onClick={handleAllocationButton}>정산 요청</MainButton>
+                                <MainButton style={{
+
+                                }} onClick={handleAllocationButton}>정산 요청</MainButton>
                             </ContentBox>
                         )
                     )}
@@ -257,8 +260,9 @@ const Container = styled.div`
     flex-direction: column;
     justify-content: start;
     align-items: center;
-    background-color: #f8f7f2;
+    background-color: transparent;
     border-radius: 10px;
+    border: 2px dotted #afa9a9;
     padding: 25px;
     margin: 10px;
 `;
@@ -309,14 +313,15 @@ const NoDataText = styled.p`
 
 const MainButton = styled.button`
     padding: 15px;
-    background-color: #f12e5e;
+    background-color: #408cff;
     color: white;
     font-size: 18px;
     border: none;
     border-radius: 8px;
     cursor: pointer;
+
     &:hover {
-        background-color: #d3204a;
+        background-color: #2a61b3;
     }
 `;
 
@@ -327,19 +332,22 @@ const ButtonGroup = styled.div`
 
 const Button = styled.button`
     padding: 10px;
-    background-color: #f12e5e;
-    color: white;
+    background-color: transparent;
+    color: black;
     border-radius: 8px;
     cursor: pointer;
+    border: 0.5px solid cornflowerblue;
+
     &:hover {
-        background-color: #d3204a;
+        background-color: cornflowerblue;
+        color: white;
     }
 `;
 
 const DeleteButton = styled(Button)`
-    background-color: #ff5f5f;
+    color: #f12e5e;
     &:hover {
-        background-color: #d94444;
+        background-color: #f12e5e;
     }
 `;
 
